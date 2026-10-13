@@ -153,9 +153,10 @@ SIMSCALE = {
     "MESH_PHYSICS_BASED": True,
     "MESH_HEX_CORE": True,
     "MESH_MAX_RUN_TIME_S": 18000,
-    # Abort a design if SimScale's estimate exceeds this many core hours
-    # (None disables the check).
-    "MAX_CORE_HOURS_PER_RUN": None,
+    # Skip a design (no run started) if SimScale's estimate exceeds this many
+    # CPU hours. Your manual runs used 0.8-3.0 CPUh per simulation plus
+    # 0.2-0.7 per mesh. None disables the check.
+    "MAX_CORE_HOURS_PER_RUN": 6.0,
     "POLL_SECONDS": 30,
     # Cd objective = mean over this trailing fraction of iterations.
     "AVERAGING_FRACTION": 0.1,
@@ -166,6 +167,9 @@ SIMSCALE = {
 # ------------------------------------------------------------------
 SHEETS = {
     "SERVICE_ACCOUNT_FILE": os.getenv("GOOGLE_SERVICE_ACCOUNT_FILE", str(ROOT / "credentials" / "service_account.json")),
+    # Alternative to the file: the key JSON's full text in one env var
+    # (handy where only environment variables can be set). Takes precedence.
+    "SERVICE_ACCOUNT_JSON": os.getenv("GOOGLE_SERVICE_ACCOUNT_JSON", ""),
     "SHEET_ID": os.getenv("GOOGLE_SHEET_ID", ""),
     "WORKSHEET": os.getenv("GOOGLE_WORKSHEET_NAME", "runs"),
 }
@@ -179,6 +183,11 @@ OPTIMIZER = {
     "INITIAL_POINT_GENERATOR": "lhs",
     "ACQ_FUNC": "gp_hedge",
     "RANDOM_STATE": 42,
+    # Stop the optimization once this many CPU hours (mesh + simulation,
+    # as billed by SimScale) have been used. The organization quota is
+    # 1000 h; ~1-3.7 CPUh per design means 300 designs could use all of it.
+    # None disables the check.
+    "CORE_HOUR_BUDGET": 800.0,
     # Objective value (Cd) reported to the GP when a run fails or the
     # design is geometrically infeasible (see solid.canopy.check_feasible).
     "FAILURE_CD": 0.0,

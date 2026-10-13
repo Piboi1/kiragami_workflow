@@ -28,6 +28,10 @@ def run_optimization(ctx, n_calls=None, n_initial_points=None):
     if resumed:
         ctx.log(f"Finished interrupted design {resumed['design_id']}: {resumed['status']}")
 
+    budget = opt.get("CORE_HOUR_BUDGET")
+    if budget_exhausted(ctx, budget):
+        return best_so_far(ctx)
+
     x0, y0 = ctx.ledger.xy()
     remaining = n_calls - len(x0)
     ctx.log(f"{len(x0)} designs already evaluated, {max(remaining, 0)} to go (target {n_calls}).")
@@ -61,9 +65,39 @@ def run_optimization(ctx, n_calls=None, n_initial_points=None):
         initial_point_generator=opt["INITIAL_POINT_GENERATOR"],
         acq_func=opt["ACQ_FUNC"],
         random_state=opt["RANDOM_STATE"] + len(x0),
-        callback=[CheckpointSaver(str(config.STATE_DIR / "skopt_result.pkl"), store_objective=False)],
+        callback=[
+            CheckpointSaver(str(config.STATE_DIR / "skopt_result.pkl"), store_objective=False),
+            BudgetStop(ctx, budget),
+        ],
     )
     return best_so_far(ctx)
+
+
+class BudgetStop:
+    """gp_minimize callback: returning True stops the optimization.
+
+    A class rather than a lambda because CheckpointSaver pickles the
+    callbacks; the live context is left out of the pickle.
+    """
+
+    def __init__(self, ctx, budget):
+        self.ctx = ctx
+        self.budget = budget
+
+    def __call__(self, _result):
+        return budget_exhausted(self.ctx, self.budget)
+
+    def __getstate__(self):
+        return {"budget": self.budget, "ctx": None}
+
+
+def budget_exhausted(ctx, budget):
+    used = ctx.ledger.core_hours_used()
+    if budget is not None and used >= budget:
+        ctx.log(f"CPU-hour budget reached: {used:.1f} of {budget:.0f} CPUh used. Stopping. "
+                "Raise OPTIMIZER['CORE_HOUR_BUDGET'] in config.py and re-run to continue.")
+        return True
+    return False
 
 
 def best_so_far(ctx):

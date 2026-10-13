@@ -139,6 +139,8 @@ def cmd_status(args):
     print(f"{len(ledger.records)} finished designs: {by_status}")
     if ledger.pending:
         print(f"Pending (will resume): {ledger.pending['design_id']} {sorted(ledger.pending.get('simscale', {}))}")
+    budget = config.OPTIMIZER.get("CORE_HOUR_BUDGET")
+    print(f"SimScale CPU hours used: {ledger.core_hours_used():.1f}" + (f" of {budget:.0f} budget" if budget else ""))
     print(f"Not yet in Google Sheet: {len([r for r in ledger.unsynced() if r.get('status') != 'dry_run'])}")
     best = best_so_far(Context(ledger=ledger, logger=None, estimator=None))
     if best:

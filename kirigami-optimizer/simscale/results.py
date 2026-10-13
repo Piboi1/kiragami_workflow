@@ -72,3 +72,10 @@ def parse_force_coefficients(csv_text, averaging_fraction=0.1):
         out[f"{key}_final"] = float(series[~np.isnan(series)][-1])
         out[f"{key}_window_std"] = float(np.nanstd(tail))
     return out
+
+
+def core_hours_used(simscale_state):
+    """Mesh + run CPU hours recorded in a design's SimScale state."""
+
+    state = simscale_state or {}
+    return float(state.get("mesh_core_hours") or 0.0) + float(state.get("run_core_hours") or 0.0)

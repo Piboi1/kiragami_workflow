@@ -15,6 +15,7 @@ from generator import generate_pattern
 from optimizer.space import from_params, normalize
 from solid import InfeasibleGeometry, build_flow_domain, build_solid, export_stl, write_named_stl
 from solid.canopy import DEFAULT_SOLID_PARAMS
+from simscale.results import core_hours_used
 from solid.flow_domain import DEFAULT_DOMAIN_PARAMS
 
 
@@ -115,6 +116,7 @@ def _row(record):
         "simscale_simulation_id": ids.get("simulation_id"),
         "simscale_run_id": ids.get("run_id"),
         "estimated_core_hours": ids.get("estimated_core_hours"),
+        "core_hours_used": core_hours_used(ids) if ids else None,
         "run_duration": c.get("run_duration"),
         "error": record.get("error"),
     })

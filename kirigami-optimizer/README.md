@@ -46,7 +46,7 @@ Copy `.env.example` to `.env` in this folder. Both `.env` and `credentials/` are
 |---|---|---|
 | SimScale API key | `SIMSCALE_API_KEY=` in `.env` | every CFD run |
 | SimScale project ID | `SIMSCALE_PROJECT_ID=` in `.env` (**optional**) | leave empty to have a `Kirigami_Optimizer` project created automatically |
-| Google service-account key | save the JSON as `credentials/service_account.json` | writing the sheet |
+| Google service-account key | save the JSON as `credentials/service_account.json`, **or** put its full text in `GOOGLE_SERVICE_ACCOUNT_JSON` | writing the sheet |
 | Google Sheet ID | `GOOGLE_SHEET_ID=` in `.env` | writing the sheet |
 
 **SimScale API key:** in SimScale, go to your avatar, then Account settings, then API keys. API access must be enabled for your account. If you don't see the section, ask SimScale support.
@@ -78,6 +78,10 @@ python main.py optimize --n-calls 150 --n-initial 20
 python main.py status                  # progress, best design, pending resume
 python main.py sync-sheet              # re-send any rows that failed to reach the sheet
 ```
+
+**CPU-hour budget:** your manual runs used 0.2–0.7 CPUh per mesh and 0.8–3.0 CPUh per simulation, so each design costs roughly 1–3.7 CPUh against the organization's 1000 h quota. Two guards in `config.py` protect it:
+- `SIMSCALE["MAX_CORE_HOURS_PER_RUN"]` (default 6): a design whose SimScale estimate is higher is skipped before it starts.
+- `OPTIMIZER["CORE_HOUR_BUDGET"]` (default 800): the loop stops once the CPU hours SimScale actually billed (mesh + run, tracked per design in the ledger) reach this. `python main.py status` shows the running total.
 
 **Crash safety:** `state/ledger.json` is rewritten atomically after every step. SimScale IDs are saved there the moment each object is created. After a crash or Ctrl-C, run the same `optimize` command again. It finishes the interrupted design by resuming the poll, so nothing is re-meshed and no core hours are billed twice. It then passes every finished design back to `gp_minimize` as `x0`/`y0` and continues. `--n-calls` is the *total* number of designs, so re-running the same command after completion does nothing.
 

@@ -21,7 +21,8 @@ class FakeSimScale:
     def run_design(self, project_id, design_id, domain_stl, uz, area, length, work_dir, state, save_state):
         self.calls += 1
         if "run_id" not in state:
-            state.update(geometry_id="g", simulation_id="s", run_id=f"r-{design_id}")
+            state.update(geometry_id="g", simulation_id="s", run_id=f"r-{design_id}",
+                         mesh_core_hours=0.5, run_core_hours=1.5)
             save_state(state)
         if self.calls == self.crash_on_call:
             raise KeyboardInterrupt  # simulated crash mid-run
@@ -63,3 +64,18 @@ def test_crash_and_resume(isolated_paths, monkeypatch):
     # asking for the same n_calls again does nothing
     run_optimization(_ctx(FakeSimScale()), n_calls=5, n_initial_points=3)
     assert len(Ledger(config.LEDGER_PATH).records) == 5
+
+
+def test_core_hour_budget_stops_the_loop(isolated_paths, monkeypatch):
+    monkeypatch.setitem(config.FIXED_PARAMS, "INNER_OVERLAP_RATIO", 0.3)
+    monkeypatch.setitem(config.OPTIMIZER, "CORE_HOUR_BUDGET", 5.0)  # 2 CPUh per fake design
+
+    run_optimization(_ctx(FakeSimScale()), n_calls=10, n_initial_points=3)
+    ledger = Ledger(config.LEDGER_PATH)
+    assert len(ledger.records) == 3  # stops once 6 >= 5 CPUh
+    assert ledger.core_hours_used() == 6.0
+    assert "core_hours_used" in config.LOCAL_RESULTS_CSV.read_text().splitlines()[0]
+
+    # re-running with the same budget starts nothing new
+    run_optimization(_ctx(FakeSimScale()), n_calls=10, n_initial_points=3)
+    assert len(Ledger(config.LEDGER_PATH).records) == 3

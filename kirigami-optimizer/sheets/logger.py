@@ -5,6 +5,7 @@ result; rows that failed to reach the sheet are retried by sync_pending().
 """
 
 import csv
+import json
 from pathlib import Path
 
 
@@ -52,15 +53,18 @@ class SheetsLogger:
     client_email from the JSON key file.
     """
 
-    def __init__(self, service_account_file, sheet_id, worksheet="runs"):
+    def __init__(self, service_account_file, sheet_id, worksheet="runs", service_account_json=""):
         import gspread
 
         if not sheet_id:
             raise ValueError("GOOGLE_SHEET_ID is not set")
-        if not Path(service_account_file).exists():
-            raise FileNotFoundError(f"service account JSON not found: {service_account_file}")
-        self._gspread = gspread
-        self.client = gspread.service_account(filename=str(service_account_file))
+        if service_account_json:
+            self.client = gspread.service_account_from_dict(json.loads(service_account_json))
+        elif Path(service_account_file).exists():
+            self.client = gspread.service_account(filename=str(service_account_file))
+        else:
+            raise FileNotFoundError(
+                f"no service account: set GOOGLE_SERVICE_ACCOUNT_JSON or create {service_account_file}")
         self.spreadsheet = self.client.open_by_key(sheet_id)
         try:
             self.ws = self.spreadsheet.worksheet(worksheet)
@@ -95,7 +99,8 @@ class RunLogger:
         if use_sheets and sheets_cfg:
             try:
                 self.sheet = SheetsLogger(
-                    sheets_cfg["SERVICE_ACCOUNT_FILE"], sheets_cfg["SHEET_ID"], sheets_cfg["WORKSHEET"]
+                    sheets_cfg["SERVICE_ACCOUNT_FILE"], sheets_cfg["SHEET_ID"], sheets_cfg["WORKSHEET"],
+                    sheets_cfg.get("SERVICE_ACCOUNT_JSON", ""),
                 )
             except Exception as exc:  # keep running; rows stay queued in the ledger
                 self.sheet_error = f"{type(exc).__name__}: {exc}"

@@ -84,6 +84,16 @@ class Ledger:
         pairs = [(r["x"], r["y"]) for r in self.records if r.get("x") is not None and r.get("y") is not None]
         return [p[0] for p in pairs], [p[1] for p in pairs]
 
+    def core_hours_used(self):
+        """CPU hours billed so far (finished designs + the pending one)."""
+
+        from simscale.results import core_hours_used
+
+        states = [r.get("simscale") for r in self.records]
+        if self.pending:
+            states.append(self.pending.get("simscale"))
+        return sum(core_hours_used(s) for s in states)
+
     def lookup(self, x):
         for r in self.records:
             if r.get("x") == list(x) and r.get("y") is not None:

@@ -37,7 +37,7 @@ from simscale_sdk import (
     TopologicalReference,
 )
 
-from .results import maybe_unzip, parse_force_coefficients
+from .results import core_hours_used, maybe_unzip, parse_force_coefficients
 from .spec import build_mesh_model, build_model, build_simulation_spec
 
 API_KEY_HEADER = "X-API-KEY"
@@ -47,6 +47,13 @@ FACE_GROUPS = ("inlet", "outlet", "side_xmin", "side_xmax", "side_ymin", "side_y
 
 class SimScaleError(RuntimeError):
     pass
+
+
+def _core_hours(obj):
+    """CPU hours SimScale billed for a finished mesh operation or run."""
+
+    resource = getattr(obj, "compute_resource", None)
+    return float(resource.value) if resource is not None and resource.value is not None else 0.0
 
 
 class SimScaleClient:
@@ -309,7 +316,7 @@ class SimScaleClient:
             spec = self.simulations.get_simulation(project_id, sim_id)
             spec.mesh_id = op.mesh_id
             self.simulations.update_simulation(project_id, sim_id, spec)
-            remember(mesh_id=op.mesh_id)
+            remember(mesh_id=op.mesh_id, mesh_core_hours=_core_hours(op))
 
         # 4. run -------------------------------------------------------------
         if "run_id" not in state:
@@ -323,6 +330,7 @@ class SimScaleClient:
         run = self._poll("simulation run",
                          lambda: self.runs.get_simulation_run(project_id, sim_id, state["run_id"]),
                          state.get("run_max_runtime_s", cfg["MAX_RUN_TIME_S"]) + 3600)
+        remember(run_core_hours=_core_hours(run))
         if run.status != "FINISHED":
             raise SimScaleError(f"simulation run {run.status}")
 
@@ -337,9 +345,7 @@ class SimScaleClient:
 
         coeffs = parse_force_coefficients(csv_text, cfg["AVERAGING_FRACTION"])
         coeffs["run_duration"] = getattr(run, "duration", None)
-        coeffs["compute_resource"] = (
-            run.compute_resource.value if getattr(run, "compute_resource", None) is not None else None
-        )
+        coeffs["core_hours_used"] = core_hours_used(state)
         return coeffs
 
     # ------------------------------------------------------------------
