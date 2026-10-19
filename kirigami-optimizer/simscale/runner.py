@@ -7,6 +7,7 @@ ID is already present and just resumes polling.
 """
 
 import json
+import os
 import time
 from pathlib import Path
 
@@ -67,6 +68,13 @@ class SimScaleClient:
         conf = Configuration()
         conf.host = sim_cfg["API_URL"].rstrip("/") + "/v0"
         conf.api_key = {API_KEY_HEADER: self.api_key}
+        # The SDK's urllib3 pool ignores the standard proxy/CA environment variables.
+        proxy = os.environ.get("HTTPS_PROXY") or os.environ.get("https_proxy")
+        if proxy:
+            conf.proxy = proxy
+        ca_bundle = os.environ.get("REQUESTS_CA_BUNDLE") or os.environ.get("SSL_CERT_FILE")
+        if ca_bundle:
+            conf.ssl_ca_cert = ca_bundle
         self.api_client = ApiClient(conf)
         retry = urllib3.Retry(connect=5, read=5, redirect=0, status=5, backoff_factor=0.5)
         self.api_client.rest_client.pool_manager.connection_pool_kw["retries"] = retry
