@@ -2,3 +2,286 @@
 [design_0001] rings=30 Aref=74.95 in^2 Uz=-6.148 m/s (Cd for Uz 0.307)
   uploading design_0001_flow_domain.step (33 MB, STEP, sewing=False, improve=True)
   geometry import: RUNNING
+  geometry import: FINISHED
+[design_0001] FAILED: ApiException: (400)
+Reason: 
+HTTP response headers: HTTPHeaderDict({'Content-Type': 'application/json', 'Content-Length': '9839', 'Connection': 'keep-alive', 'Date': 'Mon, 19 Oct 2026 22:37:20 GMT', 'Expires': 'Thu, 01 Jan 1970 00:00:00 UTC', 'Trace-Id': '54ee573f, 54ee573f', 'Span-Id': '6qdju4iy, yyufhzrt', 'Vary': 'Origin, Access-Control-Request-Method, Access-Control-Request-Headers, Authorization, Origin', 'X-Content-Type-Options': 'nosniff', 'X-XSS-Protection': '0', 'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload', 'X-Frame-Options': 'DENY', 'Cache-Control': 'private', 'X-Cache': 'Error from cloudfront', 'Via': '1.1 f0135d8d4fcc603284169a713f3f48b0.cloudfront.net (CloudFront)', 'X-Amz-Cf-Pop': 'ORD58-P17', 'Alt-Svc': 'h3=":443"; ma=86400', 'X-Amz-Cf-Id': 'JuY620Wpp5KP0Z4CvqfeUf-xq4FGS5oWCx_PZv7N0voZItQ-tCkk_w==', 'Referrer-Policy': 'strict-origin-when-cross-origin'})
+HTTP response body: {
+  "code" : "spec-validation-error",
+  "details" : {
+    "problems" : [ {
+      "severity" : "ERROR",
+      "code" : "missing-conditional-value",
+      "message" : "Value should be present when at least one of the following conditions is met: [analysis.type IS_NOT SIMERICS_ANALYSIS]",
+      "path" : "$.model.numerics.solvers",
+      "allowMarkdown" : false,
+      "topoEntities" : [ ],
+      "details" : {
+        "whenOneOf" : "[analysis.type IS_NOT SIMERICS_ANALYSIS]",
+        "path" : "$.model.numerics.solvers",
+        "topoEntities" : [ ],
+        "parameterValuesCombinations" : [ ]
+      },
+      "errorMessageAddedToI18N" : false,
+      "errorDetails" : {
+        "parameters" : [ ],
+        "details" : {
+          "whenOneOf" : "[analysis.type IS_NOT SIMERICS_ANALYSIS]",
+          "path" : "$.model.numerics.solvers",
+          "topoEntities" : [ ],
+          "parameterValuesCombinations" : [ ]
+        }
+      }
+    }, {
+      "severity" : "ERROR",
+      "code" : "missing-conditional-value",
+      "message" : "Value should be present when at least one of the following conditions is met: [analysis.type IN (COMPRESSIBLE,INCOMPRESSIBLE,CONJUGATE_HEAT_TRANSFER,CONVECTIVE_HEAT_TRANSFER,MULTIPHASE)]",
+      "path" : "$.model.numerics.schemes.gradient",
+      "allowMarkdown" : false,
+      "topoEntities" : [ ],
+      "details" : {
+        "whenOneOf" : "[analysis.type IN (COMPRESSIBLE,INCOMPRESSIBLE,CONJUGATE_HEAT_TRANSFER,CONVECTIVE_HEAT_TRANSFER,MULTIPHASE)]",
+        "path" : "$.model.numerics.schemes.gradient",
+        "topoEntities" : [ ],
+        "parameterValuesCombinations" : [ ]
+      },
+      "errorMessageAddedToI18N" : false,
+      "errorDetails" : {
+        "parameters" : [ ],
+        "details" : {
+          "whenOneOf" : "[analysis.type IN (COMPRESSIBLE,INCOMPRESSIBLE,CONJUGATE_HEAT_TRANSFER,CONVECTIVE_HEAT_TRANSFER,MULTIPHASE)]",
+          "path" : "$.model.numerics.schemes.gradient",
+          "topoEntities" : [ ],
+          "parameterValuesCombinations" : [ ]
+        }
+      }
+    }, {
+      "severity" : "ERROR",
+      "code" : "missing-conditional-value",
+      "message" : "Value should be present when at least one of the following conditions is met: [analysis.type IN (COMPRESSIBLE,INCOMPRESSIBLE,CONJUGATE_HEAT_TRANSFER,CONVECTIVE_HEAT_TRANSFER,MULTIPHASE)]",
+      "path" : "$.model.numerics.schemes.divergence",
+      "allowMarkdown" : false,
+      "topoEntities" : [ ],
+      "details" : {
+        "whenOneOf" : "[analysis.type IN (COMPRESSIBLE,INCOMPRESSIBLE,CONJUGATE_HEAT_TRANSFER,CONVECTIVE_HEAT_TRANSFER,MULTIPHASE)]",
+        "path" : "$.model.numerics.schemes.divergence",
+        "topoEntities" : [ ],
+        "parameterValuesCombinations" : [ ]
+      },
+      "errorMessageAddedToI18N" : false,
+      "errorDetails" : {
+        "parameters" : [ ],
+        "details" : {
+          "whenOneOf" : "[analysis.type IN (COMPRESSIBLE,INCOMPRESSIBLE,CONJUGATE_HEAT_TRANSFER,CONVECTIVE_HEAT_TRANSFER,MULTIPHASE)]",
+          "path" : "$.model.numerics.schemes.divergence",
+          "topoEntities" : [ ],
+          "parameterValuesCombinations" : [ ]
+        }
+      }
+    }, {
+      "severity" : "ERROR",
+      "code" : "missing-conditional-value",
+      "message" : "Value should be present when at least one of the following conditions is met: [analysis.type IN (COMPRESSIBLE,INCOMPRESSIBLE,CONJUGATE_HEAT_TRANSFER,CONVECTIVE_HEAT_TRANSFER,MULTIPHASE)]",
+      "path" : "$.model.numerics.schemes.laplacian",
+      "allowMarkdown" : false,
+      "topoEntities" : [ ],
+      "details" : {
+        "whenOneOf" : "[analysis.type IN (COMPRESSIBLE,INCOMPRESSIBLE,CONJUGATE_HEAT_TRANSFER,CONVECTIVE_HEAT_TRANSFER,MULTIPHASE)]",
+        "path" : "$.model.numerics.schemes.laplacian",
+        "topoEntities" : [ ],
+        "parameterValuesCombinations" : [ ]
+      },
+      "errorMessageAddedToI18N" : false,
+      "errorDetails" : {
+        "parameters" : [ ],
+        "details" : {
+          "whenOneOf" : "[analysis.type IN (COMPRESSIBLE,INCOMPRESSIBLE,CONJUGATE_HEAT_TRANSFER,CONVECTIVE_HEAT_TRANSFER,MULTIPHASE)]",
+          "path" : "$.model.numerics.schemes.laplacian",
+          "topoEntities" : [ ],
+          "parameterValuesCombinations" : [ ]
+        }
+      }
+    }, {
+      "severity" : "ERROR",
+      "code" : "missing-conditional-value",
+      "message" : "Value should be present when at least one of the following conditions is met: [analysis.type IN (COMPRESSIBLE,INCOMPRESSIBLE,CONJUGATE_HEAT_TRANSFER,CONVECTIVE_HEAT_TRANSFER,MULTIPHASE)]",
+      "path" : "$.model.numerics.schemes.interpolation",
+      "allowMarkdown" : false,
+      "topoEntities" : [ ],
+      "details" : {
+        "whenOneOf" : "[analysis.type IN (COMPRESSIBLE,INCOMPRESSIBLE,CONJUGATE_HEAT_TRANSFER,CONVECTIVE_HEAT_TRANSFER,MULTIPHASE)]",
+        "path" : "$.model.numerics.schemes.interpolation",
+        "topoEntities" : [ ],
+        "parameterValuesCombinations" : [ ]
+      },
+      "errorMessageAddedToI18N" : false,
+      "errorDetails" : {
+        "parameters" : [ ],
+        "details" : {
+          "whenOneOf" : "[analysis.type IN (COMPRESSIBLE,INCOMPRESSIBLE,CONJUGATE_HEAT_TRANSFER,CONVECTIVE_HEAT_TRANSFER,MULTIPHASE)]",
+          "path" : "$.model.numerics.schemes.interpolation",
+          "topoEntities" : [ ],
+          "parameterValuesCombinations" : [ ]
+        }
+      }
+    }, {
+      "severity" : "ERROR",
+      "code" : "missing-conditional-value",
+      "message" : "Value should be present when at least one of the following conditions is met: [analysis.type IN (COMPRESSIBLE,INCOMPRESSIBLE,CONJUGATE_HEAT_TRANSFER,CONVECTIVE_HEAT_TRANSFER,MULTIPHASE)]",
+      "path" : "$.model.numerics.schemes.surfaceNormalGradient",
+      "allowMarkdown" : false,
+      "topoEntities" : [ ],
+      "details" : {
+        "whenOneOf" : "[analysis.type IN (COMPRESSIBLE,INCOMPRESSIBLE,CONJUGATE_HEAT_TRANSFER,CONVECTIVE_HEAT_TRANSFER,MULTIPHASE)]",
+        "path" : "$.model.numerics.schemes.surfaceNormalGradient",
+        "topoEntities" : [ ],
+        "parameterValuesCombinations" : [ ]
+      },
+      "errorMessageAddedToI18N" : false,
+      "errorDetails" : {
+        "parameters" : [ ],
+        "details" : {
+          "whenOneOf" : "[analysis.type IN (COMPRESSIBLE,INCOMPRESSIBLE,CONJUGATE_HEAT_TRANSFER,CONVECTIVE_HEAT_TRANSFER,MULTIPHASE)]",
+          "path" : "$.model.numerics.schemes.surfaceNormalGradient",
+          "topoEntities" : [ ],
+          "parameterValuesCombinations" : [ ]
+        }
+      }
+    } ],
+    "parameters" : [ ]
+  },
+  "entries" : [ {
+    "code" : "missing-conditional-value",
+    "details" : {
+      "whenOneOf" : "[analysis.type IS_NOT SIMERICS_ANALYSIS]",
+      "path" : "$.model.numerics.solvers",
+      "topoEntities" : [ ],
+      "parameterValuesCombinations" : [ ]
+    },
+    "message" : "Value should be present when at least one of the following conditions is met: [analysis.type IS_NOT SIMERICS_ANALYSIS]",
+    "severity" : "ERROR"
+  }, {
+    "code" : "missing-conditional-value",
+    "details" : {
+      "whenOneOf" : "[analysis.type IN (COMPRESSIBLE,INCOMPRESSIBLE,CONJUGATE_HEAT_TRANSFER,CONVECTIVE_HEAT_TRANSFER,MULTIPHASE)]",
+      "path" : "$.model.numerics.schemes.gradient",
+      "topoEntities" : [ ],
+      "parameterValuesCombinations" : [ ]
+    },
+    "message" : "Value should be present when at least one of the following conditions is met: [analysis.type IN (COMPRESSIBLE,INCOMPRESSIBLE,CONJUGATE_HEAT_TRANSFER,CONVECTIVE_HEAT_TRANSFER,MULTIPHASE)]",
+    "severity" : "ERROR"
+  }, {
+    "code" : "missing-conditional-value",
+    "details" : {
+      "whenOneOf" : "[analysis.type IN (COMPRESSIBLE,INCOMPRESSIBLE,CONJUGATE_HEAT_TRANSFER,CONVECTIVE_HEAT_TRANSFER,MULTIPHASE)]",
+      "path" : "$.model.numerics.schemes.divergence",
+      "topoEntities" : [ ],
+      "parameterValuesCombinations" : [ ]
+    },
+    "message" : "Value should be present when at least one of the following conditions is met: [analysis.type IN (COMPRESSIBLE,INCOMPRESSIBLE,CONJUGATE_HEAT_TRANSFER,CONVECTIVE_HEAT_TRANSFER,MULTIPHASE)]",
+    "severity" : "ERROR"
+  }, {
+    "code" : "missing-conditional-value",
+    "details" : {
+      "whenOneOf" : "[analysis.type IN (COMPRESSIBLE,INCOMPRESSIBLE,CONJUGATE_HEAT_TRANSFER,CONVECTIVE_HEAT_TRANSFER,MULTIPHASE)]",
+      "path" : "$.model.numerics.schemes.laplacian",
+      "topoEntities" : [ ],
+      "parameterValuesCombinations" : [ ]
+    },
+    "message" : "Value should be present when at least one of the following conditions is met: [analysis.type IN (COMPRESSIBLE,INCOMPRESSIBLE,CONJUGATE_HEAT_TRANSFER,CONVECTIVE_HEAT_TRANSFER,MULTIPHASE)]",
+    "severity" : "ERROR"
+  }, {
+    "code" : "missing-conditional-value",
+    "details" : {
+      "whenOneOf" : "[analysis.type IN (COMPRESSIBLE,INCOMPRESSIBLE,CONJUGATE_HEAT_TRANSFER,CONVECTIVE_HEAT_TRANSFER,MULTIPHASE)]",
+      "path" : "$.model.numerics.schemes.interpolation",
+      "topoEntities" : [ ],
+      "parameterValuesCombinations" : [ ]
+    },
+    "message" : "Value should be present when at least one of the following conditions is met: [analysis.type IN (COMPRESSIBLE,INCOMPRESSIBLE,CONJUGATE_HEAT_TRANSFER,CONVECTIVE_HEAT_TRANSFER,MULTIPHASE)]",
+    "severity" : "ERROR"
+  }, {
+    "code" : "missing-conditional-value",
+    "details" : {
+      "whenOneOf" : "[analysis.type IN (COMPRESSIBLE,INCOMPRESSIBLE,CONJUGATE_HEAT_TRANSFER,CONVECTIVE_HEAT_TRANSFER,MULTIPHASE)]",
+      "path" : "$.model.numerics.schemes.surfaceNormalGradient",
+      "topoEntities" : [ ],
+      "parameterValuesCombinations" : [ ]
+    },
+    "message" : "Value should be present when at least one of the following conditions is met: [analysis.type IN (COMPRESSIBLE,INCOMPRESSIBLE,CONJUGATE_HEAT_TRANSFER,CONVECTIVE_HEAT_TRANSFER,MULTIPHASE)]",
+    "severity" : "ERROR"
+  } ],
+  "message" : "Unprocessable entity",
+  "severity" : "ERROR",
+  "trace" : "54ee573f"
+}
+
+{
+  "timestamp_utc": "2026-10-19T22:37:20+00:00",
+  "design_id": "design_0001",
+  "mode": "single",
+  "status": "failed",
+  "Cd": null,
+  "Cl": null,
+  "Cm": null,
+  "Cl_front": null,
+  "Cl_rear": null,
+  "Cd_final_iter": null,
+  "Cd_window_std": null,
+  "iterations": null,
+  "predicted_Uz_mps": -6.148,
+  "Cd_used_for_Uz": 0.30685604217436363,
+  "Uz_Cd_source": "override (seed)",
+  "Uz_nearest_run": null,
+  "Uz_nearest_distance": null,
+  "seed_Cd": 0.30685604217436363,
+  "mass_kg": 0.023800306093231232,
+  "ring_count": 30,
+  "clamped_rings": 0,
+  "projected_diameter_in": 9.768950863976556,
+  "reference_area_in2": 74.95243246049077,
+  "canopy_depth_in": 10.648185777782006,
+  "depth_source": "fixed",
+  "depth_extrapolated": false,
+  "depth_notes": "",
+  "canopy_triangles": 57012,
+  "PARACHUTE_DIAMETER": 10.0,
+  "OUTER_RADIUS": 5.0,
+  "RIM_WIDTH": 0.25,
+  "INNER_RADIUS": 0.75,
+  "NUM_RINGS": 30,
+  "RING_SPACING_MODE": "parabolic",
+  "RING_SPACING_EXPONENT": 1.15,
+  "CUTS_PER_RING": 8,
+  "MIN_CUT_LENGTH": 0.05,
+  "MAX_CUT_LENGTH": 2.95,
+  "PARABOLIC_EXPONENT": 1.75,
+  "ENFORCE_RING_OVERLAP": true,
+  "RING_OVERLAP_DEGREES": 16.0,
+  "INNER_RING_OVERLAP_DEGREES": 14.0,
+  "INNER_RING_COUNT": 6,
+  "MIN_GAP_DEGREES": 6.0,
+  "INNER_GAP_DEGREES": 6.0,
+  "INNER_GAP_RING_COUNT": 5,
+  "VERTICAL_DROP": 10.62,
+  "KERF_FACTOR": 0.85,
+  "SHEET_THICKNESS": 0.015,
+  "EXTRUDE_METHOD": "union",
+  "JOINT_OVERLAP": 0.03,
+  "MIN_CAP_RADIUS": 0.05,
+  "SIMPLIFY_TOLERANCE": 0.0001,
+  "DOMAIN_LATERAL_HALF_WIDTH_D": 2.583,
+  "DOMAIN_UPSTREAM_D": 3.113,
+  "DOMAIN_DOWNSTREAM_D": 7.0,
+  "STING_RADIUS": 0.0,
+  "RING_OVERLAP_FRACTION": null,
+  "INNER_OVERLAP_RATIO": null,
+  "simscale_project_id": "7871279013725148382",
+  "simscale_simulation_id": null,
+  "simscale_run_id": null,
+  "estimated_core_hours": null,
+  "core_hours_used": 0.0,
+  "run_duration": null,
+  "error": "ApiException: (400)\nReason: \nHTTP response headers: HTTPHeaderDict({'Content-Type': 'application/json', 'Content-Length': '9839', 'Connection': 'keep-alive', 'Date': 'Mon, 19 Oct 2026 22:37:20 GMT', 'Expires': 'Thu, 01 Jan 1970 00:00:00 UTC', 'Trace-Id': '54ee573f, 54ee573f', 'Span-Id': '6qdju4iy, yyufhzrt', 'Vary': 'Origin, Access-Control-Request-Method, Access-Control-Request-Headers, Authorization, Origin', 'X-Content-Type-Options': 'nosniff', 'X-XSS-Protection': '0', 'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload', 'X-Frame-Options': 'DENY', 'Cache-Control': 'private', 'X-Cache': 'Error from cloudfront', 'Via': '1.1 f0135d8d4fcc603284169a713f3f48b0.cloudfront.net (CloudFront)', 'X-Amz-Cf-Pop': 'ORD58-P17', 'Alt-Svc': 'h3=\":443\"; ma=86400', 'X-Amz-Cf-Id': 'JuY620Wpp5KP0Z4CvqfeUf-xq4FGS5oWCx_PZv7N0voZItQ-tCkk_w==', 'Referrer-Policy': 'strict-origin-when-cross-origin'})\nHTTP response body: {\n  \"code\" : \"spec-validation-error\",\n  \"details\" : {\n    \"problems\" : [ {\n      \"severity\" : \"ERROR\",\n      \"code\" : \"missing-conditional-value\",\n      \"message\" : \"Value should be present when at least one of the following conditions is met: [analysis.type IS_NOT SIMERICS_ANALYSIS]\",\n      \"path\" : \"$.model.numerics.solvers\",\n      \"allowMarkdown\" : false,\n      \"topoEntities\" : [ ],\n      \"details\" : {\n        \"whenOneOf\" : \"[analysis.type IS_NOT SIMERICS_ANALYSIS]\",\n        \"path\" : \"$.model.numerics.solvers\",\n        \"topoEntities\" : [ ],\n        \"parameterValuesCombinations\" : [ ]\n      },\n      \"errorMessageAddedToI18N\" : false,\n      \"errorDetails\" : {\n        \"parameters\" : [ ],\n        \"details\" : {\n          \"whenOneOf\" : \"[analysis.type IS_NOT SIMERICS_ANALYSIS]\",\n          \"path\" : \"$.model.numerics.solvers\",\n          \"topoEntities\" : [ ],\n          \"parameterValuesCombinations\" : [ ]\n        }\n      }\n    }, {\n      \"severity\" : \"ERROR\",\n      \"code\" : \"missing-conditional-value\",\n      \"message\" : \"Value should be present when at least one of the following conditions is met: [analysis.type IN (COMPRESSIBLE,INCOMPRESSIBLE,CONJUGATE_HEAT_TRANSFER,CONVECTIVE_HEAT_TRANSFER,MULTIPHASE)]\",\n      \"path\" : \"$.model.numerics.schemes.gradient\",\n      \"allowMarkdown\" : false,\n      \"topoEntities\" : [ ],\n      \"details\" : {\n        \"whenOneOf\" : \"[analysis.type IN (COMPRESSIBLE,INCOMPRESSIBLE,CONJUGATE_HEAT_TRANSFER,CONVECTIVE_HEAT_TRANSFER,MULTIPHASE)]\",\n        \"path\" : \"$.model.numerics.schemes.gradient\",\n        \"topoEntities\" : [ ],\n        \"parameterValuesCombinations\" : [ ]\n      },\n      \"errorMessageAddedToI18N\" : false,\n      \"errorDetails\" : {\n        \"parameters\" : [ ],\n        \"details\" : {\n          \"whenOneOf\" : \"[analysis.type IN (COMPRESSIBLE,INCOMPRESSIBLE,CONJUGATE_HEAT_TRANSFER,CONVECTIVE_HEAT_TRANSFER,MULTIPHASE)]\",\n          \"path\" : \"$.model.numerics.schemes.gradient\",\n          \"topoEntities\" : [ ],\n          \"parameterValuesCombinations\" : [ ]\n        }\n      }\n    }, {\n      \"severity\" : \"ERROR\",\n      \"code\" : \"missing-conditional-value\",\n      \"message\" : \"Value should be present when at least one of the following conditions is met: [analysis.type IN (COMPRESSIBLE,INCOMPRESSIBLE,CONJUGATE_HEAT_TRANSFER,CONVECTIVE_HEAT_TRANSFER,MULTIPHASE)]\",\n      \"path\" : \"$.model.numerics.schemes.divergence\",\n      \"allowMarkdown\" : false,\n      \"topoEntities\" : [ ],\n      \"details\" : {\n        \"whenOneOf\" : \"[analysis.type IN (COMPRESSIBLE,INCOMPRESSIBLE,CONJUGATE_HEAT_TRANSFER,CONVECTIVE_HEAT_TRANSFER,MULTIPHASE)]\",\n        \"path\" : \"$.model.numerics.schemes.divergence\",\n        \"topoEntities\" : [ ],\n        \"parameterValuesCombinations\" : [ ]\n      },\n      \"errorMessageAddedToI18N\" : false,\n      \"errorDetails\" : {\n        \"parameters\" : [ ],\n        \"details\" : {\n          \"whenOneOf\" : \"[analysis.type IN (COMPRESSIBLE,INCOMPRESSIBLE,CONJUGATE_HEAT_TRANSFER,CONVECTIVE_HEAT_TRANSFER,MULTIPHASE)]\",\n          \"path\" : \"$.model.numerics.schemes.divergence\",\n          \"topoEntities\" : [ ],\n          \"parameterValuesCombinations\" : [ ]\n        }\n      }\n    }, {\n      \"severity\" : \"ERROR\",\n      \"code\" : \"missing-conditional-value\",\n      \"message\" : \"Value should be present when at least one of the following conditions is met: [analysis.type IN (COMPRESSIBLE,INCOMPRESSIBLE,CONJUGATE_HEAT_TRANSFER,CONVECTIVE_HEAT_TRANSFER,MULTIPHASE)]\",\n      \"path\" : \"$.model.numerics.schemes.laplacian\",\n      \"allowMarkdown\" : false,\n      \"topoEntities\" : [ ],\n      \"details\" : {\n        \"whenOneOf\" : \"[analysis.type IN (COMPRESSIBLE,INCOMPRESSIBLE,CONJUGATE_HEAT_TRANSFER,CONVECTIVE_HEAT_TRANSFER,MULTIPHASE)]\",\n        \"path\" : \"$.model.numerics.schemes.laplacian\",\n        \"topoEntities\" : [ ],\n        \"parameterValuesCombinations\" : [ ]\n      },\n      \"errorMessageAddedToI18N\" : false,\n      \"errorDetails\" : {\n        \"parameters\" : [ ],\n        \"details\" : {\n          \"whenOneOf\" : \"[analysis.type IN (COMPRESSIBLE,INCOMPRESSIBLE,CONJUGATE_HEAT_TRANSFER,CONVECTIVE_HEAT_TRANSFER,MULTIPHASE)]\",\n          \"path\" : \"$.model.numerics.schemes.laplacian\",\n          \"topoEntities\" : [ ],\n          \"parameterValuesCombinations\" : [ ]\n        }\n      }\n    }, {\n      \"severity\" : \"ERROR\",\n      \"code\" : \"missing-conditional-value\",\n      \"message\" : \"Value should be present when at least one of the following conditions is met: [analysis.type IN (COMPRESSIBLE,INCOMPRESSIBLE,CONJUGATE_HEAT_TRANSFER,CONVECTIVE_HEAT_TRANSFER,MULTIPHASE)]\",\n      \"path\" : \"$.model.numerics.schemes.interpolation\",\n      \"allowMarkdown\" : false,\n      \"topoEntities\" : [ ],\n      \"details\" : {\n        \"whenOneOf\" : \"[analysis.type IN (COMPRESSIBLE,INCOMPRESSIBLE,CONJUGATE_HEAT_TRANSFER,CONVECTIVE_HEAT_TRANSFER,MULTIPHASE)]\",\n        \"path\" : \"$.model.numerics.schemes.interpolation\",\n        \"topoEntities\" : [ ],\n        \"parameterValuesCombinations\" : [ ]\n      },\n      \"errorMessageAddedToI18N\" : false,\n      \"errorDetails\" : {\n        \"parameters\" : [ ],\n        \"details\" : {\n          \"whenOneOf\" : \"[analysis.type IN (COMPRESSIBLE,INCOMPRESSIBLE,CONJUGATE_HEAT_TRANSFER,CONVECTIVE_HEAT_TRANSFER,MULTIPHASE)]\",\n          \"path\" : \"$.model.numerics.schemes.interpolation\",\n          \"topoEntities\" : [ ],\n          \"parameterValuesCombinations\" : [ ]\n        }\n      }\n    }, {\n      \"severity\" : \"ERROR\",\n      \"code\" : \"missing-conditional-value\",\n      \"message\" : \"Value should be present when at least one of the following conditions is met: [analysis.type IN (COMPRESSIBLE,INCOMPRESSIBLE,CONJUGATE_HEAT_TRANSFER,CONVECTIVE_HEAT_TRANSFER,MULTIPHASE)]\",\n      \"path\" : \"$.model.numerics.schemes.surfaceNormalGradient\",\n      \"allowMarkdown\" : false,\n      \"topoEntities\" : [ ],\n      \"details\" : {\n        \"whenOneOf\" : \"[analysis.type IN (COMPRESSIBLE,INCOMPRESSIBLE,CONJUGATE_HEAT_TRANSFER,CONVECTIVE_HEAT_TRANSFER,MULTIPHASE)]\",\n        \"path\" : \"$.model.numerics.schemes.surfaceNormalGradient\",\n        \"topoEntities\" : [ ],\n        \"parameterValuesCombinations\" : [ ]\n      },\n      \"errorMessageAddedToI18N\" : false,\n      \"errorDetails\" : {\n        \"parameters\" : [ ],\n        \"details\" : {\n          \"whenOneOf\" : \"[analysis.type IN (COMPRESSIBLE,INCOMPRESSIBLE,CONJUGATE_HEAT_TRANSFER,CONVECTIVE_HEAT_TRANSFER,MULTIPHASE)]\",\n          \"path\" : \"$.model.numerics.schemes.surfaceNormalGradient\",\n          \"topoEntities\" : [ ],\n          \"parameterValuesCombinations\" : [ ]\n        }\n      }\n    } ],\n    \"parameters\" : [ ]\n  },\n  \"entries\" : [ {\n    \"code\" : \"missing-conditional-value\",\n    \"details\" : {\n      \"whenOneOf\" : \"[analysis.type IS_NOT SIMERICS_ANALYSIS]\",\n      \"path\" : \"$.model.numerics.solvers\",\n      \"topoEntities\" : [ ],\n      \"parameterValuesCombinations\" : [ ]\n    },\n    \"message\" : \"Value should be present when at least one of the following conditions is met: [analysis.type IS_NOT SIMERICS_ANALYSIS]\",\n    \"severity\" : \"ERROR\"\n  }, {\n    \"code\" : \"missing-conditional-value\",\n    \"details\" : {\n      \"whenOneOf\" : \"[analysis.type IN (COMPRESSIBLE,INCOMPRESSIBLE,CONJUGATE_HEAT_TRANSFER,CONVECTIVE_HEAT_TRANSFER,MULTIPHASE)]\",\n      \"path\" : \"$.model.numerics.schemes.gradient\",\n      \"topoEntities\" : [ ],\n      \"parameterValuesCombinations\" : [ ]\n    },\n    \"message\" : \"Value should be present when at least one of the following conditions is met: [analysis.type IN (COMPRESSIBLE,INCOMPRESSIBLE,CONJUGATE_HEAT_TRANSFER,CONVECTIVE_HEAT_TRANSFER,MULTIPHASE)]\",\n    \"severity\" : \"ERROR\"\n  }, {\n    \"code\" : \"missing-conditional-value\",\n    \"details\" : {\n      \"whenOneOf\" : \"[analysis.type IN (COMPRESSIBLE,INCOMPRESSIBLE,CONJUGATE_HEAT_TRANSFER,CONVECTIVE_HEAT_TRANSFER,MULTIPHASE)]\",\n      \"path\" : \"$.model.numerics.schemes.divergence\",\n      \"topoEntities\" : [ ],\n      \"parameterValuesCombinations\" : [ ]\n    },\n    \"message\" : \"Value should be present when at least one of the following conditions is met: [analysis.type IN (COMPRESSIBLE,INCOMPRESSIBLE,CONJUGATE_HEAT_TRANSFER,CONVECTIVE_HEAT_TRANSFER,MULTIPHASE)]\",\n    \"severity\" : \"ERROR\"\n  }, {\n    \"code\" : \"missing-conditional-value\",\n    \"details\" : {\n      \"whenOneOf\" : \"[analysis.type IN (COMPRESSIBLE,INCOMPRESSIBLE,CONJUGATE_HEAT_TRANSFER,CONVECTIVE_HEAT_TRANSFER,MULTIPHASE)]\",\n      \"path\" : \"$.model.numerics.schemes.laplacian\",\n      \"topoEntities\" : [ ],\n      \"parameterValuesCombinations\" : [ ]\n    },\n    \"message\" : \"Value should be present when at least one of the following conditions is met: [analysis.type IN (COMPRESSIBLE,INCOMPRESSIBLE,CONJUGATE_HEAT_TRANSFER,CONVECTIVE_HEAT_TRANSFER,MULTIPHASE)]\",\n    \"severity\" : \"ERROR\"\n  }, {\n    \"code\" : \"missing-conditional-value\",\n    \"details\" : {\n      \"whenOneOf\" : \"[analysis.type IN (COMPRESSIBLE,INCOMPRESSIBLE,CONJUGATE_HEAT_TRANSFER,CONVECTIVE_HEAT_TRANSFER,MULTIPHASE)]\",\n      \"path\" : \"$.model.numerics.schemes.interpolation\",\n      \"topoEntities\" : [ ],\n      \"parameterValuesCombinations\" : [ ]\n    },\n    \"message\" : \"Value should be present when at least one of the following conditions is met: [analysis.type IN (COMPRESSIBLE,INCOMPRESSIBLE,CONJUGATE_HEAT_TRANSFER,CONVECTIVE_HEAT_TRANSFER,MULTIPHASE)]\",\n    \"severity\" : \"ERROR\"\n  }, {\n    \"code\" : \"missing-conditional-value\",\n    \"details\" : {\n      \"whenOneOf\" : \"[analysis.type IN (COMPRESSIBLE,INCOMPRESSIBLE,CONJUGATE_HEAT_TRANSFER,CONVECTIVE_HEAT_TRANSFER,MULTIPHASE)]\",\n      \"path\" : \"$.model.numerics.schemes.surfaceNormalGradient\",\n      \"topoEntities\" : [ ],\n      \"parameterValuesCombinations\" : [ ]\n    },\n    \"message\" : \"Value should be present when at least one of the following conditions is met: [analysis.type IN (COMPRESSIBLE,INCOMPRESSIBLE,CONJUGATE_HEAT_TRANSFER,CONVECTIVE_HEAT_TRANSFER,MULTIPHASE)]\",\n    \"severity\" : \"ERROR\"\n  } ],\n  \"message\" : \"Unprocessable entity\",\n  \"severity\" : \"ERROR\",\n  \"trace\" : \"54ee573f\"\n}\n"
+}
+EXIT 1
