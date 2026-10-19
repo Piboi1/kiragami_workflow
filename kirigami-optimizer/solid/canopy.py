@@ -322,8 +322,18 @@ def build_solid(ring_data, params=None):
         "surface_area_in2": float(mesh.area),
         "volume_in3": float(mesh.volume),
         "bounds_in": mesh.bounds.tolist(),
+        # Rim attachment point for the flow-domain sting: the first bridge
+        # of the last ring (a continuous band), on its mid-surface.
+        "sting_anchor_in": _rim_anchor(rings, cuts, float(p["VERTICAL_DROP"])),
     }
     return mesh, info
+
+
+def _rim_anchor(rings, cuts_per_ring, vertical_drop):
+    r_last = rings[-1][0]
+    k_last = len(rings) - 1
+    theta = math.radians(0.0 if k_last % 2 == 0 else 180.0 / cuts_per_ring)
+    return [r_last * math.cos(theta), r_last * math.sin(theta), -vertical_drop]
 
 
 def export_stl(mesh, path):

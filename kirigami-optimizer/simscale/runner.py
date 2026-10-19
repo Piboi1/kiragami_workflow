@@ -44,7 +44,8 @@ from .spec import build_mesh_model, build_model, build_simulation_spec
 
 API_KEY_HEADER = "X-API-KEY"
 TERMINAL = ("FINISHED", "CANCELED", "FAILED")
-FACE_GROUPS = ("inlet", "outlet", "side_xmin", "side_xmax", "side_ymin", "side_ymax", "canopy")
+FACE_GROUPS = ("inlet", "outlet", "side_xmin", "side_xmax", "side_ymin", "side_ymax", "canopy", "sting")
+REQUIRED_GROUPS = FACE_GROUPS[:-1]  # the sting is optional
 
 
 class SimScaleError(RuntimeError):
@@ -298,8 +299,15 @@ class SimScaleClient:
         def body_of(entity_name):  # internal names look like B1_TE5 / A1_I26_..._B102_TE196
             return entity_name.rsplit("_TE", 1)[0]
 
+        body_list = [{"name": b.name, "labels": sorted(self._labels_of(b))} for b in bodies]
+        face_bodies = sorted({body_of(n) for names in groups.values() for n in names} |
+                             {body_of(n) for n in unlabeled})
+        if not body_list:
+            # A sewn import listed no body mappings in testing; the faces'
+            # internal names (B1_TE5 ...) still say which body they are on.
+            body_list = [{"name": b, "labels": ["(from face names)"]} for b in face_bodies]
         return {
-            "bodies": [{"name": b.name, "labels": sorted(self._labels_of(b))} for b in bodies],
+            "bodies": body_list,
             "groups": groups,
             "group_bodies": {g: sorted({body_of(n) for n in names}) for g, names in groups.items()},
             "unlabeled_faces": unlabeled,
@@ -309,7 +317,7 @@ class SimScaleClient:
         """Maps our STL solid names to SimScale internal face / body names."""
 
         geo = self.describe_geometry(project_id, geometry_id, dump_path)
-        missing = [g for g, names in geo["groups"].items() if not names]
+        missing = [g for g in REQUIRED_GROUPS if not geo["groups"][g]]
         if missing:
             raise SimScaleError(
                 f"Could not find faces for {missing} in the imported geometry. "

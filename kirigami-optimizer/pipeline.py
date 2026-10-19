@@ -70,7 +70,8 @@ def build_geometry(params, design_dir, design_id):
     canopy_stl = export_stl(canopy, design_dir / f"{design_id}_canopy.stl")
 
     domain_params = {k: params.get(k, v) for k, v in DEFAULT_DOMAIN_PARAMS.items()}
-    fluid, labels, bounds = build_flow_domain(canopy, resolved["PARACHUTE_DIAMETER"], domain_params)
+    fluid, labels, bounds = build_flow_domain(canopy, resolved["PARACHUTE_DIAMETER"], domain_params,
+                                              sting_anchor=info["sting_anchor_in"])
     domain_stl = write_named_stl(fluid, labels, design_dir / f"{design_id}_flow_domain.stl")
 
     info["domain_bounds_in"] = bounds

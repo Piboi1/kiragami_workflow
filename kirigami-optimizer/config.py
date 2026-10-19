@@ -63,6 +63,10 @@ FIXED_PARAMS = {
     "DOMAIN_LATERAL_HALF_WIDTH_D": 2.583,
     "DOMAIN_UPSTREAM_D": 3.113,
     "DOMAIN_DOWNSTREAM_D": 7.0,
+    # Thin support line (inches) from the canopy rim down to the outlet, so
+    # SimScale's sewing yields ONE fluid body (see solid/flow_domain.py).
+    # Its faces are walls but are excluded from the force coefficients.
+    "STING_RADIUS": 0.04,
 }
 
 # The 4-6 parameters Bayesian optimization searches over.
@@ -164,7 +168,7 @@ SIMSCALE = {
     # Geometry import. The flow-domain STL has one 'solid' block per
     # boundary; SimScale imports each as a separate sheet body, so sewing
     # must join them into one fluid body (see `main.py probe-import`).
-    "IMPORT_SEWING": True,
+    "IMPORT_SEWING": True,   # needs the sting (FIXED_PARAMS["STING_RADIUS"] > 0)
     "IMPORT_IMPROVE": True,
     "TURBULENCE_MODEL": "KOMEGASST",
     "END_TIME_S": 500,              # steady-state iterations

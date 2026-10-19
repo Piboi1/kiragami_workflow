@@ -3,7 +3,7 @@ import numpy as np
 from conftest import LEGACY_3D_RING_DATA
 from generator import generate_pattern
 from solid import build_flow_domain, build_solid
-from solid.flow_domain import FACE_NAMES
+from solid.flow_domain import FACE_NAMES, REQUIRED_FACES
 
 
 def test_legacy_tuples_and_generator_rings_give_same_solid():
@@ -40,7 +40,7 @@ def test_flow_domain_labels_and_box():
     mesh, _ = build_solid(LEGACY_3D_RING_DATA)
     fluid, labels, (lo, hi) = build_flow_domain(mesh, 10.0)
     assert fluid.is_watertight
-    assert set(labels) == set(FACE_NAMES)
+    assert set(labels) == set(REQUIRED_FACES)  # no anchor -> no sting
     assert np.allclose(lo, [-25.83, -25.83, -70.0]) and np.allclose(hi, [25.83, 25.83, 31.13])
     # fluid volume = box - canopy
     assert abs(fluid.volume - (51.66 * 51.66 * 101.13 - mesh.volume)) < 1e-6 * fluid.volume
@@ -56,3 +56,23 @@ def test_ribbons_crossing_center_are_infeasible():
                                "INNER_OVERLAP_RATIO": 0.2}, write_files=False)
     with pytest.raises(InfeasibleGeometry):
         build_solid(report, {"CUTS_PER_RING": 12})
+
+
+def test_sting_makes_one_connected_boundary():
+    mesh, info = build_solid(LEGACY_3D_RING_DATA)
+    x, y, z = info["sting_anchor_in"]
+    assert abs(np.hypot(x, y) - 4.75) < 1e-9 and abs(z + 10.62) < 1e-9
+
+    plain, plain_labels, _ = build_flow_domain(mesh, 10.0)
+    assert len(plain.split(only_watertight=False)) == 2  # box shell + floating canopy shell
+
+    fluid, labels, _ = build_flow_domain(mesh, 10.0, sting_anchor=info["sting_anchor_in"])
+    assert fluid.is_watertight
+    assert set(labels) == set(FACE_NAMES)
+    assert len(fluid.split(only_watertight=False)) == 1
+    # sting faces run from the rim down to the outlet only
+    sting_z = fluid.triangles[labels == "sting"][:, :, 2]
+    assert sting_z.max() < -10.62 and sting_z.min() >= -70.0 - 1e-6
+    # the canopy surface the forces act on is essentially unchanged
+    area = lambda m, lab: m.area_faces[lab == "canopy"].sum()
+    assert abs(area(fluid, labels) - area(plain, plain_labels)) / area(plain, plain_labels) < 0.01

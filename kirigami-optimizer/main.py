@@ -145,7 +145,7 @@ def cmd_probe_import(args):
     from simscale_sdk import ApiException
 
     from pipeline import build_geometry
-    from simscale.runner import describe_api_error
+    from simscale.runner import REQUIRED_GROUPS, describe_api_error
 
     client, project_id = _simscale_client()
     out = config.RUNS_DIR / "probe_import"
@@ -172,7 +172,7 @@ def cmd_probe_import(args):
         for g, names in geo["groups"].items():
             print(f"    {g:10s} {len(names):3d} face(s) on body {geo['group_bodies'][g]}")
         print(f"    unlabeled  {len(geo['unlabeled_faces']):3d} face(s)")
-        good = len(geo["bodies"]) == 1 and all(geo["groups"].values())
+        good = len(geo["bodies"]) == 1 and all(geo["groups"][g] for g in REQUIRED_GROUPS)
         print("  USABLE: one body with every boundary named" if good else "  not usable as-is")
         if good:
             ok_variants.append(tag)
@@ -237,7 +237,7 @@ def main(argv=None):
     sub.add_parser("depth-model").set_defaults(fn=cmd_depth_model)
 
     p = sub.add_parser("probe-import")
-    p.add_argument("--sewing", type=lambda v: v.lower() in ("1", "true", "yes"), nargs="+", default=[True, False])
+    p.add_argument("--sewing", type=lambda v: v.lower() in ("1", "true", "yes"), nargs="+", default=[True])
     p.add_argument("--improve", type=lambda v: v.lower() in ("1", "true", "yes"), nargs="+", default=[True])
     p.set_defaults(fn=cmd_probe_import)
 
