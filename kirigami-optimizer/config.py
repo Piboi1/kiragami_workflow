@@ -141,7 +141,7 @@ SIMSCALE = {
     # Leave empty to have the pipeline create a new project (its ID is printed
     # and saved to state/simscale_project.json so later runs reuse it).
     "PROJECT_ID": os.getenv("SIMSCALE_PROJECT_ID", ""),
-    "NEW_PROJECT_NAME": "Kirigami_Optimizer",
+    "NEW_PROJECT_NAME": "Kiragami_Optimizer",  # matches the project created in the web app
     "TURBULENCE_MODEL": "KOMEGASST",
     "END_TIME_S": 500,              # steady-state iterations
     "DELTA_T_S": 1,

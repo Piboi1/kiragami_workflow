@@ -45,7 +45,7 @@ Copy `.env.example` to `.env` in this folder. Both `.env` and `credentials/` are
 | What | Where | Needed for |
 |---|---|---|
 | SimScale API key | `SIMSCALE_API_KEY=` in `.env` | every CFD run |
-| SimScale project ID | `SIMSCALE_PROJECT_ID=` in `.env` (**optional**) | leave empty to have a `Kirigami_Optimizer` project created automatically |
+| SimScale project ID | `SIMSCALE_PROJECT_ID=` in `.env` (**optional**) | leave empty to have a `Kiragami_Optimizer` project created automatically |
 | Google service-account key | save the JSON as `credentials/service_account.json`, **or** put its full text in `GOOGLE_SERVICE_ACCOUNT_JSON` | writing the sheet |
 | Google Sheet ID | `GOOGLE_SHEET_ID=` in `.env` | writing the sheet |
 
