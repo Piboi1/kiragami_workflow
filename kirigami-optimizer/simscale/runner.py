@@ -208,20 +208,58 @@ class SimScaleClient:
         resp = self.api_client.rest_client.GET(url=url, headers={API_KEY_HEADER: self.api_key}, _preload_content=False)
         return resp.data
 
-    def _poll(self, what, getter, max_seconds):
+    def _poll(self, what, getter, max_seconds, cancel=None, cpu_cap=None, stall_seconds=None):
+        """Waits for a SimScale job; with ``cancel`` it is a watchdog.
+
+        The job is cancelled ON SIMSCALE (not just abandoned locally) when it
+        runs longer than max_seconds, when its billed CPU hours exceed
+        cpu_cap, or when its progress has not moved for stall_seconds.
+        """
+
         start = time.time()
         obj = getter()
         last = None
+        last_change = time.time()
         while obj.status not in TERMINAL:
-            if time.time() - start > max_seconds:
-                raise TimeoutError(f"{what} did not finish within {max_seconds} s")
             progress = getattr(obj, "progress", None)
             if (obj.status, progress) != last:
                 self.log(f"  {what}: {obj.status}" + (f" {progress:.0%}" if isinstance(progress, float) else ""))
                 last = (obj.status, progress)
+                last_change = time.time()
+
+            reason = None
+            used = _core_hours(obj)
+            if time.time() - start > max_seconds:
+                reason = f"ran longer than {max_seconds:.0f} s"
+            elif cpu_cap is not None and used > cpu_cap:
+                reason = f"used {used:.2f} CPU h, over the {cpu_cap:g} CPU h cap"
+            elif stall_seconds and obj.status == "RUNNING" and time.time() - last_change > stall_seconds:
+                reason = f"progress stuck at {progress:.0%} for {stall_seconds:.0f} s" if isinstance(progress, float) \
+                    else f"no progress for {stall_seconds:.0f} s"
+            if reason:
+                if cancel is None:
+                    raise TimeoutError(f"{what} {reason}")
+                self.log(f"  {what}: {reason} -- cancelling it on SimScale")
+                try:
+                    cancel()
+                except ApiException as exc:
+                    self.log(f"  cancel request failed: {describe_api_error(exc)}")
+                obj = self._wait_terminal(getter)
+                raise SimScaleError(f"{what} cancelled: {reason} ({_core_hours(obj):.2f} CPU h billed)")
+
             time.sleep(self.cfg["POLL_SECONDS"])
             obj = getter()
         self.log(f"  {what}: {obj.status}")
+        return obj
+
+    def _wait_terminal(self, getter, max_seconds=600):
+        """After a cancel request, waits (bounded) for the job to stop."""
+
+        start = time.time()
+        obj = getter()
+        while obj.status not in TERMINAL and time.time() - start < max_seconds:
+            time.sleep(min(self.cfg["POLL_SECONDS"], 15))
+            obj = getter()
         return obj
 
     def _all_mappings(self, project_id, geometry_id, entity_class):
@@ -446,8 +484,15 @@ class SimScaleClient:
                     cfg["MESH_MAX_RUN_TIME_S"])
                 self.meshes.start_mesh_operation(project_id, op.mesh_operation_id, simulation_id=sim_id)
                 remember(mesh_operation_id=op.mesh_operation_id, mesh_max_runtime_s=mesh_max)
-            op = self._poll("meshing", lambda: self.meshes.get_mesh_operation(project_id, state["mesh_operation_id"]),
-                            state.get("mesh_max_runtime_s", cfg["MESH_MAX_RUN_TIME_S"]))
+            mesh_get = lambda: self.meshes.get_mesh_operation(project_id, state["mesh_operation_id"])  # noqa: E731
+            try:
+                op = self._poll(
+                    "meshing", mesh_get,
+                    min(state.get("mesh_max_runtime_s", cfg["MESH_MAX_RUN_TIME_S"]), cfg["MESH_TIMEOUT_S"]),
+                    cancel=lambda: self.meshes.cancel_mesh_operation(project_id, state["mesh_operation_id"]),
+                    cpu_cap=cfg["MESH_MAX_CORE_HOURS"], stall_seconds=cfg["STALL_TIMEOUT_S"])
+            finally:
+                remember(mesh_core_hours=_core_hours(mesh_get()))
             if op.status != "FINISHED":
                 raise SimScaleError(f"meshing {op.status}")
             spec = self.simulations.get_simulation(project_id, sim_id)
@@ -464,10 +509,17 @@ class SimScaleClient:
             run = self.runs.create_simulation_run(project_id, sim_id, SimulationRun(name="Run 1"))
             self.runs.start_simulation_run(project_id, sim_id, run.run_id)
             remember(run_id=run.run_id, run_max_runtime_s=run_max, estimated_core_hours=core_hours)
-        run = self._poll("simulation run",
-                         lambda: self.runs.get_simulation_run(project_id, sim_id, state["run_id"]),
-                         state.get("run_max_runtime_s", cfg["MAX_RUN_TIME_S"]) + 3600)
-        remember(run_core_hours=_core_hours(run))
+        run_get = lambda: self.runs.get_simulation_run(project_id, sim_id, state["run_id"])  # noqa: E731
+        run_cap = None
+        if cfg.get("MAX_CORE_HOURS_PER_RUN") is not None:
+            run_cap = max(0.0, cfg["MAX_CORE_HOURS_PER_RUN"] - float(state.get("mesh_core_hours") or 0.0))
+        try:
+            run = self._poll("simulation run", run_get,
+                             state.get("run_max_runtime_s", cfg["MAX_RUN_TIME_S"]) + 3600,
+                             cancel=lambda: self.runs.cancel_simulation_run(project_id, sim_id, state["run_id"]),
+                             cpu_cap=run_cap, stall_seconds=cfg["STALL_TIMEOUT_S"])
+        finally:
+            remember(run_core_hours=_core_hours(run_get()))
         if run.status != "FINISHED":
             raise SimScaleError(f"simulation run {run.status}")
 

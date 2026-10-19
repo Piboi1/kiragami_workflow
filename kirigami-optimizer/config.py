@@ -186,10 +186,17 @@ SIMSCALE = {
     "MESH_BOUNDARY_LAYERS": True,
     "MESH_PHYSICS_BASED": True,
     "MESH_HEX_CORE": True,
-    "MESH_MAX_RUN_TIME_S": 18000,
-    # Skip a design (no run started) if SimScale's estimate exceeds this many
-    # CPU hours. Your manual runs used 0.8-3.0 CPUh per simulation plus
-    # 0.2-0.7 per mesh. None disables the check.
+    "MESH_MAX_RUN_TIME_S": 18000,   # SimScale-side meshing limit
+    # Watchdogs: the job is CANCELLED on SimScale (not just abandoned) when
+    # any of these trips. Your manual meshes took 3-5 min / 0.2-0.7 CPU h;
+    # run 4's mesh sat at 10% for 35 min and billed 9.42 CPU h.
+    "MESH_TIMEOUT_S": 1800,
+    "MESH_MAX_CORE_HOURS": 2.0,
+    "STALL_TIMEOUT_S": 900,         # progress unchanged this long while RUNNING
+    # Per-design CPU-hour cap (mesh + simulation). Checked against SimScale's
+    # estimate before starting, AND enforced live: a simulation is cancelled
+    # once mesh + run hours pass it. Your manual runs used 0.8-3.0 CPUh per
+    # simulation plus 0.2-0.7 per mesh. None disables it.
     "MAX_CORE_HOURS_PER_RUN": 6.0,
     "POLL_SECONDS": 30,
     # Cd objective = mean over this trailing fraction of iterations.
