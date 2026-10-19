@@ -30,6 +30,7 @@ from simscale_sdk import (
     MeshOperation,
     MeshOperationsApi,
     Project,
+    ProjectPermissionsApi,
     ProjectsApi,
     SimulationRun,
     SimulationRunsApi,
@@ -178,6 +179,23 @@ class SimScaleClient:
         # Write permission: an upload slot is what every run starts with.
         # It is never used and costs nothing.
         probe("write access (create upload slot)", lambda: "ok" if self.storage.create_storage().storage_id else "?")
+
+        # The upload slot is account-level; importing geometry needs project
+        # write access and meshing/simulating needs billable-action rights.
+        resolved = project_id or next((r[2].rsplit(": ", 1)[-1] for r in results
+                                       if r[0] == "pipeline project" and r[1]), None)
+        if resolved:
+            def permissions():
+                perms = ProjectPermissionsApi(self.api_client).get_requester_project_permissions(resolved)
+                missing = [name for name in ("can_write_project", "can_execute_project_billable_action")
+                           if not getattr(perms, name)]
+                if missing:
+                    raise LookupError(
+                        f"this API key lacks {', '.join(missing)} on project {resolved}; it can read but cannot "
+                        "import geometry or start meshing/simulations. Create a key with write access "
+                        "(User Settings > API Keys) or ask SimScale support to enable API write access.")
+                return "can write and run billable actions"
+            probe("project permissions", permissions)
         return results
 
     # ------------------------------------------------------------------
