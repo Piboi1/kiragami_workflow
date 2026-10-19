@@ -1,5 +1,7 @@
 """Optimization loop against a fake SimScale client: resume + checkpointing."""
 
+import pytest
+
 import config
 from optimizer.loop import run_optimization
 from optimizer.state import Ledger
@@ -18,7 +20,7 @@ class FakeSimScale:
         self.calls = 0
         self.crash_on_call = crash_on_call
 
-    def run_design(self, project_id, design_id, domain_stl, uz, area, length, work_dir, state, save_state):
+    def run_design(self, project_id, design_id, domain_file, uz, area, length, work_dir, state, save_state):
         self.calls += 1
         if "run_id" not in state:
             state.update(geometry_id="g", simulation_id="s", run_id=f"r-{design_id}",
@@ -34,6 +36,12 @@ def _ctx(sim):
                    logger=RunLogger(config.LOCAL_RESULTS_CSV, use_sheets=False),
                    estimator=VelocityEstimator(config.VELOCITY, 10.0),
                    simscale=sim, project_id="p", search_space=SMALL_SPACE, log=lambda *a: None)
+
+
+@pytest.fixture(autouse=True)
+def fast_geometry(monkeypatch):
+    # These tests are about resume/budget logic; skip the slower STEP export.
+    monkeypatch.setitem(config.SIMSCALE, "GEOMETRY_FORMAT", "STL")
 
 
 def test_crash_and_resume(isolated_paths, monkeypatch):

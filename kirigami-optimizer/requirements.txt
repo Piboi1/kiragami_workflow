@@ -4,6 +4,7 @@ trimesh>=4.0
 manifold3d>=2.3        # boolean engine for trimesh (canopy union, box - canopy)
 networkx>=3.0          # trimesh body counting
 ezdxf>=1.1
+cadquery-ocp>=7.7   # OpenCascade: writes the flow domain as a STEP solid
 scikit-optimize>=0.10
 scikit-learn>=1.3
 gspread>=6.0

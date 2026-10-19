@@ -17,6 +17,7 @@ from solid import InfeasibleGeometry, build_flow_domain, build_solid, export_stl
 from solid.canopy import DEFAULT_SOLID_PARAMS
 from simscale.results import core_hours_used
 from solid.depth_model import get_depth_model
+from solid.step_export import write_step
 from solid.flow_domain import DEFAULT_DOMAIN_PARAMS
 
 
@@ -70,13 +71,21 @@ def build_geometry(params, design_dir, design_id):
     canopy_stl = export_stl(canopy, design_dir / f"{design_id}_canopy.stl")
 
     domain_params = {k: params.get(k, v) for k, v in DEFAULT_DOMAIN_PARAMS.items()}
-    fluid, labels, bounds = build_flow_domain(canopy, resolved["PARACHUTE_DIAMETER"], domain_params,
-                                              sting_anchor=info["sting_anchor_in"])
-    domain_stl = write_named_stl(fluid, labels, design_dir / f"{design_id}_flow_domain.stl")
+    fmt = config.SIMSCALE["GEOMETRY_FORMAT"]
+    if fmt == "STEP":
+        # One solid with the canopy as an internal void: no sting, no sewing.
+        domain_params["STING_RADIUS"] = 0.0
+        fluid, labels, bounds = build_flow_domain(canopy, resolved["PARACHUTE_DIAMETER"], domain_params)
+        domain_file = design_dir / f"{design_id}_flow_domain.step"
+        info.update(write_step(fluid, labels, domain_file))
+    else:
+        fluid, labels, bounds = build_flow_domain(canopy, resolved["PARACHUTE_DIAMETER"], domain_params,
+                                                  sting_anchor=info["sting_anchor_in"])
+        domain_file = write_named_stl(fluid, labels, design_dir / f"{design_id}_flow_domain.stl")
 
     info["domain_bounds_in"] = bounds
     paths = {"dxf": report["files"]["dxf"], "report_json": report["files"]["report_json"],
-             "canopy_stl": canopy_stl, "domain_stl": domain_stl}
+             "canopy_stl": canopy_stl, "domain_file": str(domain_file), "domain_format": fmt}
     return report, info, {**solid_params, **domain_params}, paths
 
 
@@ -193,7 +202,7 @@ def evaluate_design(ctx, params, mode="single", uz_override=None, resume=None):
                 ledger.update_pending(simscale=dict(state))
 
             coeffs = ctx.simscale.run_design(
-                ctx.project_id, design_id, paths["domain_stl"], velocity["uz_mps"],
+                ctx.project_id, design_id, paths["domain_file"], velocity["uz_mps"],
                 solid_info["reference_area_in2"], solid_info["projected_diameter_in"],
                 design_dir, sim_state, save_state,
             )

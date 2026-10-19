@@ -122,7 +122,17 @@ Every row logs the Cd used for Uz, its source, and the nearest previous run.
 
 ## Why the flow domain is built locally
 
-In the manual project, "External flow volume" and "Delete bodies" are SimScale CAD-mode operations, and the public API/SDK doesn't expose them. Instead, `solid/flow_domain.py` builds the same box as your manual setup: X/Y ±2.583 D, Z from −7 D to +3.113 D, which is ±25.83 / −70 / +31.13 in for D = 10 in. It subtracts the canopy and writes a multi-solid ASCII STL. Each boundary is its own `solid` block: `inlet`, `outlet`, `side_*`, `canopy`, `sting`. A thin support line (the `sting`, 0.04 in radius, set by `STING_RADIUS`) runs from the canopy rim straight down through the wake to the outlet. It joins the canopy to the box, so the whole boundary is one connected surface. Its faces are walls but are excluded from the force coefficients, so Cd still measures only the canopy. SimScale imports each `solid` block as its own sheet body, so the import uses SimScale's **automatic sewing** (`SIMSCALE["IMPORT_SEWING"]`) to join them into one fluid body. Each face keeps its block's name, and the runner maps those names to SimScale face IDs. If the result is not exactly one body with every boundary named, the run stops before any billed step and saves the mapping to `runs/design_NNNN/simscale_entities.json`. `python main.py probe-import` tests the import options on the baseline domain, with and without sewing, and reports the bodies and faces SimScale produced. Imports are not billed.
+In the manual project, "External flow volume" and "Delete bodies" are SimScale CAD-mode operations, and the public API/SDK doesn't expose them. Instead, `solid/flow_domain.py` builds the same box as your manual setup: X/Y ±2.583 D, Z from −7 D to +3.113 D, which is ±25.83 / −70 / +31.13 in for D = 10 in. It subtracts the canopy, giving the air volume.
+
+`solid/step_export.py` then writes that air volume as a **STEP file**, a CAD solid, using OpenCascade:
+- **One solid, two shells:** the box is the outer shell, and the canopy is an internal void, the same thing the web app's flow-volume operation produces.
+- **Named, coloured walls:** each box wall is a single face named `inlet`, `outlet`, `side_xmin`, `side_xmax`, `side_ymin` or `side_ymax`, with its own colour. The runner recognises each wall by name or by colour. Every other face is the canopy.
+- **Checked before upload:** OpenCascade validates the solid and confirms its volume matches the mesh exactly.
+- **Size and time:** about 54 MB and 40 s per design.
+
+`python main.py probe-import` imports the baseline domain and reports the bodies and faces SimScale sees, without meshing or simulating. Imports aren't billed.
+
+Why not STL: SimScale imports each `solid` block of a multi-solid STL as its own sheet body. Its automatic sewing then either produced a separate canopy solid or merged nothing, even with a thin "sting" joining the canopy to the outlet. The STL path is still available with `SIMSCALE["GEOMETRY_FORMAT"] = "STL"`, but it is not used.
 
 ## Changes and fixes vs. the original scripts
 

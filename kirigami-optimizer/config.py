@@ -168,7 +168,12 @@ SIMSCALE = {
     # Geometry import. The flow-domain STL has one 'solid' block per
     # boundary; SimScale imports each as a separate sheet body, so sewing
     # must join them into one fluid body (see `main.py probe-import`).
-    "IMPORT_SEWING": True,   # needs the sting (FIXED_PARAMS["STING_RADIUS"] > 0)
+    # "STEP" (default): the flow domain is uploaded as one CAD solid with the
+    # canopy as an internal void and the six box walls named + coloured.
+    # "STL": multi-solid STL + sewing + sting (kept for reference; SimScale's
+    # sewing did not produce a single body with it).
+    "GEOMETRY_FORMAT": "STEP",
+    "IMPORT_SEWING": True,   # STL only; needs FIXED_PARAMS["STING_RADIUS"] > 0
     "IMPORT_IMPROVE": True,
     "TURBULENCE_MODEL": "KOMEGASST",
     "END_TIME_S": 500,              # steady-state iterations

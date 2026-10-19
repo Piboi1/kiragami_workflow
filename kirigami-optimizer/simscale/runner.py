@@ -39,6 +39,8 @@ from simscale_sdk import (
     TopologicalReference,
 )
 
+from solid.step_export import BOX_FACES, COLOUR_TO_FACE, parse_colour
+
 from .results import core_hours_used, maybe_unzip, parse_force_coefficients
 from .spec import build_mesh_model, build_model, build_simulation_spec
 
@@ -248,25 +250,29 @@ class SimScaleClient:
                     labels.add(str(attr.value).lower())
         return labels
 
-    def start_import(self, project_id, name, stl_path, sewing, improve):
-        """Uploads an STL (inches) and starts its import. Returns (storage_id, import_id).
+    def start_import(self, project_id, name, path, sewing, improve, fmt=None):
+        """Uploads the flow domain and starts its import. Returns (storage_id, import_id).
 
-        sewing=True joins the STL's separate ``solid`` blocks (which SimScale
-        imports as separate sheet bodies) into one solid body, keeping each
-        block's name on its faces.
+        STEP files are written in millimetres, STL files in inches. For STL,
+        sewing=True joins the separate ``solid`` blocks (imported as separate
+        sheet bodies) into solids, keeping each block's name on its faces.
         """
 
-        self.log(f"  uploading {Path(stl_path).name} (sewing={sewing}, improve={improve})")
+        fmt = fmt or ("STEP" if str(path).lower().endswith((".step", ".stp")) else "STL")
+        unit = "mm" if fmt == "STEP" else "in"
+        sewing = bool(sewing) and fmt == "STL"
+        size_mb = Path(path).stat().st_size / 1e6
+        self.log(f"  uploading {Path(path).name} ({size_mb:.0f} MB, {fmt}, sewing={sewing}, improve={improve})")
         storage = self.storage.create_storage()
-        with open(stl_path, "rb") as fh:
+        with open(path, "rb") as fh:
             self.api_client.rest_client.PUT(
                 url=storage.url, headers={"Content-Type": "application/octet-stream"}, body=fh.read()
             )
         imp = self.imports.import_geometry(project_id, GeometryImportRequest(
             name=name,
             location=GeometryImportRequestLocation(storage.storage_id),
-            format="STL",
-            input_unit="in",
+            format=fmt,
+            input_unit=unit,
             options=GeometryImportRequestOptions(
                 facet_split=False, sewing=sewing, improve=improve, optimize_for_lbm_solver=False
             ),
@@ -294,7 +300,12 @@ class SimScaleClient:
         for e in faces:
             labels = self._labels_of(e)
             group = next((g for g in FACE_GROUPS if g in labels), None)
+            if group is None:  # STEP walls also carry a distinct colour
+                group = next((COLOUR_TO_FACE[c] for c in map(parse_colour, labels) if c in COLOUR_TO_FACE), None)
             (groups[group] if group else unlabeled).append(e.name)
+        if not groups["canopy"] and unlabeled and all(groups[g] for g in BOX_FACES):
+            # STEP: only the box walls are named; every other face is canopy.
+            groups["canopy"], unlabeled = unlabeled, []
 
         def body_of(entity_name):  # internal names look like B1_TE5 / A1_I26_..._B102_TE196
             return entity_name.rsplit("_TE", 1)[0]
@@ -384,7 +395,7 @@ class SimScaleClient:
     # ------------------------------------------------------------------
     # one design
     # ------------------------------------------------------------------
-    def run_design(self, project_id, design_id, domain_stl, uz_mps, reference_area_in2,
+    def run_design(self, project_id, design_id, domain_file, uz_mps, reference_area_in2,
                    reference_length_in, work_dir, state, save_state):
         """Runs one CFD case end to end and returns the parsed coefficients.
 
@@ -403,7 +414,8 @@ class SimScaleClient:
         if "geometry_id" not in state:
             if "geometry_import_id" not in state:
                 storage_id, import_id = self.start_import(
-                    project_id, design_id, domain_stl, cfg["IMPORT_SEWING"], cfg["IMPORT_IMPROVE"])
+                    project_id, design_id, domain_file, cfg["IMPORT_SEWING"], cfg["IMPORT_IMPROVE"],
+                    cfg.get("GEOMETRY_FORMAT"))
                 remember(storage_id=storage_id, geometry_import_id=import_id)
             remember(geometry_id=self.wait_for_import(project_id, state["geometry_import_id"]))
 

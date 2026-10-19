@@ -151,13 +151,16 @@ def cmd_probe_import(args):
     out = config.RUNS_DIR / "probe_import"
     out.mkdir(parents=True, exist_ok=True)
     _, _, _, paths = build_geometry(design_params(_preset("baseline")), out, "probe")
+    if config.SIMSCALE["GEOMETRY_FORMAT"] == "STEP":
+        args.sewing = [False]  # a STEP solid needs no sewing
     variants = [(s, i) for s in args.sewing for i in args.improve]
     ok_variants = []
     for sewing, improve in variants:
-        tag = f"sew{int(sewing)}_imp{int(improve)}"
-        print(f"\n=== import with sewing={sewing}, improve={improve} ===")
+        tag = f"{config.SIMSCALE['GEOMETRY_FORMAT'].lower()}_sew{int(sewing)}_imp{int(improve)}"
+        print(f"\n=== {config.SIMSCALE['GEOMETRY_FORMAT']} import with sewing={sewing}, improve={improve} ===")
         try:
-            _, import_id = client.start_import(project_id, f"probe_{tag}", paths["domain_stl"], sewing, improve)
+            _, import_id = client.start_import(project_id, f"probe_{tag}", paths["domain_file"], sewing, improve,
+                                               config.SIMSCALE["GEOMETRY_FORMAT"])
             geometry_id = client.wait_for_import(project_id, import_id)
             geo = client.describe_geometry(project_id, geometry_id, out / f"entities_{tag}.json")
         except ApiException as exc:
