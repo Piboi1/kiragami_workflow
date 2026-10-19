@@ -67,9 +67,15 @@ def cmd_check(args):
     ok = True
     print("SimScale:")
     try:
-        client, project_id = _simscale_client()
-        projects = client.list_projects(limit=100)
-        print(f"  OK - API key works, {len(projects)} project(s) visible; pipeline project id = {project_id}")
+        from simscale.runner import SimScaleClient
+
+        client = SimScaleClient(config.SIMSCALE)
+        cached = config.STATE_DIR / "simscale_project.json"
+        project_id = config.SIMSCALE["PROJECT_ID"] or (
+            json.loads(cached.read_text())["project_id"] if cached.exists() else "")
+        for label, passed, detail in client.check_access(project_id, config.SIMSCALE["NEW_PROJECT_NAME"]):
+            ok &= passed
+            print(f"  {'OK  ' if passed else 'FAIL'} - {label}: {detail}")
     except Exception as exc:
         ok = False
         print(f"  FAIL - {type(exc).__name__}: {exc}")

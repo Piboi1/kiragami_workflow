@@ -50,6 +50,15 @@ class SimScaleError(RuntimeError):
     pass
 
 
+def describe_api_error(exc):
+    """Short 'HTTP 403 Forbidden: <body>' text for an SDK ApiException."""
+
+    body = exc.body.decode("utf-8", "replace") if isinstance(exc.body, bytes) else str(exc.body or "")
+    body = " ".join(body.split())
+    head = " ".join(str(part) for part in (f"HTTP {exc.status}", exc.reason) if part)
+    return head + (f": {body[:300]}" if body else "")
+
+
 def _core_hours(obj):
     """CPU hours SimScale billed for a finished mesh operation or run."""
 
@@ -112,14 +121,64 @@ class SimScaleClient:
         if existing:
             pid = existing.project_id
         else:
-            project = self.projects.create_project(
-                Project(name=name, description="Automated kirigami parachute Cd optimization", measurement_system="SI")
-            )
+            try:
+                project = self.projects.create_project(Project(
+                    name=name, description="Automated kirigami parachute Cd optimization", measurement_system="SI"
+                ))
+            except ApiException as exc:
+                if exc.status in (401, 403):
+                    raise SimScaleError(
+                        f"This API key may not create projects ({describe_api_error(exc)}). Create a project "
+                        f"named {name!r} in the SimScale web app and set SIMSCALE_PROJECT_ID to the ID in its URL "
+                        "(https://www.simscale.com/workbench/?pid=<ID>)."
+                    ) from exc
+                raise
             pid = project.project_id
             self.log(f"Created SimScale project {name!r}: {pid}")
         cache.parent.mkdir(parents=True, exist_ok=True)
         cache.write_text(json.dumps({"project_id": pid, "name": name}) + "\n")
         return pid
+
+    def check_access(self, project_id, project_name):
+        """Read-only (plus one free upload-slot) probes; creates no project.
+
+        Returns a list of (label, ok, detail) tuples.
+        """
+
+        results = []
+
+        def probe(label, fn):
+            try:
+                detail = fn()
+                results.append((label, True, detail))
+                return True
+            except ApiException as exc:
+                results.append((label, False, describe_api_error(exc)))
+            except LookupError as exc:
+                results.append((label, False, str(exc)))
+            except Exception as exc:
+                results.append((label, False, f"{type(exc).__name__}: {exc}"))
+            return False
+
+        if not probe("list projects", lambda: f"{len(self.list_projects(limit=100))} project(s) visible"):
+            return results  # key/network problem; the other probes would fail the same way
+        if project_id:
+            probe(f"open project {project_id}", lambda: f"name {self.projects.get_project(project_id).name!r}")
+            probe("list simulations in it",
+                  lambda: f"{len(self.simulations.get_simulations(project_id, limit=100).embedded or [])} simulation(s)")
+        else:
+            def find():
+                existing = self.find_project(project_name)
+                if existing is None:
+                    raise LookupError(
+                        f"SIMSCALE_PROJECT_ID is not set and no project named {project_name!r} exists; the first "
+                        "run would try to create it (this check does not)")
+                return f"found {project_name!r}: {existing.project_id}"
+            probe("pipeline project", find)
+        # Write permission: an upload slot is what every run starts with.
+        # It is never used and costs nothing.
+        probe("write access (create upload slot)", lambda: "ok" if self.storage.create_storage().storage_id else "?")
+        return results
 
     # ------------------------------------------------------------------
     # helpers
