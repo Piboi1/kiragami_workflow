@@ -16,6 +16,12 @@ def test_spec_serializes_like_manual_setup():
     assert bcs["Wall 3"]["velocity"]["type"] == "SLIP"
     assert len(bcs["Wall 3"]["topologicalReference"]["entities"]) == 4
     assert bcs["Velocity inlet 2"]["velocity"]["value"]["value"]["z"]["value"] == -6.148
+    # SimScale rejects specs without these (spec-validation-error on run 3)
+    numerics = model["numerics"]
+    assert "solvers" in numerics
+    for block in ("timeDifferentiation", "gradient", "divergence", "laplacian", "interpolation",
+                  "surfaceNormalGradient"):
+        assert block in numerics["schemes"]
     fc = model["resultControl"]["forcesMoments"][0]
     assert fc["dragDirection"]["value"] == {"x": 0, "y": 0, "z": -1}
     assert fc["topologicalReference"]["entities"] == ["B1_TE6"]
