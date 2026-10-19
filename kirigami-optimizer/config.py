@@ -51,7 +51,9 @@ FIXED_PARAMS = {
     # Inner overlap follows the searched outer overlap (2.5/15 in the original).
     "INNER_OVERLAP_RATIO": 2.5 / 15.0,
     # 3D solid (inches)
-    "VERTICAL_DROP": 10.62,       # measured deployed depth of r30_open_s115 under 20 g
+    # Deployed canopy depth (inches). None = predict it per design with
+    # DEPTH_MODEL below; a number fixes it for every design.
+    "VERTICAL_DROP": None,
     "KERF_FACTOR": 0.85,
     "SHEET_THICKNESS": 0.015,
     "EXTRUDE_METHOD": "union",
@@ -80,6 +82,20 @@ SEARCH_SPACE = [
     {"name": "INNER_RADIUS", "type": "real", "low": 0.5, "high": 1.25},
 ]
 
+# Deployed-depth model (solid/depth_model.py), used when VERTICAL_DROP is None.
+# Fitted to the hanging-depth measurements in DATA_FILE; add a row per
+# measured parachute and refit happens automatically.
+DEPTH_MODEL = {
+    "DATA_FILE": ROOT / "data" / "depth_measurements.csv",
+    # Chosen by leave-one-out on the 4 current measurements (all 8 cuts per
+    # ring): depth = c * (rings - 1), LOO RMSE 1.27 in. Add e.g.
+    # "cuts_per_ring" once measurements with other cut counts exist.
+    "FEATURES": ["n_bands"],
+    "INTERCEPT": False,
+    # Predictions are clamped to this range (inches).
+    "CLAMP_IN": (4.0, 14.0),
+}
+
 # Named designs for `main.py single --preset NAME`.
 PRESETS = {
     # The design in Kiragami_CFD Run 11 (Cd 1.083 at Uz = -6.148 m/s).
@@ -95,6 +111,9 @@ PRESETS = {
         "INNER_GAP_DEGREES": 6.0,
         "RING_OVERLAP_FRACTION": None,
         "INNER_OVERLAP_RATIO": None,
+        # Measured depth of this exact chute (and the Run 11 geometry), so
+        # the validation run is not affected by depth-model error.
+        "VERTICAL_DROP": 10.62,
     },
     # Generator defaults (kirigami_Q(0.75)_OL(2.5-15)_IG(20-6)_R24).
     "generator_default": {

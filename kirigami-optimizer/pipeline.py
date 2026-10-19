@@ -16,6 +16,7 @@ from optimizer.space import from_params, normalize
 from solid import InfeasibleGeometry, build_flow_domain, build_solid, export_stl, write_named_stl
 from solid.canopy import DEFAULT_SOLID_PARAMS
 from simscale.results import core_hours_used
+from solid.depth_model import get_depth_model
 from solid.flow_domain import DEFAULT_DOMAIN_PARAMS
 
 
@@ -27,6 +28,7 @@ class Context:
     simscale: object = None          # SimScaleClient, or None for a dry run
     project_id: str = None
     search_space: list = field(default_factory=lambda: config.SEARCH_SPACE)
+    runs_dir: Path = None            # default config.RUNS_DIR
     log: object = print
 
 
@@ -57,7 +59,14 @@ def build_geometry(params, design_dir, design_id):
 
     solid_params = {k: params.get(k, v) for k, v in DEFAULT_SOLID_PARAMS.items()}
     solid_params["CUTS_PER_RING"] = resolved["CUTS_PER_RING"]
+    if params.get("VERTICAL_DROP") is None:
+        depth, depth_info = get_depth_model(config.DEPTH_MODEL).predict(report)
+        solid_params["VERTICAL_DROP"] = depth
+    else:
+        depth_info = {"depth_model": "fixed", "depth_predicted_in": float(params["VERTICAL_DROP"]),
+                      "depth_extrapolated": False, "depth_notes": ""}
     canopy, info = build_solid(report, solid_params)
+    info.update(depth_info)
     canopy_stl = export_stl(canopy, design_dir / f"{design_id}_canopy.stl")
 
     domain_params = {k: params.get(k, v) for k, v in DEFAULT_DOMAIN_PARAMS.items()}
@@ -103,6 +112,9 @@ def _row(record):
         "projected_diameter_in": s.get("projected_diameter_in"),
         "reference_area_in2": s.get("reference_area_in2"),
         "canopy_depth_in": s.get("canopy_depth_in"),
+        "depth_source": s.get("depth_model"),
+        "depth_extrapolated": s.get("depth_extrapolated"),
+        "depth_notes": s.get("depth_notes"),
         "canopy_triangles": s.get("triangle_count"),
     }
     for k, val in p.items():
@@ -140,7 +152,7 @@ def evaluate_design(ctx, params, mode="single", uz_override=None, resume=None):
     else:
         design_id = ledger.next_design_id()
         ledger.start(design_id, params, x)
-    design_dir = config.RUNS_DIR / design_id
+    design_dir = (ctx.runs_dir or config.RUNS_DIR) / design_id
     design_dir.mkdir(parents=True, exist_ok=True)
 
     record = {"design_id": design_id, "mode": mode, "params": params, "x": x, "x_norm": x_norm,

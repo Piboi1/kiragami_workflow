@@ -99,6 +99,16 @@ About 0.8% of this space is geometrically impossible. In those designs, sparse i
 
 The cut-length curve (`MIN/MAX_CUT_LENGTH`, `PARABOLIC_EXPONENT`) is left out on purpose. With `ENFORCE_RING_OVERLAP`, the overlap always sets the cut angle, so those parameters never change the geometry. Everything not searched is held at `config.FIXED_PARAMS`. To change the search, move a key between the two.
 
+## How canopy depth is predicted
+
+The expanded 3D canopy is a paraboloid whose depth (`VERTICAL_DROP`) is set per design. It is predicted from hanging-depth measurements in `data/depth_measurements.csv`, one row per physical chute measured under the 20 g payload:
+
+- **Current fit:** depth = 0.358 in × (rings − 1), with a leave-one-out error of 1.27 in. Each ring-to-ring band acts as a hinge and adds about the same lift. Two near-identical 30-ring chutes measured 9.19 and 10.62 in, so measurement scatter is about ±0.7 in.
+- **Run `python main.py depth-model`** to see the fit and how well each measurement is predicted when it is left out.
+- **Limits:** all 4 measured chutes have 8 cuts per ring, so the model cannot yet capture how cut count changes depth. Designs outside the measured range are logged with `depth_extrapolated = TRUE` and a note in the sheet.
+- **To improve it:** measure more chutes and add rows to the CSV. The cpr4–cpr12 and overlap-test chutes already exist and would be ideal. Once those rows are in, add `"cuts_per_ring"` (or other features from `solid/depth_model.py`) to `DEPTH_MODEL["FEATURES"]` in `config.py`. The model refits automatically.
+- **Fixed depth:** set `FIXED_PARAMS["VERTICAL_DROP"]` to a number to use one depth for every design. The `baseline` preset pins its measured 10.62 in.
+
 ## How Uz is estimated
 
 - **Mass:** `PAYLOAD_MASS_G` + canopy mass (`SHEET_GSM` × flat disk area, or `CANOPY_MASS_G` if you weigh it).

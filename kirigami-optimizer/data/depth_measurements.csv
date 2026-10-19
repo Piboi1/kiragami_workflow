@@ -1,0 +1,5 @@
+name,PARACHUTE_DIAMETER,RIM_WIDTH,INNER_RADIUS,NUM_RINGS,CUTS_PER_RING,RING_SPACING_EXPONENT,RING_OVERLAP_DEGREES,INNER_RING_OVERLAP_DEGREES,INNER_RING_COUNT,MIN_GAP_DEGREES,INNER_GAP_DEGREES,payload_g,depth_in,notes
+K(Base)_Q(0.75)_OL(12)_R24,9,0.25,0.75,24,8,0.75,12,12,5,6,6,20,9.611,"2 cm scale / 126.9 px * 1548.7 px = 24.41 cm. Outer cut radius 4.25 in -> D = 9 in."
+kirigami_many_rings_r30_ol12to16,10,0.25,0.75,30,8,1.15,16,12,5,6,6,20,9.186,"2 / 18.9 * 220.5 = 23.33 cm. Sheet says D = 9 but outer cut radius 4.75 in -> D = 10 in."
+kirigami_balanced_r18_ol8to12,10,0.25,0.75,18,8,0.85,12,8,5,6,6,20,5.886,"2 / 8.0 * 59.8 = 14.95 cm. Sheet says D = 9 but outer cut radius 4.75 in -> D = 10 in."
+kirigami_r30_open_s115_ol14to16,10,0.25,0.75,30,8,1.15,16,14,6,6,6,20,10.62,"2 / 38.8 * 523.6 = 26.99 cm = 10.62 in (sheet cell holds the inch value under a cm header). Run 11 design."

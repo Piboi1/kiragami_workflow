@@ -10,6 +10,7 @@
                                                     Bayesian optimization (resumable)
     python main.py sync-sheet                       re-send rows that failed to reach the sheet
     python main.py status                           ledger summary / best design
+    python main.py depth-model                      show the fitted canopy-depth model
 """
 
 import argparse
@@ -56,7 +57,7 @@ def _live_context():
 def cmd_dry_run(args):
     ledger = Ledger(config.STATE_DIR / "dry_run_ledger.json")
     ctx = Context(ledger=ledger, logger=RunLogger(config.RUNS_DIR / "dry_run_results.csv", use_sheets=False),
-                  estimator=_estimator())
+                  estimator=_estimator(), runs_dir=config.RUNS_DIR / "dry_run")
     record = evaluate_design(ctx, design_params(_preset(args.preset)), mode="dry_run", uz_override=args.uz)
     print(json.dumps(record["row"], indent=2, default=str))
     print("\nFiles:", json.dumps(record.get("files", {}), indent=2))
@@ -135,6 +136,13 @@ def cmd_sync(args):
     return 0
 
 
+def cmd_depth_model(args):
+    from solid.depth_model import get_depth_model
+
+    print(get_depth_model(config.DEPTH_MODEL).summary())
+    return 0
+
+
 def cmd_status(args):
     from optimizer.loop import best_so_far
 
@@ -181,6 +189,7 @@ def main(argv=None):
 
     sub.add_parser("sync-sheet").set_defaults(fn=cmd_sync)
     sub.add_parser("status").set_defaults(fn=cmd_status)
+    sub.add_parser("depth-model").set_defaults(fn=cmd_depth_model)
 
     args = ap.parse_args(argv)
     return args.fn(args)
