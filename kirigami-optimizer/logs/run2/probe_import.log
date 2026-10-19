@@ -1,0 +1,20 @@
+
+=== STEP import with sewing=False, improve=True ===
+  uploading probe_flow_domain.step (33 MB, STEP, sewing=False, improve=True)
+  geometry import: RUNNING
+  geometry import: FINISHED
+  geometry 7a80ac74-5f83-490e-a1d1-9e1653302edf: 1 body(ies)
+    body B1: labels ['(from face names)']
+    inlet        1 face(s) on body ['B1']
+    outlet       1 face(s) on body ['B1']
+    side_xmin    1 face(s) on body ['B1']
+    side_xmax    1 face(s) on body ['B1']
+    side_ymin    1 face(s) on body ['B1']
+    side_ymax    1 face(s) on body ['B1']
+    canopy     22522 face(s) on body ['B1']
+    sting        0 face(s) on body []
+    unlabeled    0 face(s)
+  USABLE: one body with every boundary named
+
+Mappings saved in /home/user/kiragami_workflow/kirigami-optimizer/runs/probe_import. Usable variants: ['step_sew0_imp1']
+The probe geometries are named probe_* in the project and can be deleted there.
