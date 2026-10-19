@@ -1,0 +1,21 @@
+
+=== STEP import with sewing=False, improve=True ===
+  uploading probe_flow_domain.step (54 MB, STEP, sewing=False, improve=True)
+  geometry import: RUNNING
+  geometry import: FAILED
+  FAILED: SimScaleError: geometry import FAILED: {'code': 'model-has-invalid-geometry',
+ 'details': {'faults': [{'code': 'fault-face-bad_face_face',
+                         'entityIds': ['B1_TE1104244'],
+                         'entityType': 'FACE',
+                         'isFacetFault': False,
+                         'position': {'X': -0.04798732882934621,
+                                      'Y': -0.01740040910690257,
+                                      'Z': -0.051307878278357984},
+                         'secondaryEntityIds': ['B1_TE27428']}]},
+ 'message': 'The model contains faults that could not be healed on import. '
+            'Healing operation in your CAD tool can potentially fix this '
+            'issue.',
+ 'severity': 'WARNING'}
+
+Mappings saved in /home/user/kiragami_workflow/kirigami-optimizer/runs/probe_import. Usable variants: none
+The probe geometries are named probe_* in the project and can be deleted there.
