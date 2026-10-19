@@ -1,1 +1,4 @@
 [design_0001] generating pattern + solid
+[design_0001] rings=30 Aref=74.95 in^2 Uz=-6.148 m/s (Cd for Uz 0.307)
+  uploading design_0001_flow_domain.step (33 MB, STEP, sewing=False, improve=True)
+  geometry import: RUNNING
