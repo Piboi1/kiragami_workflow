@@ -28,6 +28,8 @@ canopy: X/Y +-25.83 in, Z from -70 in to +31.13 in.
 import numpy as np
 import trimesh
 
+from . import booleans
+
 DEFAULT_DOMAIN_PARAMS = {
     # Multiples of the flat PARACHUTE_DIAMETER.
     "DOMAIN_LATERAL_HALF_WIDTH_D": 2.583,  # +-X and +-Y
@@ -87,10 +89,10 @@ def build_flow_domain(canopy, diameter_in, params=None, sting_anchor=None):
     if sting_anchor is not None and radius > 0:
         # Extends 1 in past the outlet so the boolean cuts a clean hole in it.
         sting = build_sting(sting_anchor, radius, lo[2] - 1.0)
-        body = trimesh.boolean.union([canopy, sting], engine="manifold")
+        body = booleans.union([canopy, sting])
 
     box = trimesh.creation.box(bounds=[lo, hi])
-    fluid = trimesh.boolean.difference([box, body], engine="manifold")
+    fluid = booleans.difference(box, body)
     if not fluid.is_watertight:
         raise RuntimeError("flow domain is not watertight after the boolean")
 

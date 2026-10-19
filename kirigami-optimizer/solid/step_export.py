@@ -107,8 +107,20 @@ def _patches(fluid, labels, tol_in=1e-9):
                     patch[g] = len(patches)
                     members.append(g)
                     queue.append(g)
-        patches.append(np.array(members))
+        members = np.array(members)
+        if len(members) > 1 and _pinched(F[members]):
+            # Boundary loops touching at a vertex make an invalid face; keep
+            # those triangles as separate faces instead.
+            patches.extend(np.array([m]) for m in members)
+        else:
+            patches.append(members)
     return patches
+
+
+def _pinched(tri_faces):
+    loops = _boundary_loops(tri_faces)
+    verts = [v for loop in loops for v in loop]
+    return len(verts) != len(set(verts))
 
 
 def _boundary_loops(tri_faces):
@@ -140,7 +152,7 @@ def _boundary_loops(tri_faces):
     return loops
 
 
-def build_brep(fluid, labels):
+def build_brep(fluid, labels, merge_planar=True):
     """Returns (solid, faces, face_labels): one planar B-rep face per patch."""
 
     from OCP.BRep import BRep_Builder
@@ -179,7 +191,7 @@ def build_brep(fluid, labels):
         pts = V[loop]
         return float(np.dot(np.cross(pts, np.roll(pts, -1, axis=0)).sum(axis=0), normal)) / 2.0
 
-    patches = _patches(fluid, labels)
+    patches = _patches(fluid, labels) if merge_planar else [np.array([i]) for i in range(len(F))]
     faces, face_labels, patch_of_triangle = [], [], np.empty(len(F), dtype=int)
     for k, tris in enumerate(patches):
         patch_of_triangle[tris] = k

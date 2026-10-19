@@ -59,6 +59,7 @@ FIXED_PARAMS = {
     "EXTRUDE_METHOD": "union",
     "JOINT_OVERLAP": 0.03,
     "MIN_CAP_RADIUS": 0.05,
+    "SIMPLIFY_TOLERANCE": 1e-4,   # inches; removes boolean slivers (see solid/canopy.py)
     # flow domain, in multiples of PARACHUTE_DIAMETER (matches Kiragami_CFD box)
     "DOMAIN_LATERAL_HALF_WIDTH_D": 2.583,
     "DOMAIN_UPSTREAM_D": 3.113,

@@ -26,6 +26,8 @@ import math
 import numpy as np
 import trimesh
 
+from . import booleans
+
 DEFAULT_SOLID_PARAMS = {
     "CUTS_PER_RING": 8,
     "VERTICAL_DROP": 10.62,      # max Z-drop of the deployed canopy (inches)
@@ -42,6 +44,10 @@ DEFAULT_SOLID_PARAMS = {
     # (KERF_FACTOR x ring spacing) wider than the first ring's radius, which
     # is not a physical pattern and breaks the boolean union.
     "MIN_CAP_RADIUS": 0.05,      # inches
+    # "union" only: after the boolean, collapse edges and needle triangles
+    # shorter than this (inches). The union of thin overlapping slabs leaves
+    # micron-scale slivers that CAD kernels reject as clashing faces.
+    "SIMPLIFY_TOLERANCE": 1e-4,
 }
 
 
@@ -301,7 +307,9 @@ def build_solid(ring_data, params=None):
 
     if method == "union":
         slabs = [extrude_surface(v, f, thickness) for v, f in strips]
-        mesh = trimesh.boolean.union(slabs, engine="manifold")
+        mesh = booleans.union(slabs)
+        if float(p["SIMPLIFY_TOLERANCE"]) > 0:
+            mesh = booleans.simplify(mesh, float(p["SIMPLIFY_TOLERANCE"]))
     elif method == "legacy":
         mesh = _legacy_extrude(strips, thickness)
     else:
