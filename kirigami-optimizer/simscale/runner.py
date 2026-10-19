@@ -289,7 +289,10 @@ class SimScaleClient:
         """Bodies, and which of our face groups ended up on which body."""
 
         faces = self._all_mappings(project_id, geometry_id, "face")
-        bodies = self._all_mappings(project_id, geometry_id, "body")
+        # Imported volumes are listed under the "region" class (e.g. B1_TE124126,
+        # labelled "Flow region"); "body" is kept as a fallback.
+        bodies = (self._all_mappings(project_id, geometry_id, "region")
+                  or self._all_mappings(project_id, geometry_id, "body"))
         if dump_path:
             dump = [{"name": e.name, "class": e._class, "labels": sorted(self._labels_of(e))}
                     for e in faces + bodies]

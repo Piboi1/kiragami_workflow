@@ -61,9 +61,10 @@ def test_runner_maps_step_faces(by, monkeypatch):
     faces += [_entity(f"B1_TE{100 + i}") for i in range(5)]  # canopy faces: no name, no colour
     client = SimScaleClient.__new__(SimScaleClient)
     monkeypatch.setattr(client, "_all_mappings",
-                        lambda p, g, cls: faces if cls == "face" else [SimpleNamespace(name="B1", originate_from=[])],
+                        lambda p, g, cls: faces if cls == "face" else
+                        [SimpleNamespace(name="B1_TE999", originate_from=[])] if cls == "region" else [],
                         raising=False)
     groups, body = client.resolve_entities("p", "g")
-    assert body == "B1"
+    assert body == "B1_TE999"
     assert groups["inlet"] == ["B1_TE0"] and len(groups["canopy"]) == 5
     assert all(len(groups[n]) == 1 for n in BOX_FACES)
