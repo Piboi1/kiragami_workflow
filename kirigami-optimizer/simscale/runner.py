@@ -247,36 +247,82 @@ class SimScaleClient:
                     labels.add(str(attr.value).lower())
         return labels
 
-    def resolve_entities(self, project_id, geometry_id, dump_path=None):
-        """Maps our STL solid names to SimScale internal face / body names."""
+    def start_import(self, project_id, name, stl_path, sewing, improve):
+        """Uploads an STL (inches) and starts its import. Returns (storage_id, import_id).
+
+        sewing=True joins the STL's separate ``solid`` blocks (which SimScale
+        imports as separate sheet bodies) into one solid body, keeping each
+        block's name on its faces.
+        """
+
+        self.log(f"  uploading {Path(stl_path).name} (sewing={sewing}, improve={improve})")
+        storage = self.storage.create_storage()
+        with open(stl_path, "rb") as fh:
+            self.api_client.rest_client.PUT(
+                url=storage.url, headers={"Content-Type": "application/octet-stream"}, body=fh.read()
+            )
+        imp = self.imports.import_geometry(project_id, GeometryImportRequest(
+            name=name,
+            location=GeometryImportRequestLocation(storage.storage_id),
+            format="STL",
+            input_unit="in",
+            options=GeometryImportRequestOptions(
+                facet_split=False, sewing=sewing, improve=improve, optimize_for_lbm_solver=False
+            ),
+        ))
+        return storage.storage_id, imp.geometry_import_id
+
+    def wait_for_import(self, project_id, import_id):
+        imp = self._poll("geometry import", lambda: self.imports.get_geometry_import(project_id, import_id), 1800)
+        if imp.status != "FINISHED":
+            raise SimScaleError(f"geometry import {imp.status}: {getattr(imp, 'failure_reason', '')}")
+        return imp.geometry_id
+
+    def describe_geometry(self, project_id, geometry_id, dump_path=None):
+        """Bodies, and which of our face groups ended up on which body."""
 
         faces = self._all_mappings(project_id, geometry_id, "face")
         bodies = self._all_mappings(project_id, geometry_id, "body")
-
         if dump_path:
-            dump = [
-                {"name": e.name, "class": e._class, "labels": sorted(self._labels_of(e))}
-                for e in faces + bodies
-            ]
+            dump = [{"name": e.name, "class": e._class, "labels": sorted(self._labels_of(e))}
+                    for e in faces + bodies]
             Path(dump_path).write_text(json.dumps(dump, indent=2) + "\n")
 
         groups = {g: [] for g in FACE_GROUPS}
+        unlabeled = []
         for e in faces:
             labels = self._labels_of(e)
-            for g in FACE_GROUPS:
-                if g in labels:
-                    groups[g].append(e.name)
-                    break
-        missing = [g for g, names in groups.items() if not names]
+            group = next((g for g in FACE_GROUPS if g in labels), None)
+            (groups[group] if group else unlabeled).append(e.name)
+
+        def body_of(entity_name):  # internal names look like B1_TE5 / A1_I26_..._B102_TE196
+            return entity_name.rsplit("_TE", 1)[0]
+
+        return {
+            "bodies": [{"name": b.name, "labels": sorted(self._labels_of(b))} for b in bodies],
+            "groups": groups,
+            "group_bodies": {g: sorted({body_of(n) for n in names}) for g, names in groups.items()},
+            "unlabeled_faces": unlabeled,
+        }
+
+    def resolve_entities(self, project_id, geometry_id, dump_path=None):
+        """Maps our STL solid names to SimScale internal face / body names."""
+
+        geo = self.describe_geometry(project_id, geometry_id, dump_path)
+        missing = [g for g, names in geo["groups"].items() if not names]
         if missing:
             raise SimScaleError(
                 f"Could not find faces for {missing} in the imported geometry. "
-                f"The face/body mapping was saved to {dump_path} -- check how SimScale "
-                "named the STL solids and adjust resolve_entities()."
+                f"The face/body mapping was saved to {dump_path}."
             )
-        if len(bodies) != 1:
-            raise SimScaleError(f"expected exactly 1 fluid body, found {len(bodies)} (mapping in {dump_path})")
-        return groups, bodies[0].name
+        if len(geo["bodies"]) != 1:
+            layout = ", ".join(f"{g}->{'/'.join(b)}" for g, b in geo["group_bodies"].items())
+            raise SimScaleError(
+                f"expected exactly 1 fluid body, found {len(geo['bodies'])} ({layout}). "
+                "SimScale imports each STL 'solid' block as its own body; IMPORT_SEWING must join them "
+                "(run `python main.py probe-import` to test import options at no cost)."
+            )
+        return geo["groups"], geo["bodies"][0]["name"]
 
     def _assign_air(self, project_id, simulation_id, body_entity):
         groups = self.materials.get_material_groups().embedded
@@ -348,27 +394,10 @@ class SimScaleClient:
         # 1. upload + import --------------------------------------------------
         if "geometry_id" not in state:
             if "geometry_import_id" not in state:
-                self.log("  uploading flow domain STL")
-                storage = self.storage.create_storage()
-                with open(domain_stl, "rb") as fh:
-                    self.api_client.rest_client.PUT(
-                        url=storage.url, headers={"Content-Type": "application/octet-stream"}, body=fh.read()
-                    )
-                imp = self.imports.import_geometry(project_id, GeometryImportRequest(
-                    name=design_id,
-                    location=GeometryImportRequestLocation(storage.storage_id),
-                    format="STL",
-                    input_unit="in",
-                    options=GeometryImportRequestOptions(
-                        facet_split=False, sewing=False, improve=True, optimize_for_lbm_solver=False
-                    ),
-                ))
-                remember(storage_id=storage.storage_id, geometry_import_id=imp.geometry_import_id)
-            imp = self._poll("geometry import",
-                             lambda: self.imports.get_geometry_import(project_id, state["geometry_import_id"]), 1800)
-            if imp.status != "FINISHED":
-                raise SimScaleError(f"geometry import {imp.status}: {getattr(imp, 'failure_reason', '')}")
-            remember(geometry_id=imp.geometry_id)
+                storage_id, import_id = self.start_import(
+                    project_id, design_id, domain_stl, cfg["IMPORT_SEWING"], cfg["IMPORT_IMPROVE"])
+                remember(storage_id=storage_id, geometry_import_id=import_id)
+            remember(geometry_id=self.wait_for_import(project_id, state["geometry_import_id"]))
 
         # 2. simulation spec --------------------------------------------------
         if "simulation_id" not in state:

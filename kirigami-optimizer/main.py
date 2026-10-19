@@ -11,6 +11,8 @@
     python main.py sync-sheet                       re-send rows that failed to reach the sheet
     python main.py status                           ledger summary / best design
     python main.py depth-model                      show the fitted canopy-depth model
+    python main.py probe-import [--sewing true false] [--improve true]
+                                                    test SimScale geometry import options (not billed)
 """
 
 import argparse
@@ -136,6 +138,49 @@ def cmd_sync(args):
     return 0
 
 
+def cmd_probe_import(args):
+    """Imports the baseline flow domain with given options and reports the
+    resulting bodies/faces. Geometry imports are not billed (no mesh/run)."""
+
+    from simscale_sdk import ApiException
+
+    from pipeline import build_geometry
+    from simscale.runner import describe_api_error
+
+    client, project_id = _simscale_client()
+    out = config.RUNS_DIR / "probe_import"
+    out.mkdir(parents=True, exist_ok=True)
+    _, _, _, paths = build_geometry(design_params(_preset("baseline")), out, "probe")
+    variants = [(s, i) for s in args.sewing for i in args.improve]
+    ok_variants = []
+    for sewing, improve in variants:
+        tag = f"sew{int(sewing)}_imp{int(improve)}"
+        print(f"\n=== import with sewing={sewing}, improve={improve} ===")
+        try:
+            _, import_id = client.start_import(project_id, f"probe_{tag}", paths["domain_stl"], sewing, improve)
+            geometry_id = client.wait_for_import(project_id, import_id)
+            geo = client.describe_geometry(project_id, geometry_id, out / f"entities_{tag}.json")
+        except ApiException as exc:
+            print(f"  FAILED: {describe_api_error(exc)}")
+            continue
+        except Exception as exc:
+            print(f"  FAILED: {type(exc).__name__}: {exc}")
+            continue
+        print(f"  geometry {geometry_id}: {len(geo['bodies'])} body(ies)")
+        for b in geo["bodies"]:
+            print(f"    body {b['name']}: labels {b['labels']}")
+        for g, names in geo["groups"].items():
+            print(f"    {g:10s} {len(names):3d} face(s) on body {geo['group_bodies'][g]}")
+        print(f"    unlabeled  {len(geo['unlabeled_faces']):3d} face(s)")
+        good = len(geo["bodies"]) == 1 and all(geo["groups"].values())
+        print("  USABLE: one body with every boundary named" if good else "  not usable as-is")
+        if good:
+            ok_variants.append(tag)
+    print(f"\nMappings saved in {out}. Usable variants: {ok_variants or 'none'}")
+    print("The probe geometries are named probe_* in the project and can be deleted there.")
+    return 0 if ok_variants else 1
+
+
 def cmd_depth_model(args):
     from solid.depth_model import get_depth_model
 
@@ -190,6 +235,11 @@ def main(argv=None):
     sub.add_parser("sync-sheet").set_defaults(fn=cmd_sync)
     sub.add_parser("status").set_defaults(fn=cmd_status)
     sub.add_parser("depth-model").set_defaults(fn=cmd_depth_model)
+
+    p = sub.add_parser("probe-import")
+    p.add_argument("--sewing", type=lambda v: v.lower() in ("1", "true", "yes"), nargs="+", default=[True, False])
+    p.add_argument("--improve", type=lambda v: v.lower() in ("1", "true", "yes"), nargs="+", default=[True])
+    p.set_defaults(fn=cmd_probe_import)
 
     args = ap.parse_args(argv)
     return args.fn(args)

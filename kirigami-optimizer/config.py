@@ -161,6 +161,11 @@ SIMSCALE = {
     # and saved to state/simscale_project.json so later runs reuse it).
     "PROJECT_ID": os.getenv("SIMSCALE_PROJECT_ID", ""),
     "NEW_PROJECT_NAME": "Kiragami_Optimizer",  # matches the project created in the web app
+    # Geometry import. The flow-domain STL has one 'solid' block per
+    # boundary; SimScale imports each as a separate sheet body, so sewing
+    # must join them into one fluid body (see `main.py probe-import`).
+    "IMPORT_SEWING": True,
+    "IMPORT_IMPROVE": True,
     "TURBULENCE_MODEL": "KOMEGASST",
     "END_TIME_S": 500,              # steady-state iterations
     "DELTA_T_S": 1,
