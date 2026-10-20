@@ -126,6 +126,10 @@ def cmd_single(args):
     for item in args.set or []:
         key, _, value = item.partition("=")
         params[key] = float(value)
+    if args.max_core_hours is not None:  # this run only; the config default stays
+        ctx.simscale.cfg["MAX_CORE_HOURS_PER_RUN"] = args.max_core_hours
+        print(f"CPU-hour cap for this design (mesh + run, checked against SimScale's estimate and enforced live): "
+              f"{args.max_core_hours:g}")
     resume = None
     if args.from_manual:  # reuse the flow volume made by `manual-step --design-id ...`
         from pipeline import start_with_geometry
@@ -483,6 +487,8 @@ def main(argv=None):
     p.add_argument("--uz", type=float, help="force inlet speed (m/s), e.g. 6.148 to compare with Run 11")
     p.add_argument("--from-manual", metavar="DESIGN_ID",
                    help="use the flow volume made by `manual-step --design-id DESIGN_ID`")
+    p.add_argument("--max-core-hours", type=float, default=None,
+                   help="per-design CPU-hour cap for this run (default: config MAX_CORE_HOURS_PER_RUN)")
     p.add_argument("--simplify-tol", type=float, default=None, help="canopy simplification (inches)")
     p.add_argument("--set", nargs="+", metavar="KEY=VALUE", help="numeric overrides, e.g. BRIDGE_EXTRA=0 JOINT_OVERLAP=0")
     p.set_defaults(fn=cmd_single)
