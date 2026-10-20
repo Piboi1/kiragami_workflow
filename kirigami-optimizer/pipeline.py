@@ -246,6 +246,16 @@ def evaluate_design(ctx, params, mode="single", uz_override=None, resume=None):
     return record
 
 
+def start_with_geometry(ctx, params, geometry_id):
+    """Opens a pending design whose flow-volume geometry already exists in SimScale
+    (made with `main.py manual-step`), so the run skips the import and the wait."""
+
+    ledger = ctx.ledger
+    ledger.start(ledger.next_design_id(), params, search_vector(ctx.search_space, params))
+    ledger.update_pending(simscale={"geometry_id": geometry_id})
+    return ledger.pending
+
+
 def resume_pending(ctx):
     """Finishes a design that was interrupted mid-run, if there is one."""
 

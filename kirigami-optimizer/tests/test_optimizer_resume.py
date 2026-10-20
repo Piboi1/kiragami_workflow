@@ -88,3 +88,26 @@ def test_core_hour_budget_stops_the_loop(isolated_paths, monkeypatch):
     # re-running with the same budget starts nothing new
     run_optimization(_ctx(FakeSimScale()), n_calls=10, n_initial_points=3)
     assert len(Ledger(config.LEDGER_PATH).records) == 3
+
+
+def test_single_run_reuses_existing_flow_volume_geometry(isolated_paths, monkeypatch):
+    """`single --from-manual`: the SimScale state already holds the geometry, so no import happens."""
+
+    from pipeline import evaluate_design, start_with_geometry
+
+    seen = {}
+
+    class Sim(FakeSimScale):
+        def run_design(self, *args, **kwargs):
+            seen["state"] = dict(args[7])  # SimScale state the run starts from
+            return super().run_design(*args, **kwargs)
+
+    ctx = _ctx(Sim())
+    params = dict(config.FIXED_PARAMS)
+    params.update(config.PRESETS["baseline"])
+    pending = start_with_geometry(ctx, params, "geom-123")
+    record = evaluate_design(ctx, params, mode="single", uz_override=6.148, resume=pending)
+    assert record["status"] == "ok" and record["design_id"] == pending["design_id"]
+    assert seen["state"]["geometry_id"] == "geom-123"
+    assert record["velocity"]["uz_mps"] == -6.148
+    assert ctx.ledger.pending is None

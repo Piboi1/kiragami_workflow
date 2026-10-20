@@ -120,7 +120,20 @@ def cmd_single(args):
     if ctx.ledger.pending:
         print("An interrupted design is pending; finishing it first.")
         resume_pending(ctx)
-    record = evaluate_design(ctx, design_params(_preset(args.preset)), mode="single", uz_override=args.uz)
+    params = design_params(_preset(args.preset))
+    if args.simplify_tol is not None:
+        params["SIMPLIFY_TOLERANCE"] = args.simplify_tol
+    for item in args.set or []:
+        key, _, value = item.partition("=")
+        params[key] = float(value)
+    resume = None
+    if args.from_manual:  # reuse the flow volume made by `manual-step --design-id ...`
+        from pipeline import start_with_geometry
+
+        state = json.loads((config.RUNS_DIR / "manual_step" / args.from_manual / "simscale_state.json").read_text())
+        resume = start_with_geometry(ctx, params, state["geometry_id"])
+        print(f"Using flow-volume geometry {state['geometry_id']} from manual-step {args.from_manual}")
+    record = evaluate_design(ctx, params, mode="single", uz_override=args.uz, resume=resume)
     print(json.dumps(record["row"], indent=2, default=str))
     return 0 if record["status"] == "ok" else 1
 
@@ -468,6 +481,10 @@ def main(argv=None):
     p = sub.add_parser("single")
     p.add_argument("--preset", default="baseline")
     p.add_argument("--uz", type=float, help="force inlet speed (m/s), e.g. 6.148 to compare with Run 11")
+    p.add_argument("--from-manual", metavar="DESIGN_ID",
+                   help="use the flow volume made by `manual-step --design-id DESIGN_ID`")
+    p.add_argument("--simplify-tol", type=float, default=None, help="canopy simplification (inches)")
+    p.add_argument("--set", nargs="+", metavar="KEY=VALUE", help="numeric overrides, e.g. BRIDGE_EXTRA=0 JOINT_OVERLAP=0")
     p.set_defaults(fn=cmd_single)
 
     p = sub.add_parser("optimize")
