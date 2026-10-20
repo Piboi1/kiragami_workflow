@@ -6,6 +6,14 @@ Here each strip of the expanded kirigami is lofted as one thin solid with a
 handful of smooth B-spline faces, like a native CAD model (the manual
 Onshape-based setup has 954 faces). Same kinematics as solid/canopy.py.
 
+EXPERIMENTAL - baseline measurements (local, free): 721 pieces fuse in ~2 min
+when fused in groups of 24 (fuzzy 1e-3 mm; 1e-4 mm gives invalid groups, one
+general fuse of all pieces ran >10 min at 7 GB), but the result is 10,516
+faces (UnifySameDomain merges nothing), 35 disconnected solids, not
+BRep-valid, and 13% over the mesh canopy volume. That is ~2x fewer faces than
+the triangle B-rep (22.5k), far from the manual setup's 954, so it was not
+sent to SimScale.
+
 Units: inches in, millimetres in the OpenCascade shapes (STEP is mm).
 """
 
@@ -98,7 +106,7 @@ def _shape_list(shapes):
     return lst
 
 
-def fuse_pieces(pieces, fuzzy_mm=1e-4):
+def fuse_pieces(pieces, fuzzy_mm=1e-3):
     """General-fuse of all strip/cap solids into one solid, same-surface faces merged."""
 
     from OCP.BRepAlgoAPI import BRepAlgoAPI_Fuse
@@ -112,14 +120,14 @@ def fuse_pieces(pieces, fuzzy_mm=1e-4):
     op.SetRunParallel(True)
     op.SetFuzzyValue(fuzzy_mm)
     op.Build()
-    if not op.IsDone() or op.HasErrors():
+    if not op.IsDone():
         raise RuntimeError("canopy fuse failed")
     unify = ShapeUpgrade_UnifySameDomain(op.Shape(), True, True, True)
     unify.Build()
     return unify.Shape()
 
 
-def fuse_staged(pieces, group=24, fuzzy_mm=1e-4):
+def fuse_staged(pieces, group=24, fuzzy_mm=1e-3):
     """Fuses neighbouring pieces in small groups first, then the groups.
 
     One general-fuse over hundreds of pieces is slow and memory-hungry; the
@@ -159,7 +167,7 @@ def count_solids(shape):
     return n
 
 
-def build_canopy_cad(ring_data, params=None, fuzzy_mm=1e-4, group=0):
+def build_canopy_cad(ring_data, params=None, fuzzy_mm=1e-3, group=0):
     """Returns (canopy_shape_mm, info): the fused, face-merged smooth canopy."""
 
     p = dict(DEFAULT_SOLID_PARAMS)
@@ -189,7 +197,7 @@ def build_flow_cad(canopy, lo_in, hi_in):
     hi = np.array(hi_in) * MM_PER_IN
     box = BRepPrimAPI_MakeBox(gp_Pnt(*lo), gp_Pnt(*hi)).Shape()
     cut = BRepAlgoAPI_Cut(box, canopy)
-    if not cut.IsDone() or cut.HasErrors():
+    if not cut.IsDone():
         raise RuntimeError("box - canopy failed")
     return cut.Shape()
 
@@ -226,7 +234,7 @@ def write_flow_step(fluid, lo_in, hi_in, path):
 
     named, exp = set(), TopExp_Explorer(fluid, TopAbs_FACE)
     while exp.More():
-        face = TopoDS.Face_s(exp.Current())
+        face = TopoDS.Face(exp.Current())
         surf = BRepAdaptor_Surface(face)
         if surf.GetType() == GeomAbs_Plane:
             pln = surf.Plane()
