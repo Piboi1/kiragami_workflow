@@ -1,0 +1,17 @@
+gate gate_control: canopy 57012 triangles, simplify 0.0001, cap 0.3 CPU h, timeout 180 s, pass at 30% progress
+  uploading gate_control_canopy.stl (3 MB, STL, sewing=True, improve=True)
+  geometry import: RUNNING
+  geometry import: FINISHED
+{
+  "name": "gate_control",
+  "result": "INCONCLUSIVE",
+  "reason": "stopped at cap/timeout (0.134 CPU h, progress 0.0)",
+  "status": "CANCELED",
+  "progress": 0.0,
+  "cpu_hours": 0.13527777777777777,
+  "geometry_id": "1db7561f-9b19-4cee-8e14-8cc59d6c1a71",
+  "mesh_operation_id": "710cb0f4-30cf-4dc8-99b2-8b4ecf7fec32",
+  "simplify_tol": 0.0001,
+  "joint_overlap": null,
+  "wall_s": 192
+}

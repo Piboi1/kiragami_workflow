@@ -382,11 +382,13 @@ def cmd_canopy_gate(args):
         name=f"{args.name} gate", geometry_id=geometry_id, model=model))
     op_id = op.mesh_operation_id
     client.meshes.start_mesh_operation(project_id, op_id)
-    started, result, reason = time.time(), None, ""
+    started, run_started, result, reason = time.time(), None, None, ""
     try:
         while True:
             cur = client.meshes.get_mesh_operation(project_id, op_id)
             hours = _core_hours(cur)
+            if cur.status == "RUNNING" and run_started is None:
+                run_started = time.time()  # queue time is not billed, so it does not count
             if cur.status == "FAILED":
                 entries = client.meshes.get_mesh_operation_event_log(project_id, op_id).entries or []
                 reason = " | ".join(e.message for e in entries)
@@ -395,7 +397,7 @@ def cmd_canopy_gate(args):
             if cur.status == "FINISHED" or (cur.status == "RUNNING" and (cur.progress or 0) >= args.pass_progress):
                 result = "PASS"
                 break
-            if hours > args.cap or time.time() - started > args.timeout:
+            if hours > args.cap or (run_started and time.time() - run_started > args.timeout):
                 result, reason = "INCONCLUSIVE", f"stopped at cap/timeout ({hours:.3f} CPU h, progress {cur.progress})"
                 break
             time.sleep(args.poll)
