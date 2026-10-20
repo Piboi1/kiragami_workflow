@@ -79,12 +79,16 @@ def normalize_ring_data(ring_data):
     return out
 
 
-def build_open_strips(rings, cuts_per_ring, vertical_drop, kerf_factor, joint_overlap=0.0):
+def build_open_strips(rings, cuts_per_ring, vertical_drop, kerf_factor, joint_overlap=0.0, record=None):
     """Expanded-kirigami kinematics from the original script.
 
     Returns a list of strips; each strip is (vertices Nx3, faces Mx3) of an
     open quad-strip surface. With joint_overlap=0 the list order and vertex
     layout match the original global_verts / global_faces construction.
+
+    record: optional list; each strip's analytic description (end radii,
+    heights, widths, angles, parameter range) and the centre cap are
+    appended to it, for building smooth CAD (solid/smooth_cad.py).
     """
 
     r_dep = [r for r, _ in rings]
@@ -118,6 +122,9 @@ def build_open_strips(rings, cuts_per_ring, vertical_drop, kerf_factor, joint_ov
             length = sum(np.linalg.norm(b - a) for a, b in zip(pts, pts[1:]))
             if length > 0:
                 t0, t1 = -joint_overlap / length, 1.0 + joint_overlap / length
+        if record is not None:
+            record.append({"kind": "strip", "r1": r1, "z1": z1, "w1": w1, "th1": th1,
+                           "r2": r2, "z2": z2, "w2": w2, "th2": th2, "t0": t0, "t1": t1})
         verts = []
         faces = []
         for j in range(segs + 1):
@@ -172,6 +179,8 @@ def build_open_strips(rings, cuts_per_ring, vertical_drop, kerf_factor, joint_ov
     # ---------------------------------------------------------
     w_bridge_top = get_w(0) * 2
     cap_r, cap_z = r_dep[0] - w_bridge_top / 2 + joint_overlap, get_z(r_dep[0])
+    if record is not None:
+        record.append({"kind": "cap", "r": cap_r, "z": cap_z})
 
     cap_angles = []
     for i in range(cuts_per_ring):
