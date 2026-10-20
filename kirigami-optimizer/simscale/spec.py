@@ -14,6 +14,7 @@ Mirrors the manual Kiragami_CFD "Incompressible" setup:
 
 from simscale_sdk import (
     AdvancedConcepts,
+    AdvancedSimmetrixFluidSettings,
     AutomaticCurvature,
     AutomaticLayerOff,
     AutomaticLayerOn,
@@ -167,10 +168,16 @@ def build_simulation_spec(name, geometry_id, model):
 
 
 def build_mesh_model(sim_cfg):
+    advanced = None
+    if sim_cfg.get("MESH_SMALL_FEATURE_TOLERANCE_MM"):
+        # Tells Simmetrix to ignore geometric features smaller than this.
+        advanced = AdvancedSimmetrixFluidSettings(small_feature_tolerance=DimensionalLength(
+            value=sim_cfg["MESH_SMALL_FEATURE_TOLERANCE_MM"], unit="mm"))
     return SimmetrixMeshingFluid(
         sizing=AutomaticMeshSizingSimmetrix(fineness=sim_cfg["MESH_FINENESS"], curvature=AutomaticCurvature()),
         automatic_layer_settings=AutomaticLayerOn() if sim_cfg["MESH_BOUNDARY_LAYERS"] else AutomaticLayerOff(),
         physics_based_meshing=sim_cfg["MESH_PHYSICS_BASED"],
         hex_core=sim_cfg["MESH_HEX_CORE"],
         max_meshing_run_time=DimensionalTime(value=sim_cfg["MESH_MAX_RUN_TIME_S"], unit="s"),
+        advanced_simmetrix_settings=advanced,
     )

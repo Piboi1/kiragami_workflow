@@ -28,6 +28,7 @@ from simscale_sdk import (
     MaterialUpdateOperationReference,
     MaterialUpdateRequest,
     MeshOperation,
+    MeshesApi,
     MeshOperationsApi,
     Project,
     ProjectPermissionsApi,
@@ -217,10 +218,13 @@ class SimScaleClient:
         """
 
         start = time.time()
+        running_since = None  # billing starts at RUNNING; queue time is free
         obj = getter()
         last = None
         last_change = time.time()
         while obj.status not in TERMINAL:
+            if obj.status == "RUNNING" and running_since is None:
+                running_since = time.time()
             progress = getattr(obj, "progress", None)
             if (obj.status, progress) != last:
                 self.log(f"  {what}: {obj.status}" + (f" {progress:.0%}" if isinstance(progress, float) else ""))
@@ -229,8 +233,10 @@ class SimScaleClient:
 
             reason = None
             used = _core_hours(obj)
-            if time.time() - start > max_seconds:
+            if running_since is not None and time.time() - running_since > max_seconds:
                 reason = f"ran longer than {max_seconds:.0f} s"
+            elif time.time() - start > max_seconds + 7200:
+                reason = f"still not finished {max_seconds + 7200:.0f} s after submission (queued?)"
             elif cpu_cap is not None and used > cpu_cap:
                 reason = f"used {used:.2f} CPU h, over the {cpu_cap:g} CPU h cap"
             elif stall_seconds and obj.status == "RUNNING" and time.time() - last_change > stall_seconds:
@@ -437,7 +443,7 @@ class SimScaleClient:
     # one design
     # ------------------------------------------------------------------
     def run_design(self, project_id, design_id, domain_file, uz_mps, reference_area_in2,
-                   reference_length_in, work_dir, state, save_state):
+                   reference_length_in, work_dir, state, save_state, mesh_only=False):
         """Runs one CFD case end to end and returns the parsed coefficients.
 
         state: dict persisted by the caller (keys are filled in as SimScale
@@ -499,6 +505,11 @@ class SimScaleClient:
             spec.mesh_id = op.mesh_id
             self.simulations.update_simulation(project_id, sim_id, spec)
             remember(mesh_id=op.mesh_id, mesh_core_hours=_core_hours(op))
+
+        if mesh_only:
+            mesh = MeshesApi(self.api_client).get_mesh(project_id, state["mesh_id"])
+            return {"mesh_id": state["mesh_id"], "cells": mesh.number_of_cells, "nodes": mesh.number_of_nodes,
+                    "mesh_core_hours": state.get("mesh_core_hours")}
 
         # 4. run -------------------------------------------------------------
         if "run_id" not in state:

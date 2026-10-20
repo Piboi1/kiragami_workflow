@@ -52,3 +52,13 @@ def test_healthy_job_is_not_cancelled():
     get, cancel, state = _job(["RUNNING", "RUNNING", "FINISHED"], [0.1, 0.5, 1.0], [0.1, 0.2, 0.3])
     obj = _client()._poll("meshing", get, 3600, cancel=cancel, cpu_cap=2.0, stall_seconds=900)
     assert obj.status == "FINISHED" and not state["cancelled"]
+
+
+def test_queue_time_does_not_count(monkeypatch):
+    clock = {"t": 0.0}
+    monkeypatch.setattr("simscale.runner.time.time", lambda: clock.__setitem__("t", clock["t"] + 100) or clock["t"])
+    monkeypatch.setattr("simscale.runner.time.sleep", lambda s: None)
+    # 20 polls queued (~2000 s, far over the 300 s limit), then finishes quickly
+    get, cancel, state = _job(["QUEUED"] * 20 + ["RUNNING", "FINISHED"], [0.0] * 20 + [0.5, 1.0], [0.0] * 22)
+    obj = _client()._poll("meshing", get, 300, cancel=cancel, stall_seconds=900)
+    assert obj.status == "FINISHED" and not state["cancelled"]

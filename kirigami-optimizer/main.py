@@ -18,6 +18,7 @@
 import argparse
 import json
 import sys
+import time
 
 import config
 from optimizer.state import Ledger
@@ -184,6 +185,53 @@ def cmd_probe_import(args):
     return 0 if ok_variants else 1
 
 
+MESH_PROBE_VARIANTS = {
+    # Your manual settings + ignore CAD features under 0.1 mm (the canopy
+    # sheet is 0.38 mm thick, so it is still resolved).
+    "A": {"MESH_SMALL_FEATURE_TOLERANCE_MM": 0.1},
+    # A without boundary layers: tests whether layers on the thin sheet are the cost.
+    "B": {"MESH_SMALL_FEATURE_TOLERANCE_MM": 0.1, "MESH_BOUNDARY_LAYERS": False},
+}
+
+
+def cmd_mesh_probe(args):
+    """Meshes the baseline design ONLY (no solver) with a settings variant,
+    under a hard CPU-hour cap; the mesh is cancelled on SimScale if it trips."""
+
+    from pipeline import build_geometry
+    from simscale.runner import SimScaleClient
+
+    sim_cfg = dict(config.SIMSCALE)
+    sim_cfg.update(MESH_PROBE_VARIANTS[args.variant])
+    sim_cfg.update({"MESH_MAX_CORE_HOURS": args.cap, "MESH_TIMEOUT_S": args.timeout,
+                    "STALL_TIMEOUT_S": args.stall})
+    client = SimScaleClient(sim_cfg)
+    project_id = client.ensure_project(config.SIMSCALE["PROJECT_ID"], config.SIMSCALE["NEW_PROJECT_NAME"],
+                                       config.STATE_DIR / "simscale_project.json")
+    out = config.RUNS_DIR / "mesh_probe" / args.variant
+    out.mkdir(parents=True, exist_ok=True)
+    print(f"Mesh probe {args.variant}: {MESH_PROBE_VARIANTS[args.variant]}; cap {args.cap} CPU h, "
+          f"timeout {args.timeout} s, stall {args.stall} s")
+    params = design_params(_preset("baseline"))
+    _, info, _, paths = build_geometry(params, out, f"meshprobe_{args.variant}")
+    state = {}
+    state_file = out / "simscale_state.json"
+    started = time.time()
+    summary = {"variant": args.variant, "settings": MESH_PROBE_VARIANTS[args.variant], "cap_cpu_h": args.cap}
+    try:
+        result = client.run_design(project_id, f"meshprobe_{args.variant}", paths["domain_file"], -6.148,
+                                   info["reference_area_in2"], info["projected_diameter_in"], out, state,
+                                   lambda s: state_file.write_text(json.dumps(s, indent=2)), mesh_only=True)
+        summary.update(status="FINISHED", **result)
+    except Exception as exc:
+        summary.update(status="FAILED", error=f"{type(exc).__name__}: {exc}")
+    summary["mesh_core_hours"] = state.get("mesh_core_hours", summary.get("mesh_core_hours"))
+    summary["wall_minutes"] = round((time.time() - started) / 60, 1)
+    (out / "summary.json").write_text(json.dumps(summary, indent=2, default=str) + "\n")
+    print(json.dumps(summary, indent=2, default=str))
+    return 0 if summary["status"] == "FINISHED" else 1
+
+
 def cmd_depth_model(args):
     from solid.depth_model import get_depth_model
 
@@ -238,6 +286,15 @@ def main(argv=None):
     sub.add_parser("sync-sheet").set_defaults(fn=cmd_sync)
     sub.add_parser("status").set_defaults(fn=cmd_status)
     sub.add_parser("depth-model").set_defaults(fn=cmd_depth_model)
+
+    p = sub.add_parser("mesh-probe")
+    p.add_argument("--variant", choices=sorted(MESH_PROBE_VARIANTS), required=True)
+    p.add_argument("--cap", type=float, default=1.0, help="CPU-hour cap; mesh cancelled above it")
+    # Run 4 burned ~15 CPU h per hour of meshing (~16 cores), so 4 min of
+    # meshing is ~1 CPU h even if SimScale does not report hours live.
+    p.add_argument("--timeout", type=int, default=240, help="seconds of meshing before it is cancelled")
+    p.add_argument("--stall", type=int, default=180, help="seconds without progress before cancelling")
+    p.set_defaults(fn=cmd_mesh_probe)
 
     p = sub.add_parser("probe-import")
     p.add_argument("--sewing", type=lambda v: v.lower() in ("1", "true", "yes"), nargs="+", default=[True])
