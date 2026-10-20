@@ -1,0 +1,30 @@
+[
+  {
+    "name": "B1_TE1",
+    "class": "face",
+    "labels": [
+      "canopy#1"
+    ]
+  },
+  {
+    "name": "B2_TE1",
+    "class": "face",
+    "labels": [
+      "canopy#2"
+    ]
+  },
+  {
+    "name": "B1_TE6",
+    "class": "region",
+    "labels": [
+      "canopy#1"
+    ]
+  },
+  {
+    "name": "B2_TE6",
+    "class": "region",
+    "labels": [
+      "canopy#2"
+    ]
+  }
+]
