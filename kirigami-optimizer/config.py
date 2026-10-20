@@ -173,7 +173,12 @@ SIMSCALE = {
     # canopy as an internal void and the six box walls named + coloured.
     # "STL": multi-solid STL + sewing + sting (kept for reference; SimScale's
     # sewing did not produce a single body with it).
-    "GEOMETRY_FORMAT": "STEP",
+    # "MANUAL_FLOW_VOLUME": canopy-only faceted STL is imported and a person
+    # makes SimScale's CAD-mode "External flow volume" in the web app (the
+    # pipeline prints the steps, waits for the new geometry, then continues).
+    "GEOMETRY_FORMAT": "MANUAL_FLOW_VOLUME",
+    "MANUAL_WAIT_S": 6 * 3600,      # how long to wait for the manual step
+    "MANUAL_POLL_S": 20,
     "IMPORT_SEWING": True,   # STL only; needs FIXED_PARAMS["STING_RADIUS"] > 0
     "IMPORT_IMPROVE": True,
     "TURBULENCE_MODEL": "KOMEGASST",

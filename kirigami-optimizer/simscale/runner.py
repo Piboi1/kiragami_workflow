@@ -42,6 +42,7 @@ from simscale_sdk import (
 
 from solid.step_export import BOX_FACES, COLOUR_TO_FACE, parse_colour
 
+from . import manual_flow
 from .results import core_hours_used, maybe_unzip, parse_force_coefficients
 from .spec import build_mesh_model, build_model, build_simulation_spec
 
@@ -329,6 +330,41 @@ class SimScaleClient:
             raise SimScaleError(f"geometry import {imp.status}: {getattr(imp, 'failure_reason', '')}")
         return imp.geometry_id
 
+    def list_geometry_ids(self, project_id):
+        out, page = [], 1
+        while True:
+            items = self.geometries.get_geometries(project_id, limit=100, page=page).embedded or []
+            out.extend(items)
+            if len(items) < 100:
+                return out
+            page += 1
+
+    def find_flow_volume(self, project_id, exclude_ids):
+        """First geometry outside ``exclude_ids`` that is a CAD-mode flow volume, or None."""
+
+        for geo in self.list_geometry_ids(project_id):
+            if geo.geometry_id in exclude_ids:
+                continue
+            faces = self._all_mappings(project_id, geo.geometry_id, "face")
+            if manual_flow.is_flow_volume(self._labels_of(f) for f in faces):
+                return geo
+        return None
+
+    def wait_for_flow_volume(self, project_id, exclude_ids, text, timeout_s, poll_s):
+        """Blocks until a flow volume that is not in ``exclude_ids`` shows up in the project."""
+
+        self.log("\n" + text)
+        deadline = time.time() + timeout_s
+        while True:
+            geo = self.find_flow_volume(project_id, set(exclude_ids))
+            if geo is not None:
+                self.log(f"  found flow-volume geometry {geo.name!r} ({geo.geometry_id})")
+                return geo.geometry_id
+            if time.time() >= deadline:
+                raise SimScaleError(f"no flow-volume geometry appeared within {timeout_s / 3600:.1f} h; "
+                                    "re-run to resume this design")
+            time.sleep(poll_s)
+
     def describe_geometry(self, project_id, geometry_id, dump_path=None):
         """Bodies, and which of our face groups ended up on which body."""
 
@@ -347,6 +383,8 @@ class SimScaleClient:
         for e in faces:
             labels = self._labels_of(e)
             group = next((g for g in FACE_GROUPS if g in labels), None)
+            if group is None:  # CAD-mode flow volume: "Max Z@Flow region" ...
+                group = next((manual_flow.WALL_LABELS[l] for l in labels if l in manual_flow.WALL_LABELS), None)
             if group is None:  # STEP walls also carry a distinct colour
                 group = next((COLOUR_TO_FACE[c] for c in map(parse_colour, labels) if c in COLOUR_TO_FACE), None)
             (groups[group] if group else unlabeled).append(e.name)
@@ -443,7 +481,7 @@ class SimScaleClient:
     # one design
     # ------------------------------------------------------------------
     def run_design(self, project_id, design_id, domain_file, uz_mps, reference_area_in2,
-                   reference_length_in, work_dir, state, save_state, mesh_only=False):
+                   reference_length_in, work_dir, state, save_state, mesh_only=False, manual=None):
         """Runs one CFD case end to end and returns the parsed coefficients.
 
         state: dict persisted by the caller (keys are filled in as SimScale
@@ -458,6 +496,20 @@ class SimScaleClient:
             save_state(state)
 
         # 1. upload + import --------------------------------------------------
+        if "geometry_id" not in state and cfg.get("GEOMETRY_FORMAT") == "MANUAL_FLOW_VOLUME":
+            # Canopy only (faceted STL); a person makes the flow volume in the web app.
+            if "canopy_geometry_id" not in state:
+                remember(geometries_before=[g.geometry_id for g in self.list_geometry_ids(project_id)])
+                storage_id, import_id = self.start_import(
+                    project_id, f"{design_id}_canopy", domain_file, False, cfg["IMPORT_IMPROVE"], "STL",
+                    facet_split=True)
+                remember(storage_id=storage_id, geometry_import_id=import_id)
+                remember(canopy_geometry_id=self.wait_for_import(project_id, import_id))
+            text = manual_flow.instructions(design_id, f"{design_id}_canopy", manual["bounds_in"], project_id)
+            (work_dir / "MANUAL_STEP.txt").write_text(text)
+            remember(geometry_id=self.wait_for_flow_volume(
+                project_id, set(state["geometries_before"]) | {state["canopy_geometry_id"]}, text,
+                cfg["MANUAL_WAIT_S"], cfg["MANUAL_POLL_S"]))
         if "geometry_id" not in state:
             if "geometry_import_id" not in state:
                 storage_id, import_id = self.start_import(

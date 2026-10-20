@@ -120,6 +120,29 @@ The expanded 3D canopy is a paraboloid whose depth (`VERTICAL_DROP`) is set per 
 
 Every row logs the Cd used for Uz, its source, and the nearest previous run.
 
+## Semi-manual flow volume (current geometry route)
+
+The API cannot run SimScale's CAD-mode "External flow volume", and uploading
+a ready-made fluid solid made the mesher choke (22.5k CAD faces; a smooth-CAD
+rebuild in `solid/smooth_cad.py` still gave 10.5k faces and invalid solids).
+So `GEOMETRY_FORMAT = "MANUAL_FLOW_VOLUME"` does this per design:
+
+1. the pipeline imports only the canopy (faceted STL with facet split, ~550
+   faces for the baseline) as `<design_id>_canopy`;
+2. it prints a checklist (also saved as `MANUAL_STEP.txt` in the design
+   folder) for the one manual step in the SimScale web app: open that
+   geometry in CAD mode, add an External flow volume with the printed custom
+   box, delete the canopy body, save;
+3. it polls the project for the new geometry, recognising it by its
+   `Max Z@Flow region` ... `Min Y@Flow region` faces (`simscale/manual_flow.py`),
+   names the six walls from those labels (all other faces are the canopy) and
+   continues with the usual mesh, run and results.
+
+`python main.py manual-step` does steps 1-3 and verification only: it never
+meshes or runs, so it costs nothing. Re-run it after the web-app step.
+`--wait` keeps polling instead of checking once. `single` and `optimize`
+block at step 2 for up to `MANUAL_WAIT_S` (6 h) and resume if interrupted.
+
 ## Why the flow domain is built locally
 
 In the manual project, "External flow volume" and "Delete bodies" are SimScale CAD-mode operations, and the public API/SDK doesn't expose them. Instead, `solid/flow_domain.py` builds the same box as your manual setup: X/Y ±2.583 D, Z from −7 D to +3.113 D, which is ±25.83 / −70 / +31.13 in for D = 10 in. It subtracts the canopy, giving the air volume.

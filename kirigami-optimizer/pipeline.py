@@ -18,7 +18,7 @@ from solid.canopy import DEFAULT_SOLID_PARAMS
 from simscale.results import core_hours_used
 from solid.depth_model import get_depth_model
 from solid.step_export import write_step
-from solid.flow_domain import DEFAULT_DOMAIN_PARAMS
+from solid.flow_domain import DEFAULT_DOMAIN_PARAMS, domain_box_bounds
 
 
 @dataclass
@@ -72,7 +72,11 @@ def build_geometry(params, design_dir, design_id):
 
     domain_params = {k: params.get(k, v) for k, v in DEFAULT_DOMAIN_PARAMS.items()}
     fmt = config.SIMSCALE["GEOMETRY_FORMAT"]
-    if fmt == "STEP":
+    if fmt == "MANUAL_FLOW_VOLUME":
+        lo, hi = domain_box_bounds(resolved["PARACHUTE_DIAMETER"], domain_params)
+        info["domain_bounds_in"] = [list(lo), list(hi)]
+        domain_file = canopy_stl  # canopy only; the flow volume is made in the SimScale web app
+    elif fmt == "STEP":
         # One solid with the canopy as an internal void: no sting, no sewing.
         domain_params["STING_RADIUS"] = 0.0
         fluid, labels, bounds = build_flow_domain(canopy, resolved["PARACHUTE_DIAMETER"], domain_params)
@@ -83,7 +87,8 @@ def build_geometry(params, design_dir, design_id):
                                                   sting_anchor=info["sting_anchor_in"])
         domain_file = write_named_stl(fluid, labels, design_dir / f"{design_id}_flow_domain.stl")
 
-    info["domain_bounds_in"] = bounds
+    if fmt != "MANUAL_FLOW_VOLUME":
+        info["domain_bounds_in"] = bounds
     paths = {"dxf": report["files"]["dxf"], "report_json": report["files"]["report_json"],
              "canopy_stl": canopy_stl, "domain_file": str(domain_file), "domain_format": fmt}
     return report, info, {**solid_params, **domain_params}, paths
@@ -204,7 +209,7 @@ def evaluate_design(ctx, params, mode="single", uz_override=None, resume=None):
             coeffs = ctx.simscale.run_design(
                 ctx.project_id, design_id, paths["domain_file"], velocity["uz_mps"],
                 solid_info["reference_area_in2"], solid_info["projected_diameter_in"],
-                design_dir, sim_state, save_state,
+                design_dir, sim_state, save_state, manual={"bounds_in": solid_info["domain_bounds_in"]},
             )
             record["simscale"] = sim_state
             record["coefficients"] = coeffs

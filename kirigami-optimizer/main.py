@@ -11,6 +11,9 @@
     python main.py sync-sheet                       re-send rows that failed to reach the sheet
     python main.py status                           ledger summary / best design
     python main.py depth-model                      show the fitted canopy-depth model
+    python main.py manual-step [--preset baseline] [--wait]
+                                                    import the canopy, show the web-app flow-volume checklist,
+                                                    verify the resulting geometry (not billed)
     python main.py probe-import [--variants step stl_sting stl_single stl_single_split]
                                                     test SimScale geometry import options (not billed)
 """
@@ -267,7 +270,8 @@ def cmd_mesh_probe(args):
     try:
         result = client.run_design(project_id, f"meshprobe_{args.variant}", paths["domain_file"], -6.148,
                                    info["reference_area_in2"], info["projected_diameter_in"], out, state,
-                                   lambda s: state_file.write_text(json.dumps(s, indent=2)), mesh_only=True)
+                                   lambda s: state_file.write_text(json.dumps(s, indent=2)), mesh_only=True,
+                                   manual={"bounds_in": info["domain_bounds_in"]})
         summary.update(status="FINISHED", **result)
     except Exception as exc:
         summary.update(status="FAILED", error=f"{type(exc).__name__}: {exc}")
@@ -276,6 +280,54 @@ def cmd_mesh_probe(args):
     (out / "summary.json").write_text(json.dumps(summary, indent=2, default=str) + "\n")
     print(json.dumps(summary, indent=2, default=str))
     return 0 if summary["status"] == "FINISHED" else 1
+
+
+def cmd_manual_step(args):
+    """Free: imports the canopy only, shows the web-app checklist for the flow
+    volume, waits for it, and reports how its faces were identified. Never
+    meshes or runs anything (nothing is billed)."""
+
+    from pipeline import build_geometry
+    from simscale import manual_flow
+    from simscale.runner import REQUIRED_GROUPS, SimScaleError
+
+    client, project_id = _simscale_client()
+    design_id = args.design_id
+    out = config.RUNS_DIR / "manual_step" / design_id
+    out.mkdir(parents=True, exist_ok=True)
+    state_file = out / "simscale_state.json"
+    state = json.loads(state_file.read_text()) if state_file.exists() else {}
+    _, info, _, paths = build_geometry(design_params(_preset(args.preset)), out, design_id)
+    cfg = dict(config.SIMSCALE, GEOMETRY_FORMAT="MANUAL_FLOW_VOLUME")
+    save = lambda s: state_file.write_text(json.dumps(s, indent=2))  # noqa: E731
+    if "geometry_id" not in state:
+        if "canopy_geometry_id" not in state:
+            state["geometries_before"] = [g.geometry_id for g in client.list_geometry_ids(project_id)]
+            _, import_id = client.start_import(project_id, f"{design_id}_canopy", paths["domain_file"], False,
+                                               cfg["IMPORT_IMPROVE"], "STL", facet_split=True)
+            state["canopy_geometry_id"] = client.wait_for_import(project_id, import_id)
+            save(state)
+        canopy = client.describe_geometry(project_id, state["canopy_geometry_id"])
+        n_canopy = sum(len(v) for v in canopy["groups"].values()) + len(canopy["unlabeled_faces"])
+        print(f"canopy-only geometry {state['canopy_geometry_id']}: {n_canopy} face(s), "
+              f"{len(canopy['bodies'])} body(ies)")
+        text = manual_flow.instructions(design_id, f"{design_id}_canopy", info["domain_bounds_in"], project_id)
+        (out / "MANUAL_STEP.txt").write_text(text)
+        try:
+            state["geometry_id"] = client.wait_for_flow_volume(
+                project_id, set(state["geometries_before"]) | {state["canopy_geometry_id"]}, text,
+                cfg["MANUAL_WAIT_S"] if args.wait else 0, cfg["MANUAL_POLL_S"])
+        except SimScaleError:
+            print(f"\nNo flow volume yet. Do the steps above (also in {out / 'MANUAL_STEP.txt'}), "
+                  "then re-run this same command.")
+            return 2
+        save(state)
+    groups, body = client.resolve_entities(project_id, state["geometry_id"], out / "simscale_entities.json")
+    print(f"flow-volume geometry {state['geometry_id']}: fluid region {body}")
+    for g in REQUIRED_GROUPS:
+        print(f"  {g:10s} {len(groups[g]):5d} face(s)")
+    print("OK: boundaries identified. `main.py single` will now run the same steps and continue to the mesh.")
+    return 0
 
 
 def cmd_depth_model(args):
@@ -332,6 +384,13 @@ def main(argv=None):
     sub.add_parser("sync-sheet").set_defaults(fn=cmd_sync)
     sub.add_parser("status").set_defaults(fn=cmd_status)
     sub.add_parser("depth-model").set_defaults(fn=cmd_depth_model)
+
+    p = sub.add_parser("manual-step")
+    p.add_argument("--preset", default="baseline")
+    p.add_argument("--design-id", default="manual_baseline")
+    p.add_argument("--wait", action="store_true",
+                   help="keep waiting (up to MANUAL_WAIT_S) for the flow volume; default: check once")
+    p.set_defaults(fn=cmd_manual_step)
 
     p = sub.add_parser("mesh-probe")
     p.add_argument("--variant", choices=sorted(MESH_PROBE_VARIANTS), required=True)

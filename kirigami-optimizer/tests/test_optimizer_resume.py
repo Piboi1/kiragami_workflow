@@ -20,7 +20,8 @@ class FakeSimScale:
         self.calls = 0
         self.crash_on_call = crash_on_call
 
-    def run_design(self, project_id, design_id, domain_file, uz, area, length, work_dir, state, save_state):
+    def run_design(self, project_id, design_id, domain_file, uz, area, length, work_dir, state, save_state,
+                   manual=None):
         self.calls += 1
         if "run_id" not in state:
             state.update(geometry_id="g", simulation_id="s", run_id=f"r-{design_id}",
