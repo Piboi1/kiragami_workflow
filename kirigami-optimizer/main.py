@@ -240,6 +240,8 @@ MESH_PROBE_VARIANTS = {
     "A": {"MESH_SMALL_FEATURE_TOLERANCE_MM": 0.1},
     # A without boundary layers: tests whether layers on the thin sheet are the cost.
     "B": {"MESH_SMALL_FEATURE_TOLERANCE_MM": 0.1, "MESH_BOUNDARY_LAYERS": False},
+    # Your manual Kiragami_CFD mesh settings, unchanged (use with --from-manual).
+    "M": {},
 }
 
 
@@ -264,6 +266,10 @@ def cmd_mesh_probe(args):
     params = design_params(_preset("baseline"))
     _, info, _, paths = build_geometry(params, out, f"meshprobe_{args.variant}")
     state = {}
+    if args.from_manual:  # reuse the flow volume made by `manual-step` (skips import and the wait)
+        manual_state = json.loads((config.RUNS_DIR / "manual_step" / args.from_manual / "simscale_state.json").read_text())
+        state = {"geometry_id": manual_state["geometry_id"]}
+        print(f"Using flow-volume geometry {state['geometry_id']} from manual-step {args.from_manual}")
     state_file = out / "simscale_state.json"
     started = time.time()
     summary = {"variant": args.variant, "settings": MESH_PROBE_VARIANTS[args.variant], "cap_cpu_h": args.cap}
@@ -307,13 +313,15 @@ def cmd_manual_step(args):
                                                cfg["IMPORT_IMPROVE"], "STL", facet_split=True)  # sewing -> solid
             state["canopy_geometry_id"] = client.wait_for_import(project_id, import_id)
             save(state)
-        canopy = client.describe_geometry(project_id, state["canopy_geometry_id"])
-        n_canopy = sum(len(v) for v in canopy["groups"].values()) + len(canopy["unlabeled_faces"])
-        is_solid = bool(client._all_mappings(project_id, state["canopy_geometry_id"], "region"))
-        print(f"canopy-only geometry {state['canopy_geometry_id']}: {n_canopy} face(s), "
-              f"{'SOLID volume' if is_solid else 'SHEET body (NOT a solid; External flow volume will fail)'}")
-        if not is_solid:
-            return 1
+            canopy = client.describe_geometry(project_id, state["canopy_geometry_id"])
+            n_canopy = sum(len(v) for v in canopy["groups"].values()) + len(canopy["unlabeled_faces"])
+            is_solid = bool(client._all_mappings(project_id, state["canopy_geometry_id"], "region"))
+            print(f"canopy-only geometry {state['canopy_geometry_id']}: {n_canopy} face(s), "
+                  f"{'SOLID volume' if is_solid else 'SHEET body (NOT a solid; External flow volume will fail)'}")
+            if not is_solid:
+                return 1
+        # The web app's CAD edit replaces this geometry with a new one of the same
+        # name, so it is only inspected right after import (above).
         text = manual_flow.instructions(design_id, f"{design_id}_canopy", info["domain_bounds_in"], project_id)
         (out / "MANUAL_STEP.txt").write_text(text)
         try:
@@ -402,6 +410,8 @@ def main(argv=None):
     # meshing is ~1 CPU h even if SimScale does not report hours live.
     p.add_argument("--timeout", type=int, default=240, help="seconds of meshing before it is cancelled")
     p.add_argument("--stall", type=int, default=180, help="seconds without progress before cancelling")
+    p.add_argument("--from-manual", metavar="DESIGN_ID",
+                   help="mesh the flow volume made by `manual-step --design-id DESIGN_ID`")
     p.set_defaults(fn=cmd_mesh_probe)
 
     p = sub.add_parser("probe-import")
