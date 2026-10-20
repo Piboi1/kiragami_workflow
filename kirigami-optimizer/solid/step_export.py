@@ -364,3 +364,96 @@ def read_step_summary(path):
         info["colours"] = sorted({colour_of.get(r, "none") for r in info.pop("ids")})
     return {"solids": count(TopAbs_SOLID), "shells": count(TopAbs_SHELL), "faces": count(TopAbs_FACE),
             "valid": bool(BRepCheck_Analyzer(shape).IsValid()), "named_faces": named}
+
+
+TESSELLATED_ORDER = ("inlet", "outlet", "side_xmin", "side_xmax", "side_ymin", "side_ymax", "canopy")
+
+
+def write_tessellated_step(fluid, labels, path):
+    """Writes the fluid domain as an AP242 TESSELLATED_SOLID: one named
+    TRIANGULATED_FACE per boundary (6 walls + the whole canopy).
+
+    Unlike the B-rep export (one planar CAD face per triangle, ~22k faces
+    that the mesher cannot handle cheaply), this keeps the canopy as faceted
+    geometry, like an STL upload, while still describing one solid whose
+    canopy is an internal void. Typically ~5 MB.
+    """
+
+    import re
+
+    from OCP.BRep import BRep_Builder
+    from OCP.gp import gp_Pnt
+    from OCP.IFSelect import IFSelect_RetDone
+    from OCP.Interface import Interface_Static
+    from OCP.Poly import Poly_Triangle, Poly_Triangulation
+    from OCP.STEPCAFControl import STEPCAFControl_Writer
+    from OCP.STEPControl import STEPControl_AsIs
+    from OCP.TCollection import TCollection_ExtendedString
+    from OCP.TDataStd import TDataStd_Name
+    from OCP.TDocStd import TDocStd_Document
+    from OCP.TopoDS import TopoDS_Face, TopoDS_Shell, TopoDS_Solid
+    from OCP.XCAFDoc import XCAFDoc_DocumentTool
+
+    labels = np.asarray(labels)
+    V = np.asarray(fluid.vertices, dtype=float) * MM_PER_IN
+    F = np.asarray(fluid.faces)
+    builder = BRep_Builder()
+
+    faces = {}
+    for name in TESSELLATED_ORDER:
+        tris = F[labels == name]
+        if len(tris) == 0:
+            raise RuntimeError(f"no triangles labelled {name!r}")
+        used, inverse = np.unique(tris, return_inverse=True)
+        tri = Poly_Triangulation(len(used), len(tris), False)
+        for i, v in enumerate(used, 1):
+            tri.SetNode(i, gp_Pnt(*V[v]))
+        for i, (a, b, c) in enumerate(inverse.reshape(-1, 3) + 1, 1):
+            tri.SetTriangle(i, Poly_Triangle(int(a), int(b), int(c)))
+        face = TopoDS_Face()
+        builder.MakeFace(face, tri)
+        faces[name] = face
+
+    outer = TopoDS_Shell()
+    builder.MakeShell(outer)
+    for name in BOX_FACES:
+        builder.Add(outer, faces[name])
+    inner = TopoDS_Shell()
+    builder.MakeShell(inner)
+    builder.Add(inner, faces["canopy"])
+    solid = TopoDS_Solid()
+    builder.MakeSolid(solid)
+    builder.Add(solid, outer)
+    builder.Add(solid, inner)
+
+    doc = TDocStd_Document(TCollection_ExtendedString("XmlOcaf"))
+    shapes = XCAFDoc_DocumentTool.ShapeTool_s(doc.Main())
+    main = shapes.AddShape(solid, False)
+    TDataStd_Name.Set_s(main, TCollection_ExtendedString("Flow region"))
+
+    _quiet_occ()
+    writer = STEPCAFControl_Writer()
+    for key, value in (("write.step.schema", "AP242DIS"), ("write.step.unit", "MM")):
+        if not Interface_Static.SetCVal_s(key, value):
+            raise RuntimeError(f"could not set STEP option {key}")
+    if not Interface_Static.SetIVal_s("write.step.tessellated", 2):  # tessellation only, no B-rep
+        raise RuntimeError("could not enable tessellated STEP output")
+    writer.SetNameMode(True)
+    if not writer.Transfer(doc, STEPControl_AsIs):
+        raise RuntimeError("STEP transfer failed")
+    if writer.Write(str(path)) != IFSelect_RetDone:
+        raise RuntimeError(f"could not write {path}")
+    # Restore the B-rep defaults for later write_step() calls in this process.
+    Interface_Static.SetIVal_s("write.step.tessellated", 0)
+    Interface_Static.SetCVal_s("write.step.schema", "AP214IS")
+
+    # OpenCascade leaves tessellated face names blank; it writes the faces in
+    # shell order (outer walls, then the canopy), so name them in that order.
+    text = Path(path).read_text()
+    names = iter(BOX_FACES + ("canopy",))
+    text, n = re.subn(r"TRIANGULATED_FACE\(''", lambda m: f"TRIANGULATED_FACE('{next(names)}'", text)
+    text = text.replace("TESSELLATED_SOLID(''", "TESSELLATED_SOLID('Flow region'", 1)
+    if n != len(TESSELLATED_ORDER) or "TESSELLATED_SOLID('Flow region'" not in text:
+        raise RuntimeError(f"unexpected tessellated STEP layout ({n} triangulated faces)")
+    Path(path).write_text(text)
+    return {"step_faces": n, "step_unit": "mm", "step_kind": "AP242 tessellated"}

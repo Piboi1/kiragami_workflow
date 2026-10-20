@@ -149,6 +149,9 @@ IMPORT_VARIANTS = {
     # Multi-block STL with the sting joining canopy to outlet, sewn. The
     # canopy stays faceted geometry, like the manual setup (954 faces).
     "stl_sting": {"format": "STL", "sting": True, "sewing": True},
+    # AP242 tessellated solid: 6 named wall faces + ONE faceted canopy face,
+    # canopy as a void. Aims for STEP's single body + STL's low face count.
+    "step_tess": {"format": "STEP", "tessellated": True, "sewing": False},
     # Whole fluid boundary as ONE STL block (box + canopy void), sewn.
     "stl_single": {"format": "STL", "single_block": True, "sewing": True},
     # As stl_single, with SimScale splitting facets into faces by angle.
@@ -162,7 +165,7 @@ def _probe_domain(variant, out):
     from generator import generate_pattern
     from solid import build_flow_domain, build_solid, write_named_stl
     from solid.canopy import DEFAULT_SOLID_PARAMS
-    from solid.step_export import write_step
+    from solid.step_export import write_step, write_tessellated_step
 
     params = design_params(_preset("baseline"))
     report = generate_pattern(params, write_files=False)
@@ -174,8 +177,8 @@ def _probe_domain(variant, out):
     fluid, labels, _ = build_flow_domain(canopy, report["parameters"]["PARACHUTE_DIAMETER"], domain_params,
                                          sting_anchor=info["sting_anchor_in"] if variant.get("sting") else None)
     if variant["format"] == "STEP":
-        path = out / "probe_domain.step"
-        write_step(fluid, labels, path)
+        path = out / ("probe_domain_tess.step" if variant.get("tessellated") else "probe_domain.step")
+        (write_tessellated_step if variant.get("tessellated") else write_step)(fluid, labels, path)
         return path
     if variant.get("single_block"):
         import numpy as np
