@@ -1,0 +1,18 @@
+Mesh probe M: {}; cap 1.0 CPU h, timeout 240 s, stall 180 s
+Using flow-volume geometry 9b8dbffd-c91d-401f-a21f-748a0b2cccd2 from manual-step manual_baseline3
+  meshing: QUEUED 0%
+  meshing: RUNNING 0%
+  meshing: RUNNING 30%
+  meshing: RUNNING 95%
+  meshing: FINISHED
+{
+  "variant": "M",
+  "settings": {},
+  "cap_cpu_h": 1.0,
+  "status": "FINISHED",
+  "mesh_id": "a24d7fa7-06cf-402a-a2ed-6ba69c9cc53b",
+  "cells": 1264478,
+  "nodes": 325209,
+  "mesh_core_hours": 0.08833333333333333,
+  "wall_minutes": 4.2
+}
