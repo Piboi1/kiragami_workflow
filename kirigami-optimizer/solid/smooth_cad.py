@@ -104,6 +104,8 @@ def fuse_pieces(pieces, fuzzy_mm=1e-4):
     from OCP.BRepAlgoAPI import BRepAlgoAPI_Fuse
     from OCP.ShapeUpgrade import ShapeUpgrade_UnifySameDomain
 
+    if len(pieces) == 1:
+        return pieces[0]
     op = BRepAlgoAPI_Fuse()
     op.SetArguments(_shape_list(pieces[:1]))
     op.SetTools(_shape_list(pieces[1:]))
@@ -115,6 +117,20 @@ def fuse_pieces(pieces, fuzzy_mm=1e-4):
     unify = ShapeUpgrade_UnifySameDomain(op.Shape(), True, True, True)
     unify.Build()
     return unify.Shape()
+
+
+def fuse_staged(pieces, group=24, fuzzy_mm=1e-4):
+    """Fuses neighbouring pieces in small groups first, then the groups.
+
+    One general-fuse over hundreds of pieces is slow and memory-hungry; the
+    pieces are in ring order, so consecutive ones are spatial neighbours.
+    """
+
+    level = list(pieces)
+    while len(level) > 1:
+        level = [fuse_pieces(level[i:i + group], fuzzy_mm) if len(level[i:i + group]) > 1 else level[i]
+                 for i in range(0, len(level), group)]
+    return level[0]
 
 
 def volume_mm3(shape):
@@ -143,7 +159,7 @@ def count_solids(shape):
     return n
 
 
-def build_canopy_cad(ring_data, params=None, fuzzy_mm=1e-4):
+def build_canopy_cad(ring_data, params=None, fuzzy_mm=1e-4, group=0):
     """Returns (canopy_shape_mm, info): the fused, face-merged smooth canopy."""
 
     p = dict(DEFAULT_SOLID_PARAMS)
@@ -156,7 +172,7 @@ def build_canopy_cad(ring_data, params=None, fuzzy_mm=1e-4):
                       float(p["KERF_FACTOR"]), float(p["JOINT_OVERLAP"]), record=record)
     thickness = float(p["SHEET_THICKNESS"])
     pieces = [strip_solid(d, thickness) if d["kind"] == "strip" else cap_solid(d, thickness) for d in record]
-    canopy = fuse_pieces(pieces, fuzzy_mm)
+    canopy = fuse_staged(pieces, group, fuzzy_mm) if group else fuse_pieces(pieces, fuzzy_mm)
     info = {"pieces": len(pieces), "canopy_faces": count_faces(canopy), "canopy_solids": count_solids(canopy),
             "canopy_valid": is_valid(canopy), "canopy_volume_in3": volume_mm3(canopy) / MM_PER_IN ** 3}
     return canopy, info
