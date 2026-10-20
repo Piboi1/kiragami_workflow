@@ -177,7 +177,8 @@ def build_canopy_cad(ring_data, params=None, fuzzy_mm=1e-3, group=0):
     check_feasible(rings, float(p["KERF_FACTOR"]), float(p["MIN_CAP_RADIUS"]))
     record = []
     build_open_strips(rings, int(round(p["CUTS_PER_RING"])), float(p["VERTICAL_DROP"]),
-                      float(p["KERF_FACTOR"]), float(p["JOINT_OVERLAP"]), record=record)
+                      float(p["KERF_FACTOR"]), float(p["JOINT_OVERLAP"]), record=record,
+                      bridge_extra=float(p["BRIDGE_EXTRA"]))
     thickness = float(p["SHEET_THICKNESS"])
     pieces = [strip_solid(d, thickness) if d["kind"] == "strip" else cap_solid(d, thickness) for d in record]
     canopy = fuse_staged(pieces, group, fuzzy_mm) if group else fuse_pieces(pieces, fuzzy_mm)

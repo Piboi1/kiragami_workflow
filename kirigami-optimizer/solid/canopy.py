@@ -39,6 +39,11 @@ DEFAULT_SOLID_PARAMS = {
     # real volume instead of just touching; the boolean then fuses them into
     # one connected canopy. Ignored by "legacy".
     "JOINT_OVERLAP": 0.03,       # inches
+    # Hinge (bridge) width = ribbon width + BRIDGE_EXTRA * previous ring's
+    # ribbon width. 1.0 is the original script's "union of upper and lower
+    # ribbons" (a block wider than the ribbons that meet it); 0 makes the
+    # hinge the same width as the ribbons.
+    "BRIDGE_EXTRA": 1.0,
     # Feasibility: the solid center cap (inside the first ring's bridges)
     # must keep at least this radius. Sparse inner rings make the ribbons
     # (KERF_FACTOR x ring spacing) wider than the first ring's radius, which
@@ -79,7 +84,8 @@ def normalize_ring_data(ring_data):
     return out
 
 
-def build_open_strips(rings, cuts_per_ring, vertical_drop, kerf_factor, joint_overlap=0.0, record=None):
+def build_open_strips(rings, cuts_per_ring, vertical_drop, kerf_factor, joint_overlap=0.0, record=None,
+                      bridge_extra=1.0):
     """Expanded-kirigami kinematics from the original script.
 
     Returns a list of strips; each strip is (vertices Nx3, faces Mx3) of an
@@ -148,7 +154,7 @@ def build_open_strips(rings, cuts_per_ring, vertical_drop, kerf_factor, joint_ov
 
         # True bridge width (union of upper and lower ribbons)
         w_prev = get_w(k - 1) if k > 0 else w_k
-        w_bridge = w_k + w_prev
+        w_bridge = w_k + bridge_extra * w_prev
 
         stagger_k = 0 if k % 2 == 0 else half
 
@@ -177,7 +183,7 @@ def build_open_strips(rings, cuts_per_ring, vertical_drop, kerf_factor, joint_ov
     # ---------------------------------------------------------
     # CENTER HOLE CAP
     # ---------------------------------------------------------
-    w_bridge_top = get_w(0) * 2
+    w_bridge_top = get_w(0) * (1.0 + bridge_extra)
     cap_r, cap_z = r_dep[0] - w_bridge_top / 2 + joint_overlap, get_z(r_dep[0])
     if record is not None:
         record.append({"kind": "cap", "r": cap_r, "z": cap_z})
@@ -312,7 +318,8 @@ def build_solid(ring_data, params=None):
     check_feasible(rings, float(p["KERF_FACTOR"]), float(p["MIN_CAP_RADIUS"]))
     method = p["EXTRUDE_METHOD"]
     joint_overlap = float(p["JOINT_OVERLAP"]) if method == "union" else 0.0
-    strips = build_open_strips(rings, cuts, float(p["VERTICAL_DROP"]), float(p["KERF_FACTOR"]), joint_overlap)
+    strips = build_open_strips(rings, cuts, float(p["VERTICAL_DROP"]), float(p["KERF_FACTOR"]), joint_overlap,
+                               bridge_extra=float(p["BRIDGE_EXTRA"]))
 
     if method == "union":
         slabs = [extrude_surface(v, f, thickness) for v, f in strips]
