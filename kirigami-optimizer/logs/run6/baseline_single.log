@@ -5,3 +5,6 @@ Resuming design_0002 (SimScale state: ['geometry_id'])
 [design_0002] rings=30 Aref=72.90 in^2 Uz=-6.148 m/s (Cd for Uz 0.307)
   meshing: QUEUED 0%
   meshing: RUNNING 30%
+  meshing: RUNNING 100%
+  meshing: FINISHED
+  simulation run: QUEUED 0%
