@@ -1,0 +1,10 @@
+SimScale:
+  OK   - list projects: 3 project(s) visible
+  OK   - open project 7871279013725148382: name 'Kiragami_Optimizer'
+  OK   - list simulations in it: 2 simulation(s)
+  OK   - write access (create upload slot): ok
+  OK   - project permissions: can write and run billable actions
+Google Sheets:
+  OK - writing to 'Kirigami CFD runs / runs'
+Velocity seed:
+  seed Cd = 0.307 ({'source': 'drop test 24-10 (24 rings, s1.15, overlap 10)', 'seed_velocity_mps': 5.127070970552575, 'seed_mass_kg': 0.023800306093231232}), mass = 23.8 g

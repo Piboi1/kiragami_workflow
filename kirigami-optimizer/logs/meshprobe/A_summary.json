@@ -1,0 +1,11 @@
+{
+  "variant": "A",
+  "settings": {
+    "MESH_SMALL_FEATURE_TOLERANCE_MM": 0.1
+  },
+  "cap_cpu_h": 1.0,
+  "status": "FAILED",
+  "error": "SimScaleError: meshing cancelled: used 1.08 CPU h, over the 1 CPU h cap (1.08 CPU h billed)",
+  "mesh_core_hours": 1.0769444444444445,
+  "wall_minutes": 11.4
+}
