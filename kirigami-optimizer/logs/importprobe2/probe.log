@@ -1,0 +1,63 @@
+
+=== import variant stl_sting: {'format': 'STL', 'sting': True, 'sewing': True} ===
+  uploading probe_domain_named.stl (16 MB, STL, sewing=True, improve=True)
+  geometry import: RUNNING
+  geometry import: FINISHED
+  geometry 1ea2b5ea-ff94-403f-a32a-6b22f83944f6: 8 body(ies), 8 face(s) in total
+    body B1: labels ['inlet']
+    body B2: labels ['outlet']
+    body B3: labels ['side_xmin']
+    body B4: labels ['side_xmax']
+    body B5: labels ['side_ymin']
+    body B6: labels ['side_ymax']
+    body B7: labels ['canopy']
+    body B8: labels ['sting']
+    inlet          1 face(s) on body ['B1']
+    outlet         1 face(s) on body ['B2']
+    side_xmin      1 face(s) on body ['B3']
+    side_xmax      1 face(s) on body ['B4']
+    side_ymin      1 face(s) on body ['B5']
+    side_ymax      1 face(s) on body ['B6']
+    canopy         1 face(s) on body ['B7']
+    sting          1 face(s) on body ['B8']
+    unlabeled      0 face(s)
+  not usable as-is
+
+=== import variant stl_single: {'format': 'STL', 'single_block': True, 'sewing': True} ===
+  uploading probe_domain_single.stl (16 MB, STL, sewing=True, improve=True)
+  geometry import: RUNNING
+  geometry import: FINISHED
+  geometry ec90e771-a2b8-45fb-8641-51a99a27ae2d: 2 body(ies), 2 face(s) in total
+    body B1_TE6: labels ['canopy#1']
+    body B2_TE6: labels ['canopy#2']
+    inlet          0 face(s) on body []
+    outlet         0 face(s) on body []
+    side_xmin      0 face(s) on body []
+    side_xmax      0 face(s) on body []
+    side_ymin      0 face(s) on body []
+    side_ymax      0 face(s) on body []
+    canopy         0 face(s) on body []
+    sting          0 face(s) on body []
+    unlabeled      2 face(s)
+  not usable as-is
+
+=== import variant stl_single_split: {'format': 'STL', 'single_block': True, 'sewing': True, 'facet_split': True} ===
+  uploading probe_domain_single.stl (16 MB, STL, sewing=True, improve=True)
+  geometry import: RUNNING
+  geometry import: FINISHED
+  geometry 30fd8948-fa5d-47d9-bf67-1994cf66d76f: 2 body(ies), 564 face(s) in total
+    body B1_TE6: labels ['canopy#1']
+    body B2_TE6: labels ['canopy#2']
+    inlet          0 face(s) on body []
+    outlet         0 face(s) on body []
+    side_xmin      0 face(s) on body []
+    side_xmax      0 face(s) on body []
+    side_ymin      0 face(s) on body []
+    side_ymax      0 face(s) on body []
+    canopy         0 face(s) on body []
+    sting          0 face(s) on body []
+    unlabeled    564 face(s)
+  not usable as-is
+
+Mappings saved in /home/user/kiragami_workflow/kirigami-optimizer/runs/probe_import. Usable variants: none
+The probe geometries are named probe_* in the project and can be deleted there.

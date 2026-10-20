@@ -1,0 +1,114 @@
+[
+  {
+    "name": "B1_TE2",
+    "class": "face",
+    "labels": [
+      "inlet"
+    ]
+  },
+  {
+    "name": "B2_TE2",
+    "class": "face",
+    "labels": [
+      "outlet"
+    ]
+  },
+  {
+    "name": "B3_TE2",
+    "class": "face",
+    "labels": [
+      "side_xmin"
+    ]
+  },
+  {
+    "name": "B4_TE2",
+    "class": "face",
+    "labels": [
+      "side_xmax"
+    ]
+  },
+  {
+    "name": "B5_TE2",
+    "class": "face",
+    "labels": [
+      "side_ymin"
+    ]
+  },
+  {
+    "name": "B6_TE2",
+    "class": "face",
+    "labels": [
+      "side_ymax"
+    ]
+  },
+  {
+    "name": "B7_TE2",
+    "class": "face",
+    "labels": [
+      "canopy"
+    ]
+  },
+  {
+    "name": "B8_TE2",
+    "class": "face",
+    "labels": [
+      "sting"
+    ]
+  },
+  {
+    "name": "B1",
+    "class": "body",
+    "labels": [
+      "inlet"
+    ]
+  },
+  {
+    "name": "B2",
+    "class": "body",
+    "labels": [
+      "outlet"
+    ]
+  },
+  {
+    "name": "B3",
+    "class": "body",
+    "labels": [
+      "side_xmin"
+    ]
+  },
+  {
+    "name": "B4",
+    "class": "body",
+    "labels": [
+      "side_xmax"
+    ]
+  },
+  {
+    "name": "B5",
+    "class": "body",
+    "labels": [
+      "side_ymin"
+    ]
+  },
+  {
+    "name": "B6",
+    "class": "body",
+    "labels": [
+      "side_ymax"
+    ]
+  },
+  {
+    "name": "B7",
+    "class": "body",
+    "labels": [
+      "canopy"
+    ]
+  },
+  {
+    "name": "B8",
+    "class": "body",
+    "labels": [
+      "sting"
+    ]
+  }
+]
