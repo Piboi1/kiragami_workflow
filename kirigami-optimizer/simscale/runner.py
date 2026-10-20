@@ -294,7 +294,7 @@ class SimScaleClient:
                     labels.add(str(attr.value).lower())
         return labels
 
-    def start_import(self, project_id, name, path, sewing, improve, fmt=None):
+    def start_import(self, project_id, name, path, sewing, improve, fmt=None, facet_split=False):
         """Uploads the flow domain and starts its import. Returns (storage_id, import_id).
 
         STEP files are written in millimetres, STL files in inches. For STL,
@@ -318,7 +318,7 @@ class SimScaleClient:
             format=fmt,
             input_unit=unit,
             options=GeometryImportRequestOptions(
-                facet_split=False, sewing=sewing, improve=improve, optimize_for_lbm_solver=False
+                facet_split=bool(facet_split), sewing=sewing, improve=improve, optimize_for_lbm_solver=False
             ),
         ))
         return storage.storage_id, imp.geometry_import_id

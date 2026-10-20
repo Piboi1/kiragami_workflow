@@ -11,7 +11,7 @@
     python main.py sync-sheet                       re-send rows that failed to reach the sheet
     python main.py status                           ledger summary / best design
     python main.py depth-model                      show the fitted canopy-depth model
-    python main.py probe-import [--sewing true false] [--improve true]
+    python main.py probe-import [--variants step stl_sting stl_single stl_single_split]
                                                     test SimScale geometry import options (not billed)
 """
 
@@ -19,6 +19,7 @@ import argparse
 import json
 import sys
 import time
+from pathlib import Path
 
 import config
 from optimizer.state import Ledger
@@ -139,47 +140,89 @@ def cmd_sync(args):
     return 0
 
 
+# Geometry-import experiments (imports are not billed). Each builds the
+# baseline flow domain in one form and reports what SimScale made of it.
+IMPORT_VARIANTS = {
+    # One CAD solid, canopy as a void, named walls (imports cleanly, but the
+    # canopy arrives as ~22.5k CAD faces and meshing is too expensive).
+    "step": {"format": "STEP", "sewing": False},
+    # Multi-block STL with the sting joining canopy to outlet, sewn. The
+    # canopy stays faceted geometry, like the manual setup (954 faces).
+    "stl_sting": {"format": "STL", "sting": True, "sewing": True},
+    # Whole fluid boundary as ONE STL block (box + canopy void), sewn.
+    "stl_single": {"format": "STL", "single_block": True, "sewing": True},
+    # As stl_single, with SimScale splitting facets into faces by angle.
+    "stl_single_split": {"format": "STL", "single_block": True, "sewing": True, "facet_split": True},
+}
+
+
+def _probe_domain(variant, out):
+    """Writes the baseline flow domain for an import variant; returns its path."""
+
+    from generator import generate_pattern
+    from solid import build_flow_domain, build_solid, write_named_stl
+    from solid.canopy import DEFAULT_SOLID_PARAMS
+    from solid.step_export import write_step
+
+    params = design_params(_preset("baseline"))
+    report = generate_pattern(params, write_files=False)
+    solid_params = {k: params.get(k, v) for k, v in DEFAULT_SOLID_PARAMS.items()}
+    canopy, info = build_solid(report, solid_params)
+    domain_params = dict(params)
+    if not variant.get("sting"):
+        domain_params["STING_RADIUS"] = 0.0
+    fluid, labels, _ = build_flow_domain(canopy, report["parameters"]["PARACHUTE_DIAMETER"], domain_params,
+                                         sting_anchor=info["sting_anchor_in"] if variant.get("sting") else None)
+    if variant["format"] == "STEP":
+        path = out / "probe_domain.step"
+        write_step(fluid, labels, path)
+        return path
+    if variant.get("single_block"):
+        import numpy as np
+        labels = np.full(len(labels), "canopy", dtype=object)  # one block for everything
+    return Path(write_named_stl(fluid, labels, out / f"probe_domain_{'single' if variant.get('single_block') else 'named'}.stl"))
+
+
 def cmd_probe_import(args):
-    """Imports the baseline flow domain with given options and reports the
+    """Imports the baseline flow domain in one or more forms and reports the
     resulting bodies/faces. Geometry imports are not billed (no mesh/run)."""
 
     from simscale_sdk import ApiException
 
-    from pipeline import build_geometry
     from simscale.runner import REQUIRED_GROUPS, describe_api_error
 
     client, project_id = _simscale_client()
     out = config.RUNS_DIR / "probe_import"
     out.mkdir(parents=True, exist_ok=True)
-    _, _, _, paths = build_geometry(design_params(_preset("baseline")), out, "probe")
-    if config.SIMSCALE["GEOMETRY_FORMAT"] == "STEP":
-        args.sewing = [False]  # a STEP solid needs no sewing
-    variants = [(s, i) for s in args.sewing for i in args.improve]
+    names = args.variants or [config.SIMSCALE["GEOMETRY_FORMAT"].lower()]
     ok_variants = []
-    for sewing, improve in variants:
-        tag = f"{config.SIMSCALE['GEOMETRY_FORMAT'].lower()}_sew{int(sewing)}_imp{int(improve)}"
-        print(f"\n=== {config.SIMSCALE['GEOMETRY_FORMAT']} import with sewing={sewing}, improve={improve} ===")
+    for name in names:
+        variant = IMPORT_VARIANTS[name]
+        print(f"\n=== import variant {name}: {variant} ===")
         try:
-            _, import_id = client.start_import(project_id, f"probe_{tag}", paths["domain_file"], sewing, improve,
-                                               config.SIMSCALE["GEOMETRY_FORMAT"])
+            path = _probe_domain(variant, out)
+            _, import_id = client.start_import(project_id, f"probe_{name}", path, variant.get("sewing", False),
+                                               True, variant["format"], variant.get("facet_split", False))
             geometry_id = client.wait_for_import(project_id, import_id)
-            geo = client.describe_geometry(project_id, geometry_id, out / f"entities_{tag}.json")
+            geo = client.describe_geometry(project_id, geometry_id, out / f"entities_{name}.json")
         except ApiException as exc:
             print(f"  FAILED: {describe_api_error(exc)}")
             continue
         except Exception as exc:
             print(f"  FAILED: {type(exc).__name__}: {exc}")
             continue
-        print(f"  geometry {geometry_id}: {len(geo['bodies'])} body(ies)")
+        n_faces = sum(len(v) for v in geo["groups"].values()) + len(geo["unlabeled_faces"])
+        print(f"  geometry {geometry_id}: {len(geo['bodies'])} body(ies), {n_faces} face(s) in total")
         for b in geo["bodies"]:
-            print(f"    body {b['name']}: labels {b['labels']}")
-        for g, names in geo["groups"].items():
-            print(f"    {g:10s} {len(names):3d} face(s) on body {geo['group_bodies'][g]}")
-        print(f"    unlabeled  {len(geo['unlabeled_faces']):3d} face(s)")
+            print(f"    body {b['name']}: labels {b['labels'][:6]}")
+        for g, members in geo["groups"].items():
+            print(f"    {g:10s} {len(members):5d} face(s) on body {geo['group_bodies'][g]}")
+        print(f"    unlabeled  {len(geo['unlabeled_faces']):5d} face(s)")
         good = len(geo["bodies"]) == 1 and all(geo["groups"][g] for g in REQUIRED_GROUPS)
-        print("  USABLE: one body with every boundary named" if good else "  not usable as-is")
+        print("  USABLE: one body with every boundary named" if good else
+              ("  ONE BODY, but boundaries are not named" if len(geo["bodies"]) == 1 else "  not usable as-is"))
         if good:
-            ok_variants.append(tag)
+            ok_variants.append(name)
     print(f"\nMappings saved in {out}. Usable variants: {ok_variants or 'none'}")
     print("The probe geometries are named probe_* in the project and can be deleted there.")
     return 0 if ok_variants else 1
@@ -297,8 +340,8 @@ def main(argv=None):
     p.set_defaults(fn=cmd_mesh_probe)
 
     p = sub.add_parser("probe-import")
-    p.add_argument("--sewing", type=lambda v: v.lower() in ("1", "true", "yes"), nargs="+", default=[True])
-    p.add_argument("--improve", type=lambda v: v.lower() in ("1", "true", "yes"), nargs="+", default=[True])
+    p.add_argument("--variants", nargs="+", choices=sorted(IMPORT_VARIANTS),
+                   help="import forms to try (default: the configured GEOMETRY_FORMAT)")
     p.set_defaults(fn=cmd_probe_import)
 
     args = ap.parse_args(argv)
