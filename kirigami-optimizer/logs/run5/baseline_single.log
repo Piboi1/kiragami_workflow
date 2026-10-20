@@ -1,0 +1,4 @@
+Using flow-volume geometry 9b8dbffd-c91d-401f-a21f-748a0b2cccd2 from manual-step manual_baseline3
+Resuming design_0001 (SimScale state: ['geometry_id'])
+[design_0001] generating pattern + solid
+[design_0001] rings=30 Aref=72.90 in^2 Uz=-6.148 m/s (Cd for Uz 0.307)
