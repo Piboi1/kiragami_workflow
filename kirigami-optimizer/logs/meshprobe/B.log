@@ -1,0 +1,20 @@
+Mesh probe B: {'MESH_SMALL_FEATURE_TOLERANCE_MM': 0.1, 'MESH_BOUNDARY_LAYERS': False}; cap 1.0 CPU h, timeout 240 s, stall 180 s
+  uploading meshprobe_B_flow_domain.step (33 MB, STEP, sewing=False, improve=True)
+  geometry import: RUNNING
+  geometry import: FINISHED
+  meshing: QUEUED 0%
+  meshing: RUNNING 0%
+  meshing: progress stuck at 0% for 180 s -- cancelling it on SimScale
+{
+  "variant": "B",
+  "settings": {
+    "MESH_SMALL_FEATURE_TOLERANCE_MM": 0.1,
+    "MESH_BOUNDARY_LAYERS": false
+  },
+  "cap_cpu_h": 1.0,
+  "status": "FAILED",
+  "error": "SimScaleError: meshing cancelled: progress stuck at 0% for 180 s (0.85 CPU h billed)",
+  "mesh_core_hours": 0.8538888888888889,
+  "wall_minutes": 12.5
+}
+exit=1
