@@ -303,14 +303,17 @@ def cmd_manual_step(args):
     if "geometry_id" not in state:
         if "canopy_geometry_id" not in state:
             state["geometries_before"] = [g.geometry_id for g in client.list_geometry_ids(project_id)]
-            _, import_id = client.start_import(project_id, f"{design_id}_canopy", paths["domain_file"], False,
-                                               cfg["IMPORT_IMPROVE"], "STL", facet_split=True)
+            _, import_id = client.start_import(project_id, f"{design_id}_canopy", paths["domain_file"], True,
+                                               cfg["IMPORT_IMPROVE"], "STL", facet_split=True)  # sewing -> solid
             state["canopy_geometry_id"] = client.wait_for_import(project_id, import_id)
             save(state)
         canopy = client.describe_geometry(project_id, state["canopy_geometry_id"])
         n_canopy = sum(len(v) for v in canopy["groups"].values()) + len(canopy["unlabeled_faces"])
+        is_solid = bool(client._all_mappings(project_id, state["canopy_geometry_id"], "region"))
         print(f"canopy-only geometry {state['canopy_geometry_id']}: {n_canopy} face(s), "
-              f"{len(canopy['bodies'])} body(ies)")
+              f"{'SOLID volume' if is_solid else 'SHEET body (NOT a solid; External flow volume will fail)'}")
+        if not is_solid:
+            return 1
         text = manual_flow.instructions(design_id, f"{design_id}_canopy", info["domain_bounds_in"], project_id)
         (out / "MANUAL_STEP.txt").write_text(text)
         try:

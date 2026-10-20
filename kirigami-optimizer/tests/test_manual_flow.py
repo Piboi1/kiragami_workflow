@@ -76,3 +76,21 @@ def test_wait_for_flow_volume_times_out():
     client = FakeClient([], {})
     with pytest.raises(SimScaleError, match="no flow-volume geometry"):
         client.wait_for_flow_volume("p", set(), "steps", 0, 0)
+
+
+def test_manual_import_uses_sewing(tmp_path, monkeypatch):
+    """Without sewing SimScale imports the canopy as a sheet body and External flow volume fails."""
+
+    calls = {}
+
+    class C(FakeClient):
+        def start_import(self, project_id, name, path, sewing, improve, fmt=None, facet_split=False):
+            calls.update(sewing=sewing, fmt=fmt, facet_split=facet_split)
+            raise RuntimeError("stop after import request")
+
+    client = C([], {})
+    client.cfg = {"GEOMETRY_FORMAT": "MANUAL_FLOW_VOLUME", "IMPORT_IMPROVE": True}
+    with pytest.raises(RuntimeError, match="stop after"):
+        client.run_design("p", "d", "canopy.stl", -6.0, 70.0, 9.7, tmp_path, {}, lambda s: None,
+                          manual={"bounds_in": ([-1, -1, -1], [1, 1, 1])})
+    assert calls == {"sewing": True, "fmt": "STL", "facet_split": True}

@@ -127,8 +127,11 @@ a ready-made fluid solid made the mesher choke (22.5k CAD faces; a smooth-CAD
 rebuild in `solid/smooth_cad.py` still gave 10.5k faces and invalid solids).
 So `GEOMETRY_FORMAT = "MANUAL_FLOW_VOLUME"` does this per design:
 
-1. the pipeline imports only the canopy (faceted STL with facet split, ~550
-   faces for the baseline) as `<design_id>_canopy`;
+1. the pipeline imports only the canopy (faceted STL, facet split, **sewing on**,
+   ~550 faces for the baseline) as `<design_id>_canopy`. Sewing is what makes
+   SimScale read the closed STL as a solid volume (a `region` mapping);
+   without it the canopy is a zero-thickness sheet body (`body` mapping) and
+   External flow volume (box - solid) fails;
 2. it prints a checklist (also saved as `MANUAL_STEP.txt` in the design
    folder) for the one manual step in the SimScale web app: open that
    geometry in CAD mode, add an External flow volume with the printed custom

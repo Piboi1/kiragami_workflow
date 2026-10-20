@@ -500,8 +500,11 @@ class SimScaleClient:
             # Canopy only (faceted STL); a person makes the flow volume in the web app.
             if "canopy_geometry_id" not in state:
                 remember(geometries_before=[g.geometry_id for g in self.list_geometry_ids(project_id)])
+                # sewing=True is what makes the closed STL a solid volume; without it
+                # SimScale imports a zero-thickness sheet body and External flow
+                # volume (box - solid) fails.
                 storage_id, import_id = self.start_import(
-                    project_id, f"{design_id}_canopy", domain_file, False, cfg["IMPORT_IMPROVE"], "STL",
+                    project_id, f"{design_id}_canopy", domain_file, True, cfg["IMPORT_IMPROVE"], "STL",
                     facet_split=True)
                 remember(storage_id=storage_id, geometry_import_id=import_id)
                 remember(canopy_geometry_id=self.wait_for_import(project_id, import_id))
