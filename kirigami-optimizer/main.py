@@ -308,7 +308,12 @@ def cmd_manual_step(args):
     params = design_params(_preset(args.preset))
     if args.simplify_tol is not None:
         params["SIMPLIFY_TOLERANCE"] = args.simplify_tol
+    for item in args.set or []:  # e.g. --set BRIDGE_EXTRA=0 JOINT_OVERLAP=0
+        key, _, value = item.partition("=")
+        params[key] = float(value)
     _, info, _, paths = build_geometry(params, out, design_id)
+    print(f"canopy: {info['triangle_count']} triangles, volume {info['volume_in3']:.4f} in^3, "
+          f"watertight {info['is_watertight']}, bodies {info['body_count']}")
     cfg = dict(config.SIMSCALE, GEOMETRY_FORMAT="MANUAL_FLOW_VOLUME")
     save = lambda s: state_file.write_text(json.dumps(s, indent=2))  # noqa: E731
     if "geometry_id" not in state:
@@ -479,6 +484,8 @@ def main(argv=None):
     p.add_argument("--design-id", default="manual_baseline")
     p.add_argument("--simplify-tol", type=float, default=None,
                    help="canopy mesh simplification in inches (default: config, 1e-4)")
+    p.add_argument("--set", nargs="+", metavar="KEY=VALUE",
+                   help="numeric design/solid overrides, e.g. BRIDGE_EXTRA=0 JOINT_OVERLAP=0")
     p.add_argument("--wait", action="store_true",
                    help="keep waiting (up to MANUAL_WAIT_S) for the flow volume; default: check once")
     p.set_defaults(fn=cmd_manual_step)
