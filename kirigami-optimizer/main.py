@@ -305,7 +305,10 @@ def cmd_manual_step(args):
     out.mkdir(parents=True, exist_ok=True)
     state_file = out / "simscale_state.json"
     state = json.loads(state_file.read_text()) if state_file.exists() else {}
-    _, info, _, paths = build_geometry(design_params(_preset(args.preset)), out, design_id)
+    params = design_params(_preset(args.preset))
+    if args.simplify_tol is not None:
+        params["SIMPLIFY_TOLERANCE"] = args.simplify_tol
+    _, info, _, paths = build_geometry(params, out, design_id)
     cfg = dict(config.SIMSCALE, GEOMETRY_FORMAT="MANUAL_FLOW_VOLUME")
     save = lambda s: state_file.write_text(json.dumps(s, indent=2))  # noqa: E731
     if "geometry_id" not in state:
@@ -474,6 +477,8 @@ def main(argv=None):
     p = sub.add_parser("manual-step")
     p.add_argument("--preset", default="baseline")
     p.add_argument("--design-id", default="manual_baseline")
+    p.add_argument("--simplify-tol", type=float, default=None,
+                   help="canopy mesh simplification in inches (default: config, 1e-4)")
     p.add_argument("--wait", action="store_true",
                    help="keep waiting (up to MANUAL_WAIT_S) for the flow volume; default: check once")
     p.set_defaults(fn=cmd_manual_step)
