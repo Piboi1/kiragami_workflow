@@ -14,6 +14,8 @@
     python main.py manual-step [--preset baseline] [--wait]
                                                     import the canopy, show the web-app flow-volume checklist,
                                                     verify the resulting geometry (not billed)
+    python main.py canopy-gate --name N [--simplify-tol 1e-3]
+                                                    mesh the canopy alone until surface meshing passes/fails (tiny cost)
     python main.py probe-import [--variants step stl_sting stl_single stl_single_split]
                                                     test SimScale geometry import options (not billed)
 """
@@ -341,6 +343,77 @@ def cmd_manual_step(args):
     return 0
 
 
+def cmd_canopy_gate(args):
+    """Billed but tiny: imports the canopy ALONE, starts SimScale's mesher on it
+    (no physics, no layers) and stops as soon as surface meshing has passed or
+    failed. Tells whether SimScale accepts the canopy surface (the
+    self-intersection error of mesh probe M) without a manual flow volume."""
+
+    from simscale_sdk import MeshOperation, SimmetrixMeshingFluid, AutomaticMeshSizingSimmetrix, AutomaticCurvature
+    from simscale_sdk import AutomaticLayerOff, DimensionalTime
+
+    from pipeline import build_geometry
+    from simscale.runner import SimScaleClient, _core_hours
+
+    client = SimScaleClient(config.SIMSCALE)
+    project_id = client.ensure_project(config.SIMSCALE["PROJECT_ID"], config.SIMSCALE["NEW_PROJECT_NAME"],
+                                       config.STATE_DIR / "simscale_project.json")
+    out = config.RUNS_DIR / "canopy_gate" / args.name
+    out.mkdir(parents=True, exist_ok=True)
+    overrides = {"SIMPLIFY_TOLERANCE": args.simplify_tol}
+    if args.joint_overlap is not None:
+        overrides["JOINT_OVERLAP"] = args.joint_overlap
+    params = design_params(_preset(args.preset))
+    params.update(overrides)
+    _, info, _, paths = build_geometry(params, out, args.name)
+    print(f"gate {args.name}: canopy {info['triangle_count']} triangles, simplify {args.simplify_tol:g}, "
+          f"cap {args.cap} CPU h, timeout {args.timeout} s, pass at {args.pass_progress:.0%} progress")
+    _, import_id = client.start_import(project_id, f"{args.name}_gate", paths["canopy_stl"], True,
+                                       config.SIMSCALE["IMPORT_IMPROVE"], "STL", facet_split=True)
+    geometry_id = client.wait_for_import(project_id, import_id)
+    if not client._all_mappings(project_id, geometry_id, "region"):
+        print("RESULT: import is a sheet body, not a solid")
+        return 1
+    model = SimmetrixMeshingFluid(
+        sizing=AutomaticMeshSizingSimmetrix(fineness=config.SIMSCALE["MESH_FINENESS"], curvature=AutomaticCurvature()),
+        automatic_layer_settings=AutomaticLayerOff(), physics_based_meshing=False, hex_core=False,
+        max_meshing_run_time=DimensionalTime(value=args.timeout, unit="s"))
+    op = client.meshes.create_mesh_operation(project_id, MeshOperation(
+        name=f"{args.name} gate", geometry_id=geometry_id, model=model))
+    op_id = op.mesh_operation_id
+    client.meshes.start_mesh_operation(project_id, op_id)
+    started, result, reason = time.time(), None, ""
+    try:
+        while True:
+            cur = client.meshes.get_mesh_operation(project_id, op_id)
+            hours = _core_hours(cur)
+            if cur.status == "FAILED":
+                entries = client.meshes.get_mesh_operation_event_log(project_id, op_id).entries or []
+                reason = " | ".join(e.message for e in entries)
+                result = "FAIL"
+                break
+            if cur.status == "FINISHED" or (cur.status == "RUNNING" and (cur.progress or 0) >= args.pass_progress):
+                result = "PASS"
+                break
+            if hours > args.cap or time.time() - started > args.timeout:
+                result, reason = "INCONCLUSIVE", f"stopped at cap/timeout ({hours:.3f} CPU h, progress {cur.progress})"
+                break
+            time.sleep(args.poll)
+    finally:
+        final = client.meshes.get_mesh_operation(project_id, op_id)
+        if final.status not in ("FINISHED", "FAILED", "CANCELED"):
+            client.meshes.cancel_mesh_operation(project_id, op_id)
+            time.sleep(5)
+            final = client.meshes.get_mesh_operation(project_id, op_id)
+    summary = {"name": args.name, "result": result, "reason": reason, "status": final.status,
+               "progress": final.progress, "cpu_hours": _core_hours(final), "geometry_id": geometry_id,
+               "mesh_operation_id": op_id, "simplify_tol": args.simplify_tol, "joint_overlap": args.joint_overlap,
+               "wall_s": round(time.time() - started)}
+    (out / "gate.json").write_text(json.dumps(summary, indent=2, default=str) + "\n")
+    print(json.dumps(summary, indent=2, default=str))
+    return 0 if result == "PASS" else 1
+
+
 def cmd_depth_model(args):
     from solid.depth_model import get_depth_model
 
@@ -402,6 +475,18 @@ def main(argv=None):
     p.add_argument("--wait", action="store_true",
                    help="keep waiting (up to MANUAL_WAIT_S) for the flow volume; default: check once")
     p.set_defaults(fn=cmd_manual_step)
+
+    p = sub.add_parser("canopy-gate")
+    p.add_argument("--preset", default="baseline")
+    p.add_argument("--name", required=True)
+    p.add_argument("--simplify-tol", type=float, default=1e-4, help="inches (the default is the current setting)")
+    p.add_argument("--joint-overlap", type=float, default=None)
+    p.add_argument("--cap", type=float, default=0.3, help="CPU-hour cap")
+    p.add_argument("--timeout", type=int, default=180, help="seconds")
+    p.add_argument("--pass-progress", type=float, default=0.3,
+                   help="progress fraction that counts as surface meshing passed")
+    p.add_argument("--poll", type=int, default=5)
+    p.set_defaults(fn=cmd_canopy_gate)
 
     p = sub.add_parser("mesh-probe")
     p.add_argument("--variant", choices=sorted(MESH_PROBE_VARIANTS), required=True)
