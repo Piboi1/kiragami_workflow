@@ -1,4 +1,4 @@
-"""WORK IN PROGRESS: canopy and flow domain as smooth CAD (OpenCascade B-rep).
+"""Canopy and flow domain as smooth CAD (OpenCascade B-rep).
 
 The mesh-based export turned every canopy triangle into its own flat CAD
 face (~22.5k faces), which SimScale's mesher could not handle cheaply.
@@ -89,8 +89,62 @@ def count_faces(shape):
     return n
 
 
-def build_canopy_cad(ring_data, params=None):
-    """Returns (canopy_shape_mm, info) built from smooth lofted strips."""
+def _shape_list(shapes):
+    from OCP.collections import List_TopoDS_Shape
+
+    lst = List_TopoDS_Shape()
+    for sh in shapes:
+        lst.Append(sh)
+    return lst
+
+
+def fuse_pieces(pieces, fuzzy_mm=1e-4):
+    """General-fuse of all strip/cap solids into one solid, same-surface faces merged."""
+
+    from OCP.BRepAlgoAPI import BRepAlgoAPI_Fuse
+    from OCP.ShapeUpgrade import ShapeUpgrade_UnifySameDomain
+
+    op = BRepAlgoAPI_Fuse()
+    op.SetArguments(_shape_list(pieces[:1]))
+    op.SetTools(_shape_list(pieces[1:]))
+    op.SetRunParallel(True)
+    op.SetFuzzyValue(fuzzy_mm)
+    op.Build()
+    if not op.IsDone() or op.HasErrors():
+        raise RuntimeError("canopy fuse failed")
+    unify = ShapeUpgrade_UnifySameDomain(op.Shape(), True, True, True)
+    unify.Build()
+    return unify.Shape()
+
+
+def volume_mm3(shape):
+    from OCP.BRepGProp import BRepGProp
+    from OCP.GProp import GProp_GProps
+
+    props = GProp_GProps()
+    BRepGProp.VolumeProperties_s(shape, props)
+    return props.Mass()
+
+
+def is_valid(shape):
+    from OCP.BRepCheck import BRepCheck_Analyzer
+
+    return bool(BRepCheck_Analyzer(shape).IsValid())
+
+
+def count_solids(shape):
+    from OCP.TopAbs import TopAbs_SOLID
+    from OCP.TopExp import TopExp_Explorer
+
+    exp, n = TopExp_Explorer(shape, TopAbs_SOLID), 0
+    while exp.More():
+        n += 1
+        exp.Next()
+    return n
+
+
+def build_canopy_cad(ring_data, params=None, fuzzy_mm=1e-4):
+    """Returns (canopy_shape_mm, info): the fused, face-merged smooth canopy."""
 
     p = dict(DEFAULT_SOLID_PARAMS)
     if params:
@@ -102,7 +156,87 @@ def build_canopy_cad(ring_data, params=None):
                       float(p["KERF_FACTOR"]), float(p["JOINT_OVERLAP"]), record=record)
     thickness = float(p["SHEET_THICKNESS"])
     pieces = [strip_solid(d, thickness) if d["kind"] == "strip" else cap_solid(d, thickness) for d in record]
-    # TODO (work in progress): fuse the pieces (BRepAlgoAPI_Fuse with fuzzy
-    # value), ShapeUpgrade_UnifySameDomain, BRepCheck, then cut from the box
-    # and write a named STEP; measure the face count against the manual 954.
-    return pieces, {"pieces": len(pieces)}
+    canopy = fuse_pieces(pieces, fuzzy_mm)
+    info = {"pieces": len(pieces), "canopy_faces": count_faces(canopy), "canopy_solids": count_solids(canopy),
+            "canopy_valid": is_valid(canopy), "canopy_volume_in3": volume_mm3(canopy) / MM_PER_IN ** 3}
+    return canopy, info
+
+
+def build_flow_cad(canopy, lo_in, hi_in):
+    """Box (inches bounds) minus the canopy, as one OpenCascade solid (mm)."""
+
+    from OCP.BRepAlgoAPI import BRepAlgoAPI_Cut
+    from OCP.BRepPrimAPI import BRepPrimAPI_MakeBox
+    from OCP.gp import gp_Pnt
+
+    lo = np.array(lo_in) * MM_PER_IN
+    hi = np.array(hi_in) * MM_PER_IN
+    box = BRepPrimAPI_MakeBox(gp_Pnt(*lo), gp_Pnt(*hi)).Shape()
+    cut = BRepAlgoAPI_Cut(box, canopy)
+    if not cut.IsDone() or cut.HasErrors():
+        raise RuntimeError("box - canopy failed")
+    return cut.Shape()
+
+
+def write_flow_step(fluid, lo_in, hi_in, path):
+    """Writes the fluid solid with the six box walls named and coloured."""
+
+    from OCP.BRepAdaptor import BRepAdaptor_Surface
+    from OCP.GeomAbs import GeomAbs_Plane
+    from OCP.IFSelect import IFSelect_RetDone
+    from OCP.Interface import Interface_Static
+    from OCP.Quantity import Quantity_Color, Quantity_TOC_RGB
+    from OCP.STEPCAFControl import STEPCAFControl_Writer
+    from OCP.STEPControl import STEPControl_AsIs
+    from OCP.TCollection import TCollection_ExtendedString
+    from OCP.TDataStd import TDataStd_Name
+    from OCP.TDocStd import TDocStd_Document
+    from OCP.TopAbs import TopAbs_FACE
+    from OCP.TopExp import TopExp_Explorer
+    from OCP.TopoDS import TopoDS
+    from OCP.XCAFDoc import XCAFDoc_ColorSurf, XCAFDoc_DocumentTool
+
+    from .step_export import FACE_COLOURS, _quiet_occ
+
+    lo, hi = np.array(lo_in) * MM_PER_IN, np.array(hi_in) * MM_PER_IN
+    planes = [("side_xmin", 0, lo[0]), ("side_xmax", 0, hi[0]), ("side_ymin", 1, lo[1]),
+              ("side_ymax", 1, hi[1]), ("outlet", 2, lo[2]), ("inlet", 2, hi[2])]
+
+    doc = TDocStd_Document(TCollection_ExtendedString("XmlOcaf"))
+    shapes = XCAFDoc_DocumentTool.ShapeTool_s(doc.Main())
+    colours = XCAFDoc_DocumentTool.ColorTool_s(doc.Main())
+    main = shapes.AddShape(fluid, False)
+    TDataStd_Name.Set_s(main, TCollection_ExtendedString("Flow region"))
+
+    named, exp = set(), TopExp_Explorer(fluid, TopAbs_FACE)
+    while exp.More():
+        face = TopoDS.Face_s(exp.Current())
+        surf = BRepAdaptor_Surface(face)
+        if surf.GetType() == GeomAbs_Plane:
+            pln = surf.Plane()
+            axis, origin = pln.Axis().Direction(), pln.Location()
+            for name, k, value in planes:
+                comp = (axis.X(), axis.Y(), axis.Z())[k]
+                loc = (origin.X(), origin.Y(), origin.Z())[k]
+                if abs(abs(comp) - 1.0) < 1e-9 and abs(loc - value) < 1e-6:
+                    sub = shapes.AddSubShape(main, face)
+                    TDataStd_Name.Set_s(sub, TCollection_ExtendedString(name))
+                    colours.SetColor(sub, Quantity_Color(*FACE_COLOURS[name], Quantity_TOC_RGB), XCAFDoc_ColorSurf)
+                    named.add(name)
+        exp.Next()
+    if len(named) != 6:
+        raise RuntimeError(f"found box walls {sorted(named)}, expected all six")
+
+    _quiet_occ()
+    writer = STEPCAFControl_Writer()
+    for key, value in (("write.step.unit", "MM"),):
+        Interface_Static.SetCVal_s(key, value)
+    for key, value in (("write.stepcaf.subshapes.name", 1),):
+        Interface_Static.SetIVal_s(key, value)
+    writer.SetNameMode(True)
+    writer.SetColorMode(True)
+    if not writer.Transfer(doc, STEPControl_AsIs):
+        raise RuntimeError("STEP transfer failed")
+    if writer.Write(str(path)) != IFSelect_RetDone:
+        raise RuntimeError(f"could not write {path}")
+    return {"named_walls": sorted(named), "step_faces": count_faces(fluid)}
