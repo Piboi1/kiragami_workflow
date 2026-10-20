@@ -1,0 +1,14 @@
+
+=== import variant step_tess: {'format': 'STEP', 'tessellated': True, 'sewing': False} ===
+  uploading probe_domain_tess.step (5 MB, STEP, sewing=False, improve=True)
+  geometry import: RUNNING
+  geometry import: FAILED
+  FAILED: SimScaleError: geometry import FAILED: {'code': 'invalid-file',
+ 'details': {},
+ 'message': 'The file could not be imported as valid geometry based on the '
+            'provided geometry format. Please try to export a different format '
+            'or contact our support for assistance.',
+ 'severity': 'ERROR'}
+
+Mappings saved in /home/user/kiragami_workflow/kirigami-optimizer/runs/probe_import. Usable variants: none
+The probe geometries are named probe_* in the project and can be deleted there.
