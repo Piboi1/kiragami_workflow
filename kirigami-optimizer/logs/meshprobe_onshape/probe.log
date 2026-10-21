@@ -1,0 +1,15 @@
+Mesh probe M: {}; cap 1.0 CPU h, timeout 240 s, stall 180 s
+Using flow-volume geometry d17a9d17-b17d-4a28-b051-b5d01ab0fb44 from manual-step onshape_rt1
+  meshing: QUEUED 0%
+  meshing: RUNNING 0%
+  meshing: RUNNING 10%
+  meshing: FAILED
+{
+  "variant": "M",
+  "settings": {},
+  "cap_cpu_h": 1.0,
+  "status": "FAILED",
+  "error": "SimScaleError: meshing FAILED",
+  "mesh_core_hours": 0.0,
+  "wall_minutes": 5.2
+}

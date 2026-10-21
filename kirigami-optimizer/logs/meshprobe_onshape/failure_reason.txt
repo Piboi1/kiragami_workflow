@@ -1,0 +1,1 @@
+SimScale event log (mesh op 3e4436ae-ab49-4a1f-86d9-0317a43d7683): The meshing failed due to a self intersection in the mesh on the following entities: B2_TE11477,B2_TE45089. Position: [{"X":0.04066644033528942,"Y":0.0022371415360394756,"Z":-0.03275320682288449}] (metres)

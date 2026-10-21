@@ -1,0 +1,9 @@
+{
+  "variant": "M",
+  "settings": {},
+  "cap_cpu_h": 1.0,
+  "status": "FAILED",
+  "error": "SimScaleError: meshing FAILED",
+  "mesh_core_hours": 0.0,
+  "wall_minutes": 5.2
+}

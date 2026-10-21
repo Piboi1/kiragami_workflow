@@ -73,3 +73,16 @@ deterministically (same cell, same mesh 1,264,478 cells). Findings:
   (previous union-mesh canopies failed at surface meshing; see `logs/canopygate_onshape/`). Total spent now about 15.3 of 800 CPU h.
 - Next (needs user approval + cap): either a longer gate (e.g. `--cap 1 --timeout 600`) to see whether meshing passes 30%, or go straight to
   `mesh-probe`/`single` on this geometry. Then check the solver does not diverge in rings 7-8 as it did on the union-mesh canopy.
+
+## Update: mesh-probe on the Onshape flow volume FAILED (0 CPU h billed)
+- `mesh-probe --variant M --from-manual onshape_rt1 --cap 1.0 --timeout 240` (user-approved 1 CPU h), geometry `d17a9d17-...`
+  (made by writing `runs/manual_step/onshape_rt1/simscale_state.json` = `{"geometry_id": "d17a9d17-..."}`; `runs/` is gitignored).
+  Failed at 10% progress in surface meshing, 0.0 CPU h billed: **self intersection between faces B2_TE11477 and B2_TE45089
+  at (0.0407, 0.0022, -0.0328) m = (1.60, 0.088, -1.29) in, r = 1.60 in, angle 3.1 deg** - the same ring 7-8 zone (r 1.5-1.65 in)
+  where the earlier canopies diverged. So the Onshape round trip + 2718-face split did NOT fix SimScale's surface mesher there,
+  and the earlier 0.3 CPU h gate run was just slow (10%), the failure came after.
+- Logs: `logs/meshprobe_onshape/`. Total spent still about 15.3 of 800 CPU h.
+- Open: the user's manual geometry meshes fine. Differences to examine at r~1.6 in: hinge/slab overlap structure there vs the manual
+  Onshape-exported STL (the Google Drive comparison was skipped by the user's choice), Onshape export settings
+  (the user used "basic settings"; check whether chord/angle tolerance in the translation matches), or increase SimScale
+  geometry import tolerances. Another option: get the user to export the geometry from the web app (mesh fine) and compare face names.
