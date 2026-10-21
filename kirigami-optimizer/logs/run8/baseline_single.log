@@ -1,0 +1,26 @@
+CPU-hour cap for this design (mesh + run, checked against SimScale's estimate and enforced live): 18
+Using flow-volume geometry 9b8dbffd-c91d-401f-a21f-748a0b2cccd2 from manual-step manual_baseline3
+Resuming design_0004 (SimScale state: ['geometry_id'])
+[design_0004] generating pattern + solid
+[design_0004] rings=30 Aref=72.90 in^2 Uz=-6.148 m/s (Cd for Uz 0.307)
+[design_0004] FAILED: ApiException: (404)
+Reason: 
+HTTP response headers: HTTPHeaderDict({'Content-Type': 'application/json', 'Content-Length': '462', 'Connection': 'keep-alive', 'Date': 'Wed, 21 Oct 2026 20:11:59 GMT', 'Expires': 'Thu, 01 Jan 1970 00:00:00 UTC', 'Vary': 'Accept-Encoding, Origin, Access-Control-Request-Method, Access-Control-Request-Headers, Authorization, Origin', 'Trace-Id': '63437e1d, 63437e1d', 'Span-Id': '2s2oe2ho, mzncqz3t', 'X-Content-Type-Options': 'nosniff', 'X-XSS-Protection': '0', 'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload', 'X-Frame-Options': 'DENY', 'Cache-Control': 'private', 'X-Cache': 'Error from cloudfront', 'Via': '1.1 07d5eec4594a9bae53f5a0be90a3425a.cloudfront.net (CloudFront)', 'X-Amz-Cf-Pop': 'IAD61-P9', 'Alt-Svc': 'h3=":443"; ma=86400', 'X-Amz-Cf-Id': 'lGBIoTEEcIi8jZFwAqfhHoyvpkHFXHyuMmgIWswVYJ2zXhBc-RftqQ==', 'Referrer-Policy': 'strict-origin-when-cross-origin'})
+HTTP response body: {
+  "code" : "not-found",
+  "details" : {
+    "geometryId" : "9b8dbffd-c91d-401f-a21f-748a0b2cccd2"
+  },
+  "entries" : [ {
+    "code" : "not-found",
+    "details" : {
+      "geometryId" : "9b8dbffd-c91d-401f-a21f-748a0b2cccd2"
+    },
+    "message" : "Geometry 9b8dbffd-c91d-401f-a21f-748a0b2cccd2 not found",
+    "severity" : "ERROR"
+  } ],
+  "message" : "Geometry 9b8dbffd-c91d-401f-a21f-748a0b2cccd2 not found",
+  "severity" : "ERROR",
+  "trace" : "63437e1d"
+}
+
