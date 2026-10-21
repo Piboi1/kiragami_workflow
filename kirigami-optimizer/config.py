@@ -241,3 +241,14 @@ OPTIMIZER = {
     # design is geometrically infeasible (see solid.canopy.check_feasible).
     "FAILURE_CD": 0.0,
 }
+
+
+# ------------------------------------------------------------------
+# Onshape (free plan: public documents, ~2,500 API requests per year)
+# ------------------------------------------------------------------
+ONSHAPE = {
+    "DOCUMENT_NAME": "kirigami_optimizer",   # one document, overwritten per design
+    "REQUEST_CAP": 2000,                     # soft stop, counted in state/onshape_usage.json
+    # Canopy as the manual workflow feeds Onshape: overlapping slabs, flush hinges, no boolean union.
+    "CANOPY_OVERRIDES": {"EXTRUDE_METHOD": "legacy", "BRIDGE_EXTRA": 0.0, "JOINT_OVERLAP": 0.0},
+}

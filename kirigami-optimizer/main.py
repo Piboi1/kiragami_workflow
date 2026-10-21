@@ -17,6 +17,8 @@
     python main.py reference-check                  run the pipeline's spec on the manual project's own geometry (billed)
     python main.py canopy-gate --name N [--simplify-tol 1e-3]
                                                     mesh the canopy alone until surface meshing passes/fails (tiny cost)
+    python main.py onshape-roundtrip [--preset baseline] [--stl FILE]
+                                                    STL -> Onshape import -> Part Studio STL export (free; no SimScale)
     python main.py probe-import [--variants step stl_sting stl_single stl_single_split]
                                                     test SimScale geometry import options (not billed)
 """
@@ -369,6 +371,52 @@ def cmd_manual_step(args):
     return 0
 
 
+def cmd_onshape_roundtrip(args):
+    """Free: sends the (legacy-style) canopy STL through Onshape's import and Part Studio STL export."""
+
+    import numpy as np
+    import trimesh
+    from onshape import OnshapeClient
+    from onshape.roundtrip import round_trip
+
+    out = config.RUNS_DIR / "onshape" / args.name
+    out.mkdir(parents=True, exist_ok=True)
+    if args.exported_stl:  # already round-tripped: skip Onshape, only inspect/import the result
+        res = {"file": args.exported_stl, "requests_used": OnshapeClient(config.STATE_DIR / "onshape_usage.json").requests_used()}
+    else:
+        stl = Path(args.stl) if args.stl else None
+        if stl is None:
+            from pipeline import build_geometry
+
+            params = design_params(_preset(args.preset))
+            params.update(config.ONSHAPE["CANOPY_OVERRIDES"])
+            for item in args.set or []:
+                key, _, value = item.partition("=")
+                params[key] = float(value)
+            _, info, _, paths = build_geometry(params, out, args.name)
+            stl = Path(paths["canopy_stl"])
+            print(f"canopy: {info['triangle_count']} triangles, {info['body_count']} bodies, volume {info['volume_in3']:.4f} in^3")
+        client = OnshapeClient(config.STATE_DIR / "onshape_usage.json", request_cap=config.ONSHAPE["REQUEST_CAP"])
+        res = round_trip(client, stl, out / f"{args.name}_onshape.stl", config.STATE_DIR / "onshape_doc.json",
+                         doc_name=config.ONSHAPE["DOCUMENT_NAME"])
+    m = trimesh.load(res["file"])
+    comps = trimesh.graph.connected_components(m.face_adjacency, nodes=np.arange(len(m.faces)))
+    print(f"exported mesh: {len(m.faces)} triangles, watertight {m.is_watertight}, "
+          f"{len(comps)} connected piece(s), volume {m.volume:.4f} in^3")
+    print(f"Onshape requests used so far: {res['requests_used']} (cap {config.ONSHAPE['REQUEST_CAP']})")
+    if args.simscale_import:  # geometry import only: free, no mesh or solver
+        client_s, project_id = _simscale_client()
+        _, import_id = client_s.start_import(project_id, f"{args.name}_onshape", res["file"], True,
+                                             config.SIMSCALE["IMPORT_IMPROVE"], "STL", facet_split=True)
+        geometry_id = client_s.wait_for_import(project_id, import_id)
+        d = client_s.describe_geometry(project_id, geometry_id)
+        n_faces = sum(len(v) for v in d["groups"].values()) + len(d["unlabeled_faces"])
+        is_solid = bool(client_s._all_mappings(project_id, geometry_id, "region"))
+        print(f"SimScale geometry {geometry_id}: {n_faces} face(s), {'SOLID volume' if is_solid else 'SHEET body'} "
+              "(manual Onshape export: ~948 faces)")
+    return 0
+
+
 def cmd_canopy_gate(args):
     """Billed but tiny: imports the canopy ALONE, starts SimScale's mesher on it
     (no physics, no layers) and stops as soon as surface meshing has passed or
@@ -561,6 +609,16 @@ def main(argv=None):
     p.add_argument("--length", type=float, default=9.634, help="reference length in")
     p.add_argument("--max-core-hours", type=float, default=18.0)
     p.set_defaults(fn=cmd_reference_check)
+
+    p = sub.add_parser("onshape-roundtrip")
+    p.add_argument("--preset", default="baseline")
+    p.add_argument("--name", default="onshape_design")
+    p.add_argument("--simscale-import", action="store_true",
+                   help="then import the exported STL into SimScale with facet split (free; reports face count)")
+    p.add_argument("--exported-stl", help="skip Onshape; use this already-exported Part Studio STL")
+    p.add_argument("--stl", help="send this STL instead of building one from the preset")
+    p.add_argument("--set", nargs="+", metavar="KEY=VALUE", help="numeric design overrides")
+    p.set_defaults(fn=cmd_onshape_roundtrip)
 
     p = sub.add_parser("canopy-gate")
     p.add_argument("--preset", default="baseline")
