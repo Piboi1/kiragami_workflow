@@ -1,1 +1,27 @@
 Kiragami_CFD: geometry 'kirigami_hex_solid' 97b0ded6-a64a-46d1-8351-8d5568d0ca73, fluid region B2_TE5, faces inlet=1, outlet=1, side_xmin=1, side_xmax=1, side_ymin=1, side_ymax=1, canopy=948
+  meshing: QUEUED 0%
+  meshing: RUNNING 30%
+  meshing: RUNNING 80%
+  meshing: RUNNING 95%
+  meshing: FINISHED
+Traceback (most recent call last):
+  File "/home/user/kiragami_workflow/kirigami-optimizer/main.py", line 598, in <module>
+    sys.exit(main())
+             ~~~~^^
+  File "/home/user/kiragami_workflow/kirigami-optimizer/main.py", line 594, in main
+    return args.fn(args)
+           ~~~~~~~^^^^^^
+  File "/home/user/kiragami_workflow/kirigami-optimizer/main.py", line 479, in cmd_reference_check
+    coeffs = client.run_design(project.project_id, "pipeline_spec_check", None, -abs(args.uz), args.area, args.length,
+                               out, state, save)
+  File "/home/user/kiragami_workflow/kirigami-optimizer/simscale/runner.py", line 572, in run_design
+    run_max, core_hours = self._estimate_ok(
+                          ~~~~~~~~~~~~~~~~~^
+        "simulation", lambda: self.simulations.estimate_simulation_setup(project_id, sim_id),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        cfg["MAX_RUN_TIME_S"])
+        ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/kiragami_workflow/kirigami-optimizer/simscale/runner.py", line 474, in _estimate_ok
+    raise SimScaleError(f"{what} estimate {core_hours} core hours exceeds cap {cap}")
+simscale.runner.SimScaleError: simulation estimate 18.66 core hours exceeds cap 18.0
+EXIT 1
