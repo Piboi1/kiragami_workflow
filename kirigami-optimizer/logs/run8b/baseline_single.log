@@ -1,0 +1,5 @@
+CPU-hour cap for this design (mesh + run, checked against SimScale's estimate and enforced live): 18
+Using flow-volume geometry 661bfec6-e4b0-4dfa-9aee-f310c77b7fb8 from manual-step manual_baseline3
+Resuming design_0005 (SimScale state: ['geometry_id'])
+[design_0005] generating pattern + solid
+[design_0005] rings=30 Aref=72.90 in^2 Uz=-6.148 m/s (Cd for Uz 0.307)
