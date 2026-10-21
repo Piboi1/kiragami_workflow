@@ -110,3 +110,13 @@ Analysis (scripts were scratch, results below):
 - Next: the user makes the External flow volume + Delete bodies on `c1110008...` in the web app (box X/Y +-25.83 in, Z -70..+31.13 in),
   then `mesh-probe --variant M --from-manual <id>` (needs `runs/manual_step/<id>/simscale_state.json` with the new geometry id) under an
   approved CPU-h cap, then the solver. Total spent still about 15.3 of 800 CPU h.
+
+## Update: mesh-probe on the welded canopy FINISHED
+- User saved the flow volume on `weld2_raw_direct`: new geometry **`c9f66466-2163-4b95-98fd-e68d2cf95bca`** (954 faces, 1 fluid region `B2_TE5`).
+  `runs/manual_step/weld2/simscale_state.json` = `{"geometry_id": "c9f66466-..."}` (runs/ is gitignored; recreate it if missing).
+- `mesh-probe --variant M --from-manual weld2 --cap 1.0 --timeout 240` (user-approved 1 CPU h): **FINISHED**, no self-intersection.
+  1,683,594 cells, 444,326 nodes, 0.275 CPU h, 2.7 min wall. (The union-mesh canopies meshed to 1,264,478 cells.) Logs: `logs/meshprobe_weld2/`.
+  Total spent about 15.6 of 800 CPU h.
+- Next (needs user approval + CPU-h cap; the reference check cost ~3.5 CPU h): `main.py single --from-manual weld2 --uz 6.148 --max-core-hours N`
+  to check the solver does not diverge in rings 7-8, then compare force/Cd with Run 11 (0.797 N). Cd uses the per-design projected area.
+- Still open: canopy volume 0.774 in^3 (script) vs 0.8826 in^3 reported for Run 11.

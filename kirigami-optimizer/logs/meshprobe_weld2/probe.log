@@ -1,0 +1,18 @@
+Mesh probe M: {}; cap 1.0 CPU h, timeout 240 s, stall 180 s
+Using flow-volume geometry c9f66466-2163-4b95-98fd-e68d2cf95bca from manual-step weld2
+  meshing: QUEUED 0%
+  meshing: RUNNING 10%
+  meshing: RUNNING 30%
+  meshing: RUNNING 95%
+  meshing: FINISHED
+{
+  "variant": "M",
+  "settings": {},
+  "cap_cpu_h": 1.0,
+  "status": "FINISHED",
+  "mesh_id": "b1ba1424-7c84-4a12-8b03-9fe2a56ff60f",
+  "cells": 1683594,
+  "nodes": 444326,
+  "mesh_core_hours": 0.2752777777777778,
+  "wall_minutes": 2.7
+}
