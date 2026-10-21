@@ -191,7 +191,9 @@ SIMSCALE = {
     "MESH_BOUNDARY_LAYERS": True,
     "MESH_PHYSICS_BASED": True,
     "MESH_HEX_CORE": True,
-    "MESH_SMALL_FEATURE_TOLERANCE_MM": None,  # e.g. 0.1: ignore CAD features smaller than this
+    # The manual Kiragami_CFD mesh (Run 11, 1.58M cells) used 0.000646 in; via the API an unset
+    # value arrives as 0, which gave a coarser mesh (1.26M cells) that diverged on the same geometry.
+    "MESH_SMALL_FEATURE_TOLERANCE_MM": 0.016413,
     "MESH_MAX_RUN_TIME_S": 18000,   # SimScale-side meshing limit
     # Watchdogs: the job is CANCELLED on SimScale (not just abandoned) when
     # any of these trips. Your manual meshes took 3-5 min / 0.2-0.7 CPU h;
