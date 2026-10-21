@@ -3,3 +3,8 @@ Using flow-volume geometry 9b8dbffd-c91d-401f-a21f-748a0b2cccd2 from manual-step
 Resuming design_0003 (SimScale state: ['geometry_id'])
 [design_0003] generating pattern + solid
 [design_0003] rings=30 Aref=72.90 in^2 Uz=-6.148 m/s (Cd for Uz 0.307)
+  meshing: QUEUED 0%
+  meshing: RUNNING 30%
+  meshing: RUNNING 95%
+  meshing: FINISHED
+  simulation run: QUEUED 0%
