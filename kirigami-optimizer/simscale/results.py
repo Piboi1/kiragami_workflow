@@ -1,7 +1,8 @@
 """Parses SimScale's FORCE_COEFFICIENTS_PLOT CSV into Cd / Cl / Cm.
 
 The plot's series are "Moment coefficient", "Drag coefficient",
-"Lift coefficient", "Cl(f)" and "Cl(r)". Column headers are matched loosely
+"Lift coefficient", "Cl(f)" and "Cl(r)" in the web app, and
+FORCE_COEFFICIENT_CD / _CL / _CLF / _CLR / _CM in the API's CSV. Column headers are matched loosely
 (case-insensitive; full names or Cd/Cl/Cm abbreviations) so small format
 changes on SimScale's side don't break parsing.
 """
@@ -15,6 +16,10 @@ import numpy as np
 
 def _classify(header):
     h = header.strip().lower().replace(" ", "")
+    # The API's CSV names the series FORCE_COEFFICIENT_CD / _CL / _CLF / _CLR / _CM.
+    for suffix, key in (("_clf", "cl_front"), ("_clr", "cl_rear"), ("_cd", "cd"), ("_cl", "cl"), ("_cm", "cm")):
+        if h.startswith("force_coefficient") and h.endswith(suffix):
+            return key
     if "cl(f)" in h:
         return "cl_front"
     if "cl(r)" in h:

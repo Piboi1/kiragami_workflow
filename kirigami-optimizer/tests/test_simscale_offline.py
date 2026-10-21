@@ -1,3 +1,5 @@
+import pytest
+
 from simscale_sdk import ApiClient
 
 import config
@@ -49,3 +51,14 @@ def test_numerics_match_the_working_manual_runs():
     div = model["numerics"]["schemes"]["divergence"]
     assert div["forDefault"] == {"type": "GAUSS_LINEARUPWINDV_UNLIMITED", "limiterCoefficient": 1.0}
     assert div["div_Phi_velocity"] == {"type": "BOUNDED_GAUSS_UPWIND"}
+
+
+def test_parse_force_coefficients_from_api_csv():
+    """The header the SimScale API actually returns (seen on the first real download)."""
+
+    head = "Time (s),FORCE_COEFFICIENT_CD,FORCE_COEFFICIENT_CL,FORCE_COEFFICIENT_CLF,FORCE_COEFFICIENT_CLR,FORCE_COEFFICIENT_CM\n"
+    rows = "".join(f'"{i:20d}",{1.0 if i <= 450 else 1.1:.6e},2.0e-04,-1.0e-04,3.0e-04,-5.0e-05\n' for i in range(1, 501))
+    out = parse_force_coefficients(head + rows, 0.1)
+    assert out["cd"] == pytest.approx(1.1) and out["cl"] == pytest.approx(2.0e-04) and out["cm"] == pytest.approx(-5.0e-05)
+    assert out["cl_front"] == pytest.approx(-1.0e-04) and out["cl_rear"] == pytest.approx(3.0e-04)
+    assert out["n_iterations"] == 500

@@ -1,0 +1,10 @@
+Kiragami_CFD: geometry 'kirigami_hex_solid' 97b0ded6-a64a-46d1-8351-8d5568d0ca73, fluid region B2_TE5, faces inlet=1, outlet=1, side_xmin=1, side_xmax=1, side_ymin=1, side_ymax=1, canopy=948
+  simulation run: FINISHED
+{
+  "cd": 0.7421168536055961,
+  "cl": 0.00016729925313225795,
+  "cm": 0.0007750514587313141,
+  "n_iterations": 500,
+  "core_hours_used": 3.513055555555556
+}
+EXIT 0
