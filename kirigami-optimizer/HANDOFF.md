@@ -63,3 +63,13 @@ deterministically (same cell, same mesh 1,264,478 cells). Findings:
   my union mesh: 1 face / rejected). Geometry fde1fdf5-81de-459a-974f-a2cf426ca20b in the project. Not yet meshed.
 - Onshape key cannot DELETE elements (403): old blobs/Part Studios pile up in the document until the key scope is widened.
 - Next: create the flow volume on that geometry (manual-step flow) and run the canopy-gate mesh test (needs user approval + CPU-h cap).
+
+## Update: flow volume on the Onshape canopy + gate run
+- User made the flow volume in the web app; the geometry ID changed `fde1fdf5...` -> **`d17a9d17-b17d-4a28-b051-b5d01ab0fb44`** (`rt1_onshape`): one fluid region (`B2_TE5`), 8 face groups, no unlabeled faces.
+- Decision: Cd uses the **per-design projected area** (`solid/canopy.py` `reference_area_in2`, already the code's behavior), not the fixed 50.27 in^2 of Run 11.
+- `main.py canopy-gate` got `--geometry-id` (mesh a geometry already in the project; no import). Ran
+  `canopy-gate --name onshape_rt1 --geometry-id d17a9d17-... --cap 0.3 --timeout 180` (user-approved 0.3 CPU h cap):
+  **INCONCLUSIVE** - stopped at the cap (0.31 CPU h) at 10% progress, no FAILED status and no self-intersection error
+  (previous union-mesh canopies failed at surface meshing; see `logs/canopygate_onshape/`). Total spent now about 15.3 of 800 CPU h.
+- Next (needs user approval + cap): either a longer gate (e.g. `--cap 1 --timeout 600`) to see whether meshing passes 30%, or go straight to
+  `mesh-probe`/`single` on this geometry. Then check the solver does not diverge in rings 7-8 as it did on the union-mesh canopy.

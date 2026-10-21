@@ -423,17 +423,19 @@ def cmd_canopy_gate(args):
     failed. Tells whether SimScale accepts the canopy surface (the
     self-intersection error of mesh probe M) without a manual flow volume."""
 
-    from simscale_sdk import MeshOperation, SimmetrixMeshingFluid, AutomaticMeshSizingSimmetrix, AutomaticCurvature
-    from simscale_sdk import AutomaticLayerOff, DimensionalTime
-
     from pipeline import build_geometry
-    from simscale.runner import SimScaleClient, _core_hours
+    from simscale.runner import SimScaleClient
 
     client = SimScaleClient(config.SIMSCALE)
     project_id = client.ensure_project(config.SIMSCALE["PROJECT_ID"], config.SIMSCALE["NEW_PROJECT_NAME"],
                                        config.STATE_DIR / "simscale_project.json")
     out = config.RUNS_DIR / "canopy_gate" / args.name
     out.mkdir(parents=True, exist_ok=True)
+    if args.geometry_id:  # already in the project (e.g. the Onshape-repaired flow volume made in the web app)
+        print(f"gate {args.name}: existing geometry {args.geometry_id}, cap {args.cap} CPU h, "
+              f"timeout {args.timeout} s, pass at {args.pass_progress:.0%} progress")
+        geometry_id = args.geometry_id
+        return _canopy_gate_mesh(client, project_id, args, out, geometry_id, time.time())
     overrides = {"SIMPLIFY_TOLERANCE": args.simplify_tol}
     if args.joint_overlap is not None:
         overrides["JOINT_OVERLAP"] = args.joint_overlap
@@ -448,6 +450,14 @@ def cmd_canopy_gate(args):
     if not client._all_mappings(project_id, geometry_id, "region"):
         print("RESULT: import is a sheet body, not a solid")
         return 1
+    return _canopy_gate_mesh(client, project_id, args, out, geometry_id, time.time())
+
+
+def _canopy_gate_mesh(client, project_id, args, out, geometry_id, started):
+    from simscale_sdk import MeshOperation, SimmetrixMeshingFluid, AutomaticMeshSizingSimmetrix, AutomaticCurvature
+    from simscale_sdk import AutomaticLayerOff, DimensionalTime
+    from simscale.runner import _core_hours
+
     model = SimmetrixMeshingFluid(
         sizing=AutomaticMeshSizingSimmetrix(fineness=config.SIMSCALE["MESH_FINENESS"], curvature=AutomaticCurvature()),
         automatic_layer_settings=AutomaticLayerOff(), physics_based_meshing=False, hex_core=False,
@@ -456,7 +466,7 @@ def cmd_canopy_gate(args):
         name=f"{args.name} gate", geometry_id=geometry_id, model=model))
     op_id = op.mesh_operation_id
     client.meshes.start_mesh_operation(project_id, op_id)
-    started, run_started, result, reason = time.time(), None, None, ""
+    run_started, result, reason = None, None, ""
     try:
         while True:
             cur = client.meshes.get_mesh_operation(project_id, op_id)
@@ -625,6 +635,7 @@ def main(argv=None):
     p.add_argument("--name", required=True)
     p.add_argument("--simplify-tol", type=float, default=1e-4, help="inches (the default is the current setting)")
     p.add_argument("--joint-overlap", type=float, default=None)
+    p.add_argument("--geometry-id", help="mesh this geometry already in the project instead of importing the canopy")
     p.add_argument("--cap", type=float, default=0.3, help="CPU-hour cap")
     p.add_argument("--timeout", type=int, default=180, help="seconds")
     p.add_argument("--pass-progress", type=float, default=0.3,

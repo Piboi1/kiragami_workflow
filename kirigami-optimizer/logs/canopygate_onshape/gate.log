@@ -1,0 +1,14 @@
+gate onshape_rt1: existing geometry d17a9d17-b17d-4a28-b051-b5d01ab0fb44, cap 0.3 CPU h, timeout 180 s, pass at 30% progress
+{
+  "name": "onshape_rt1",
+  "result": "INCONCLUSIVE",
+  "reason": "stopped at cap/timeout (0.306 CPU h, progress 0.1)",
+  "status": "CANCELED",
+  "progress": 0.1,
+  "cpu_hours": 0.30972222222222223,
+  "geometry_id": "d17a9d17-b17d-4a28-b051-b5d01ab0fb44",
+  "mesh_operation_id": "6908e9d3-1eaa-452a-84be-a0db91a54bbc",
+  "simplify_tol": 0.0001,
+  "joint_overlap": null,
+  "wall_s": 161
+}
