@@ -1,1 +1,2 @@
 Kiragami_CFD: geometry 'kirigami_hex_solid' 97b0ded6-a64a-46d1-8351-8d5568d0ca73, fluid region B2_TE5, faces inlet=1, outlet=1, side_xmin=1, side_xmax=1, side_ymin=1, side_ymax=1, canopy=948
+  simulation run: QUEUED 0%
