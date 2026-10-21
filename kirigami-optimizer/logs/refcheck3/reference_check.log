@@ -1,0 +1,112 @@
+Kiragami_CFD: geometry 'kirigami_hex_solid' 97b0ded6-a64a-46d1-8351-8d5568d0ca73, fluid region B2_TE5, faces inlet=1, outlet=1, side_xmin=1, side_xmax=1, side_ymin=1, side_ymax=1, canopy=948
+  simulation run: FINISHED
+Traceback (most recent call last):
+  File "/root/.local/lib/python3.13/site-packages/urllib3/connectionpool.py", line 779, in urlopen
+    self._prepare_proxy(conn)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/root/.local/lib/python3.13/site-packages/urllib3/connectionpool.py", line 1074, in _prepare_proxy
+    conn.connect()
+    ~~~~~~~~~~~~^^
+  File "/root/.local/lib/python3.13/site-packages/urllib3/connection.py", line 844, in connect
+    self._tunnel()
+    ~~~~~~~~~~~~^^
+  File "/usr/lib/python3.13/http/client.py", line 1029, in _tunnel
+    raise OSError(f"Tunnel connection failed: {code} {message.strip()}")
+OSError: Tunnel connection failed: 403 Forbidden
+
+The above exception was the direct cause of the following exception:
+
+urllib3.exceptions.ProxyError: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden'))
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/user/kiragami_workflow/kirigami-optimizer/main.py", line 598, in <module>
+    sys.exit(main())
+             ~~~~^^
+  File "/home/user/kiragami_workflow/kirigami-optimizer/main.py", line 594, in main
+    return args.fn(args)
+           ~~~~~~~^^^^^^
+  File "/home/user/kiragami_workflow/kirigami-optimizer/main.py", line 479, in cmd_reference_check
+    coeffs = client.run_design(project.project_id, "pipeline_spec_check", None, -abs(args.uz), args.area, args.length,
+                               out, state, save)
+  File "/home/user/kiragami_workflow/kirigami-optimizer/simscale/runner.py", line 598, in run_design
+    csv_text = maybe_unzip(self._download(results[0].download.url))
+                           ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/kiragami_workflow/kirigami-optimizer/simscale/runner.py", line 210, in _download
+    resp = self.api_client.rest_client.GET(url=url, headers={API_KEY_HEADER: self.api_key}, _preload_content=False)
+  File "/usr/local/lib/python3.13/dist-packages/simscale_sdk/rest.py", line 228, in GET
+    return self.request("GET", url,
+           ~~~~~~~~~~~~^^^^^^^^^^^^
+                        headers=headers,
+                        ^^^^^^^^^^^^^^^^
+                        _preload_content=_preload_content,
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                        _request_timeout=_request_timeout,
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                        query_params=query_params)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.13/dist-packages/simscale_sdk/rest.py", line 206, in request
+    r = self.pool_manager.request(method, url,
+                                  fields=query_params,
+                                  preload_content=_preload_content,
+                                  timeout=timeout,
+                                  headers=headers)
+  File "/root/.local/lib/python3.13/site-packages/urllib3/_request_methods.py", line 135, in request
+    return self.request_encode_url(
+           ~~~~~~~~~~~~~~~~~~~~~~~^
+        method,
+        ^^^^^^^
+    ...<3 lines>...
+        **urlopen_kw,
+        ^^^^^^^^^^^^^
+    )
+    ^
+  File "/root/.local/lib/python3.13/site-packages/urllib3/_request_methods.py", line 182, in request_encode_url
+    return self.urlopen(method, url, **extra_kw)
+           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/.local/lib/python3.13/site-packages/urllib3/poolmanager.py", line 673, in urlopen
+    return super().urlopen(method, url, redirect=redirect, **kw)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/.local/lib/python3.13/site-packages/urllib3/poolmanager.py", line 459, in urlopen
+    response = conn.urlopen(method, u.request_uri, **kw)
+  File "/root/.local/lib/python3.13/site-packages/urllib3/connectionpool.py", line 886, in urlopen
+    return self.urlopen(
+           ~~~~~~~~~~~~^
+        method,
+        ^^^^^^^
+    ...<13 lines>...
+        **response_kw,
+        ^^^^^^^^^^^^^^
+    )
+    ^
+  File "/root/.local/lib/python3.13/site-packages/urllib3/connectionpool.py", line 886, in urlopen
+    return self.urlopen(
+           ~~~~~~~~~~~~^
+        method,
+        ^^^^^^^
+    ...<13 lines>...
+        **response_kw,
+        ^^^^^^^^^^^^^^
+    )
+    ^
+  File "/root/.local/lib/python3.13/site-packages/urllib3/connectionpool.py", line 886, in urlopen
+    return self.urlopen(
+           ~~~~~~~~~~~~^
+        method,
+        ^^^^^^^
+    ...<13 lines>...
+        **response_kw,
+        ^^^^^^^^^^^^^^
+    )
+    ^
+  [Previous line repeated 7 more times]
+  File "/root/.local/lib/python3.13/site-packages/urllib3/connectionpool.py", line 847, in urlopen
+    retries = retries.increment(
+        method, url, error=new_e, _pool=self, _stacktrace=sys.exc_info()[2]
+    )
+  File "/root/.local/lib/python3.13/site-packages/urllib3/util/retry.py", line 555, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='www.simscale.com', port=443): Max retries exceeded with url: /api/v2/load/projects/3363949319712666659/results/2eb0de5f-aa74-4316-9b1e-2c6ebdcb9e4a/components/8ad8ecad-268e-4653-a18d-9ab405d590e8/plots?token=4f7e4801f42c164cb06c7162012ef3b390ef67a302ce181b226acb2c0201415620261021T224000.000Z&uid=1148753333 (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')))
+EXIT 1
