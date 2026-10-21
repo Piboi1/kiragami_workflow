@@ -52,3 +52,14 @@ deterministically (same cell, same mesh 1,264,478 cells). Findings:
 `main.py check`, `manual-step --design-id X [--simplify-tol 3e-3 --set BRIDGE_EXTRA=0 JOINT_OVERLAP=0]`,
 `single --from-manual X --uz 6.148 --max-core-hours N`, `reference-check`, `mesh-probe`, `canopy-gate` (weak),
 `inspect-simscale`. Logs of every run are in `logs/`.
+
+## Update: Onshape step built (next session)
+- `main.py onshape-roundtrip --name N [--simscale-import]` builds the legacy-style canopy (config.ONSHAPE CANOPY_OVERRIDES),
+  imports it into Onshape document `kirigami_optimizer` (ids in state/onshape_doc.json), exports the Part Studio STL
+  (basic settings, via async translation because the direct /stl redirect to cad-usw2.onshape.com is blocked by the sandbox
+  proxy) and optionally imports that into SimScale with facet split (free). Counter: state/onshape_usage.json (cap 2000).
+- Result for the baseline: Onshape imported 753 parts (user's manual: Part 1 + 704 surfaces); exported STL 18,336 tris, same
+  volume (0.9142 in^3). SimScale import with facet split FINISHED as a SOLID with **2718 faces** (manual: ~948;
+  my union mesh: 1 face / rejected). Geometry fde1fdf5-81de-459a-974f-a2cf426ca20b in the project. Not yet meshed.
+- Onshape key cannot DELETE elements (403): old blobs/Part Studios pile up in the document until the key scope is widened.
+- Next: create the flow volume on that geometry (manual-step flow) and run the canopy-gate mesh test (needs user approval + CPU-h cap).
