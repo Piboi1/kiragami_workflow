@@ -14,6 +14,7 @@
     python main.py manual-step [--preset baseline] [--wait]
                                                     import the canopy, show the web-app flow-volume checklist,
                                                     verify the resulting geometry (not billed)
+    python main.py reference-check                  run the pipeline's spec on the manual project's own geometry (billed)
     python main.py canopy-gate --name N [--simplify-tol 1e-3]
                                                     mesh the canopy alone until surface meshing passes/fails (tiny cost)
     python main.py probe-import [--variants step stl_sting stl_single stl_single_split]
@@ -441,6 +442,46 @@ def cmd_canopy_gate(args):
     return 0 if result == "PASS" else 1
 
 
+def cmd_reference_check(args):
+    """Runs the pipeline's simulation spec on the manual project's OWN flow-volume
+    geometry (kirigami_hex_solid, 954 faces). Converges -> the spec is fine and
+    the pipeline's canopy mesh is the problem; diverges -> the spec is. Creates
+    one simulation named `pipeline_spec_check` in that project (billed)."""
+
+    from simscale_sdk import ProjectPermissionsApi
+
+    from simscale.runner import REQUIRED_GROUPS, SimScaleClient
+
+    sim_cfg = dict(config.SIMSCALE, MAX_CORE_HOURS_PER_RUN=args.max_core_hours)
+    client = SimScaleClient(sim_cfg)
+    project = client.find_project(args.project_name)
+    if not project:
+        sys.exit(f"no project named {args.project_name!r}")
+    perms = ProjectPermissionsApi(client.api_client).get_requester_project_permissions(project.project_id)
+    if not (perms.can_write_project and perms.can_execute_project_billable_action):
+        print(f"This API key cannot write / run billable actions in {args.project_name} "
+              f"(write={perms.can_write_project}, billable={perms.can_execute_project_billable_action}). "
+              "Nothing was created.")
+        return 2
+    geo = client.find_flow_volume(project.project_id, set())
+    if geo is None:
+        sys.exit(f"{args.project_name} has no flow-volume geometry")
+    groups, body = client.resolve_entities(project.project_id, geo.geometry_id)
+    print(f"{args.project_name}: geometry {geo.name!r} {geo.geometry_id}, fluid region {body}, faces " +
+          ", ".join(f"{g}={len(groups[g])}" for g in REQUIRED_GROUPS))
+    out = config.RUNS_DIR / "reference_check"
+    out.mkdir(parents=True, exist_ok=True)
+    state_file = out / "simscale_state.json"
+    state = json.loads(state_file.read_text()) if state_file.exists() else {}
+    state.setdefault("geometry_id", geo.geometry_id)
+    save = lambda st: state_file.write_text(json.dumps(st, indent=2))  # noqa: E731
+    # Reference area/length only scale the reported coefficients; they do not affect convergence.
+    coeffs = client.run_design(project.project_id, "pipeline_spec_check", None, -abs(args.uz), args.area, args.length,
+                               out, state, save)
+    print(json.dumps({k: coeffs.get(k) for k in ("cd", "cl", "cm", "n_iterations", "core_hours_used")}, indent=2))
+    return 0
+
+
 def cmd_depth_model(args):
     from solid.depth_model import get_depth_model
 
@@ -512,6 +553,14 @@ def main(argv=None):
     p.add_argument("--wait", action="store_true",
                    help="keep waiting (up to MANUAL_WAIT_S) for the flow volume; default: check once")
     p.set_defaults(fn=cmd_manual_step)
+
+    p = sub.add_parser("reference-check")
+    p.add_argument("--project-name", default="Kiragami_CFD")
+    p.add_argument("--uz", type=float, default=6.148)
+    p.add_argument("--area", type=float, default=72.9, help="reference area in^2 (scales coefficients only)")
+    p.add_argument("--length", type=float, default=9.634, help="reference length in")
+    p.add_argument("--max-core-hours", type=float, default=18.0)
+    p.set_defaults(fn=cmd_reference_check)
 
     p = sub.add_parser("canopy-gate")
     p.add_argument("--preset", default="baseline")
