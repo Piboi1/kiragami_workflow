@@ -19,6 +19,7 @@ from simscale_sdk import (
     AutomaticLayerOff,
     AutomaticLayerOn,
     AutomaticMeshSizingSimmetrix,
+    BoundedGaussUpwindDivergenceScheme,
     ComponentVectorFunction,
     ConstantFunction,
     DecimalVector,
@@ -30,6 +31,7 @@ from simscale_sdk import (
     DimensionalTime,
     DimensionalVectorFunctionSpeed,
     DimensionalVectorLength,
+    DILUPreconditioner,
     DivergenceSchemes,
     FixedValuePBC,
     FixedValueVBC,
@@ -39,12 +41,14 @@ from simscale_sdk import (
     FluidResultControls,
     FluidSimulationControl,
     FluidSolvers,
+    GaussLinearUpwindVUnlimitedDivergenceScheme,
     ForceMomentCoefficientsResultControl,
     GradientSchemes,
     Incompressible,
     IncompressibleFluidMaterials,
     InterpolationSchemes,
     LaplacianSchemes,
+    PBICGStabSolver,
     PressureOutletBC,
     RelaxationFactor,
     ResidualControls,
@@ -98,11 +102,21 @@ def build_model(sim_cfg, entities, uz_mps, reference_area_in2, reference_length_
             ),
             # SimScale requires these blocks to be present (empty = defaults),
             # as in the SDK's own incompressible example.
-            solvers=FluidSolvers(),
+            # Numerics of the manual simulation's working runs (5-11). SimScale's
+            # defaults (smoothed velocity solver, central default divergence,
+            # second-order convection) diverged in the first pipeline run, as
+            # the manual Runs 1-4 did before these were changed.
+            solvers=FluidSolvers(
+                velocity_solver=PBICGStabSolver(absolute_tolerance=1e-8, relative_tolerance=0.01,
+                                                preconditioner=DILUPreconditioner()),
+            ),
             schemes=Schemes(
                 time_differentiation=TimeDifferentiationSchemes(),
                 gradient=GradientSchemes(),
-                divergence=DivergenceSchemes(),
+                divergence=DivergenceSchemes(
+                    for_default=GaussLinearUpwindVUnlimitedDivergenceScheme(limiter_coefficient=1.0),
+                    div_phi_velocity=BoundedGaussUpwindDivergenceScheme(),
+                ),
                 laplacian=LaplacianSchemes(),
                 interpolation=InterpolationSchemes(),
                 surface_normal_gradient=SurfaceNormalGradientSchemes(),

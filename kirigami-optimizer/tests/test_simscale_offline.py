@@ -35,3 +35,17 @@ def test_parse_force_coefficients():
         "Time (s),Moment coefficient,Drag coefficient,Lift coefficient,Cl(f),Cl(r)\n" + rows, 0.1)
     assert out["cd"] == 1.1 and out["cd_final"] == 1.1
     assert out["cl"] == 0.02 and out["cm"] == 0.01 and out["n_iterations"] == 500
+
+
+def test_numerics_match_the_working_manual_runs():
+    """Runs 1-4 of the manual simulation diverged on SimScale's default numerics; runs 5+ used these."""
+
+    ents = {k: [f"B1_TE{i}"] for i, k in enumerate(
+        ["inlet", "outlet", "side_xmin", "side_xmax", "side_ymin", "side_ymax", "canopy"])}
+    model = ApiClient().sanitize_for_serialization(build_model(config.SIMSCALE, ents, -6.148, 72.9, 9.6))
+    vel = model["numerics"]["solvers"]["velocitySolver"]
+    assert vel["type"] == "PBICGStab" and vel["preconditioner"] == {"type": "DILU"}
+    assert vel["absoluteTolerance"] == 1e-8 and vel["relativeTolerance"] == 0.01
+    div = model["numerics"]["schemes"]["divergence"]
+    assert div["forDefault"] == {"type": "GAUSS_LINEARUPWINDV_UNLIMITED", "limiterCoefficient": 1.0}
+    assert div["div_Phi_velocity"] == {"type": "BOUNDED_GAUSS_UPWIND"}
