@@ -1,2 +1,16 @@
 Kiragami_CFD: geometry 'kirigami_hex_solid' 97b0ded6-a64a-46d1-8351-8d5568d0ca73, fluid region B2_TE5, faces inlet=1, outlet=1, side_xmin=1, side_xmax=1, side_ymin=1, side_ymax=1, canopy=948
   simulation run: QUEUED 0%
+  simulation run: RUNNING 0%
+  simulation run: RUNNING 5%
+  simulation run: RUNNING 12%
+  simulation run: RUNNING 18%
+  simulation run: RUNNING 29%
+  simulation run: RUNNING 37%
+  simulation run: RUNNING 45%
+  simulation run: RUNNING 52%
+  simulation run: RUNNING 61%
+  simulation run: RUNNING 70%
+  simulation run: RUNNING 77%
+  simulation run: RUNNING 86%
+  simulation run: RUNNING 93%
+  simulation run: RUNNING 100%
