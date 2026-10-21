@@ -76,3 +76,30 @@ def test_sting_makes_one_connected_boundary():
     # the canopy surface the forces act on is essentially unchanged
     area = lambda m, lab: m.area_faces[lab == "canopy"].sum()
     assert abs(area(fluid, labels) - area(plain, plain_labels)) / area(plain, plain_labels) < 0.01
+
+
+def test_flush_baseline_canopy_is_watertight_after_stl_roundtrip(tmp_path):
+    """The flush-hinge baseline had a zero-thickness fin (two coincident triangles) that made the
+    exported STL non-watertight once its points were welded; booleans.repair removes it."""
+
+    import io
+
+    import trimesh
+
+    import config
+    from generator import generate_pattern
+    from solid import build_solid
+    from solid.canopy import DEFAULT_SOLID_PARAMS
+
+    params = dict(config.FIXED_PARAMS)
+    params.update(config.PRESETS["baseline"])
+    report = generate_pattern(params, output_dir=tmp_path, name="flush")
+    sp = {k: params.get(k, v) for k, v in DEFAULT_SOLID_PARAMS.items()}
+    sp.update(CUTS_PER_RING=report["parameters"]["CUTS_PER_RING"], SIMPLIFY_TOLERANCE=3e-3,
+              BRIDGE_EXTRA=0.0, JOINT_OVERLAP=0.0)
+    mesh, info = build_solid(report, sp)
+    assert info["is_watertight"] and info["body_count"] == 1
+    out = tmp_path / "canopy.stl"
+    mesh.export(str(out), file_type="stl_ascii")
+    again = trimesh.load(str(out), file_type="stl")
+    assert again.is_watertight and abs(again.volume - mesh.volume) < 1e-4

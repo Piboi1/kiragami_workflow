@@ -44,6 +44,10 @@ DEFAULT_SOLID_PARAMS = {
     # ribbons" (a block wider than the ribbons that meet it); 0 makes the
     # hinge the same width as the ribbons.
     "BRIDGE_EXTRA": 1.0,
+    # How far the centre cap reaches into the ring-0 hinges. None = JOINT_OVERLAP.
+    # With JOINT_OVERLAP = 0 the cap only touches the hinges along an edge, which
+    # leaves a non-manifold pinch vertex (and defeats SimScale's face split).
+    "CAP_OVERLAP": None,
     # Feasibility: the solid center cap (inside the first ring's bridges)
     # must keep at least this radius. Sparse inner rings make the ribbons
     # (KERF_FACTOR x ring spacing) wider than the first ring's radius, which
@@ -85,7 +89,7 @@ def normalize_ring_data(ring_data):
 
 
 def build_open_strips(rings, cuts_per_ring, vertical_drop, kerf_factor, joint_overlap=0.0, record=None,
-                      bridge_extra=1.0):
+                      bridge_extra=1.0, cap_overlap=None):
     """Expanded-kirigami kinematics from the original script.
 
     Returns a list of strips; each strip is (vertices Nx3, faces Mx3) of an
@@ -184,7 +188,7 @@ def build_open_strips(rings, cuts_per_ring, vertical_drop, kerf_factor, joint_ov
     # CENTER HOLE CAP
     # ---------------------------------------------------------
     w_bridge_top = get_w(0) * (1.0 + bridge_extra)
-    cap_r, cap_z = r_dep[0] - w_bridge_top / 2 + joint_overlap, get_z(r_dep[0])
+    cap_r, cap_z = r_dep[0] - w_bridge_top / 2 + (joint_overlap if cap_overlap is None else cap_overlap), get_z(r_dep[0])
     if record is not None:
         record.append({"kind": "cap", "r": cap_r, "z": cap_z})
 
@@ -319,13 +323,15 @@ def build_solid(ring_data, params=None):
     method = p["EXTRUDE_METHOD"]
     joint_overlap = float(p["JOINT_OVERLAP"]) if method == "union" else 0.0
     strips = build_open_strips(rings, cuts, float(p["VERTICAL_DROP"]), float(p["KERF_FACTOR"]), joint_overlap,
-                               bridge_extra=float(p["BRIDGE_EXTRA"]))
+                               bridge_extra=float(p["BRIDGE_EXTRA"]),
+                               cap_overlap=None if p["CAP_OVERLAP"] is None else float(p["CAP_OVERLAP"]))
 
     if method == "union":
         slabs = [extrude_surface(v, f, thickness) for v, f in strips]
         mesh = booleans.union(slabs)
         if float(p["SIMPLIFY_TOLERANCE"]) > 0:
             mesh = booleans.simplify(mesh, float(p["SIMPLIFY_TOLERANCE"]))
+        mesh = booleans.repair(mesh)
     elif method == "legacy":
         mesh = _legacy_extrude(strips, thickness)
     else:

@@ -44,3 +44,28 @@ def simplify(mesh, tolerance):
     """Collapses edges/features smaller than ``tolerance`` (mesh units)."""
 
     return from_manifold(to_manifold(mesh).simplify(tolerance))
+
+
+def repair(mesh):
+    """Welds coincident vertices and drops pairs of coincident (back-to-back)
+    triangles, i.e. zero-thickness internal fins the boolean can leave behind.
+
+    Such a fin has two triangles on the same three points; once the points
+    are welded (as every STL reader does) they are an edge shared by four
+    faces, the file is no longer watertight and SimScale's automatic face
+    split fails. Returns the repaired mesh, or ``mesh`` unchanged when the
+    repair would not leave a watertight solid.
+    """
+
+    welded = mesh.copy()
+    welded.merge_vertices()
+    key = np.sort(welded.faces, axis=1)
+    _, inverse, counts = np.unique(key, axis=0, return_inverse=True, return_counts=True)
+    keep = counts[inverse.ravel()] == 1
+    if keep.all() and welded.is_watertight == mesh.is_watertight and len(welded.vertices) == len(mesh.vertices):
+        return mesh
+    fixed = trimesh.Trimesh(welded.vertices, welded.faces[keep], process=False)
+    fixed.remove_unreferenced_vertices()
+    if fixed.is_watertight and fixed.body_count == mesh.body_count and abs(fixed.volume - mesh.volume) < 1e-3 * abs(mesh.volume):
+        return fixed
+    return mesh
