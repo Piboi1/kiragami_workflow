@@ -328,6 +328,8 @@ def cmd_manual_step(args):
     params = design_params(_preset(args.preset))
     if args.simplify_tol is not None:
         params["SIMPLIFY_TOLERANCE"] = args.simplify_tol
+    if args.user_style:  # the user's exact script output (welded legacy strips, flush hinges)
+        params.update(config.ONSHAPE["CANOPY_OVERRIDES"])
     for item in args.set or []:  # e.g. --set BRIDGE_EXTRA=0 JOINT_OVERLAP=0
         key, _, value = item.partition("=")
         params[key] = float(value)
@@ -398,7 +400,7 @@ def cmd_onshape_roundtrip(args):
             print(f"canopy: {info['triangle_count']} triangles, {info['body_count']} bodies, volume {info['volume_in3']:.4f} in^3")
         client = OnshapeClient(config.STATE_DIR / "onshape_usage.json", request_cap=config.ONSHAPE["REQUEST_CAP"])
         res = round_trip(client, stl, out / f"{args.name}_onshape.stl", config.STATE_DIR / "onshape_doc.json",
-                         doc_name=config.ONSHAPE["DOCUMENT_NAME"])
+                         doc_name=config.ONSHAPE["DOCUMENT_NAME"], allow_faulty=config.ONSHAPE["ALLOW_FAULTY_PARTS"])
     m = trimesh.load(res["file"])
     comps = trimesh.graph.connected_components(m.face_adjacency, nodes=np.arange(len(m.faces)))
     print(f"exported mesh: {len(m.faces)} triangles, watertight {m.is_watertight}, "
@@ -608,6 +610,9 @@ def main(argv=None):
                    help="canopy mesh simplification in inches (default: config, 1e-4)")
     p.add_argument("--set", nargs="+", metavar="KEY=VALUE",
                    help="numeric design/solid overrides, e.g. BRIDGE_EXTRA=0 JOINT_OVERLAP=0")
+    p.add_argument("--user-style", action="store_true",
+                   help="build the canopy exactly like the user's script (config.ONSHAPE CANOPY_OVERRIDES: welded legacy "
+                        "strips, flush hinges); SimScale imports it as a 948-face solid without the Onshape round trip")
     p.add_argument("--wait", action="store_true",
                    help="keep waiting (up to MANUAL_WAIT_S) for the flow volume; default: check once")
     p.set_defaults(fn=cmd_manual_step)

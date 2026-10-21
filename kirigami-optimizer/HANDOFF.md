@@ -86,3 +86,27 @@ deterministically (same cell, same mesh 1,264,478 cells). Findings:
   Onshape-exported STL (the Google Drive comparison was skipped by the user's choice), Onshape export settings
   (the user used "basic settings"; check whether chord/angle tolerance in the translation matches), or increase SimScale
   geometry import tolerances. Another option: get the user to export the geometry from the web app (mesh fine) and compare face names.
+
+## Update: ROOT CAUSE FOUND - the canopy STL, not Onshape (supersedes the "open problem" above)
+The user uploaded (to piboi9740@gmail.com's Drive; the Drive connector reads that account) their Onshape-exported STL
+(`kirigami_hex_solid (3).stl`, in **mm**; the earlier `(1)` is an older, denser design and is NOT the Run 11 geometry).
+Analysis (scripts were scratch, results below):
+- It is almost a pass-through of the script STL: 15360 tris, 705 watertight pieces (111 with inverted orientation), volume
+  0.7744 in^3, centre cap 0.0296 in^3, **neighbouring parts share exact vertices**. My earlier STL (`process=False` shell)
+  had 18400 tris, 721 separate bodies and 0.001-0.01 in gaps between hinge and slab corners (the near-contacts that SimScale
+  rejects as self-intersections at r~1.6 in).
+- The user's script builds `shell = trimesh.Trimesh(verts, faces)` with the DEFAULT `process=True` (welds coincident vertices, so
+  strips share vertices and the +-t/2 offsets use averaged normals) and its trimesh also ends up with a consistent winding
+  (the cap fan is wound opposite to the hinges; `trimesh.repair.fix_winding(shell)` reproduces it). With flush hinges
+  (BRIDGE_EXTRA=0) the result matches the user's Onshape export vertex-for-vertex (max 3e-6 in).
+- Now implemented: `WELD_STRIPS=1` in `solid/canopy.py` (legacy method) and in `config.ONSHAPE["CANOPY_OVERRIDES"]`;
+  `main.py manual-step --user-style` builds it. Test: `test_welded_legacy_matches_users_onshape_export`.
+- **SimScale imports the generator's welded STL directly as a SOLID with 948 faces (same as the user's file): geometry
+  `c1110008-6e9b-4e8e-b3eb-9794d96fa9a1` (`weld2_raw_direct`). The Onshape round trip is NOT needed** (it even fragments the
+  mesh through the API: 715 parts, 56 one-triangle pieces, and the SimScale import then yields 1 face). Onshape request counter
+  reads ~64 (state lost between containers); a stray public Onshape doc `kirigami_optimizer` was created in this container's run.
+- Volume of this canopy is 0.774 in^3 vs 0.8826 in^3 reported for Run 11 - the cause is unexplained (different ring data or
+  thickness in the Run 11 script version?). Worth asking the user which script/version produced Run 11.
+- Next: the user makes the External flow volume + Delete bodies on `c1110008...` in the web app (box X/Y +-25.83 in, Z -70..+31.13 in),
+  then `mesh-probe --variant M --from-manual <id>` (needs `runs/manual_step/<id>/simscale_state.json` with the new geometry id) under an
+  approved CPU-h cap, then the solver. Total spent still about 15.3 of 800 CPU h.

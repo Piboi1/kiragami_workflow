@@ -81,7 +81,7 @@ class OnshapeClient:
     def delete_element(self, did, wid, eid):
         self._call("DELETE", f"/elements/d/{did}/w/{wid}/e/{eid}")
 
-    def upload_stl(self, did, wid, path, unit="inch"):
+    def upload_stl(self, did, wid, path, unit="inch", allow_faulty=True):
         """Uploads an STL and starts the translation into a Part Studio. Returns (translation id, blob element id)."""
 
         path = Path(path)
@@ -90,7 +90,7 @@ class OnshapeClient:
                 "POST", f"/blobelements/d/{did}/w/{wid}",
                 files={"file": (path.name, fh, "application/octet-stream")},
                 data={"encodedFilename": path.name, "formatName": "STL", "flattenAssemblies": "false",
-                      "yAxisIsUp": "false", "unit": unit, "translate": "true", "allowFaultyParts": "true"},
+                      "yAxisIsUp": "false", "unit": unit, "translate": "true", "allowFaultyParts": "true" if allow_faulty else "false"},
                 timeout=600)
         body = resp.json()
         return body.get("translationId") or body["id"], body["id"]

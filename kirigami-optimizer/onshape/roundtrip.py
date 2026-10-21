@@ -6,7 +6,7 @@ from pathlib import Path
 from .client import OnshapeError
 
 
-def round_trip(client, stl_path, out_path, state_file, doc_name="kirigami_optimizer", unit="inch", log=print):
+def round_trip(client, stl_path, out_path, state_file, doc_name="kirigami_optimizer", unit="inch", log=print, allow_faulty=True):
     """Overwrites the working document's previous import with stl_path and exports the Part Studio.
 
     The document is created on first use (public: free plan) and its ids kept in
@@ -30,7 +30,7 @@ def round_trip(client, stl_path, out_path, state_file, doc_name="kirigami_optimi
     save()
 
     before = {e["id"] for e in client.elements(did, wid)}
-    tid, blob_id = client.upload_stl(did, wid, stl_path, unit=unit)
+    tid, blob_id = client.upload_stl(did, wid, stl_path, unit=unit, allow_faulty=allow_faulty)
     state["element_ids"] = [blob_id]
     save()
     log(f"uploaded {Path(stl_path).name}; translation {tid}")

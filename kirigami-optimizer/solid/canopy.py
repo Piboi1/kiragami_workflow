@@ -57,6 +57,10 @@ DEFAULT_SOLID_PARAMS = {
     # shorter than this (inches). The union of thin overlapping slabs leaves
     # micron-scale slivers that CAD kernels reject as clashing faces.
     "SIMPLIFY_TOLERANCE": 1e-4,
+    # "legacy" only: 1 builds the shell like the original Colab script (trimesh's default
+    # process=True merges coincident vertices, so neighbouring strips share vertices and
+    # the extrusion offsets use averaged normals). 0 keeps every strip separate.
+    "WELD_STRIPS": 0,
 }
 
 
@@ -246,7 +250,7 @@ def extrude_surface(vertices, faces, thickness):
     return solid
 
 
-def _legacy_extrude(strips, thickness):
+def _legacy_extrude(strips, thickness, weld=False):
     """The original script's section 4, with the missing ``shell`` built."""
 
     global_verts = []
@@ -259,7 +263,13 @@ def _legacy_extrude(strips, thickness):
     # FIX: build the shell that the original code referenced but never created.
     # process=False keeps strips as separate components (merging coincident
     # vertices would create non-manifold edges between touching strips).
-    shell = trimesh.Trimesh(vertices=np.array(global_verts), faces=np.array(global_faces), process=False)
+    # weld=True is what the original script's default Trimesh(...) call does; with flush hinges
+    # (BRIDGE_EXTRA=0) it reproduces the user's STL exactly (15360 triangles, 705 parts).
+    shell = trimesh.Trimesh(vertices=np.array(global_verts), faces=np.array(global_faces), process=bool(weld))
+    if weld:
+        # The cap fan is wound opposite to the hinges; without this the averaged vertex normals at the
+        # cap rim point sideways and the cap solid collapses (volume 0.0012 instead of 0.0296 in^3).
+        trimesh.repair.fix_winding(shell)
 
     normals = shell.vertex_normals
     v_top = shell.vertices + normals * (thickness / 2.0)
@@ -333,7 +343,7 @@ def build_solid(ring_data, params=None):
             mesh = booleans.simplify(mesh, float(p["SIMPLIFY_TOLERANCE"]))
         mesh = booleans.repair(mesh)
     elif method == "legacy":
-        mesh = _legacy_extrude(strips, thickness)
+        mesh = _legacy_extrude(strips, thickness, weld=bool(round(float(p["WELD_STRIPS"]))))
     else:
         raise ValueError(f"unknown EXTRUDE_METHOD {method!r}")
 

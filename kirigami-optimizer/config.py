@@ -248,7 +248,8 @@ OPTIMIZER = {
 # ------------------------------------------------------------------
 ONSHAPE = {
     "DOCUMENT_NAME": "kirigami_optimizer",   # one document, overwritten per design
+    "ALLOW_FAULTY_PARTS": True,               # Onshape STL import option (the web UI default may differ)
     "REQUEST_CAP": 2000,                     # soft stop, counted in state/onshape_usage.json
     # Canopy as the manual workflow feeds Onshape: overlapping slabs, flush hinges, no boolean union.
-    "CANOPY_OVERRIDES": {"EXTRUDE_METHOD": "legacy", "BRIDGE_EXTRA": 0.0, "JOINT_OVERLAP": 0.0},
+    "CANOPY_OVERRIDES": {"EXTRUDE_METHOD": "legacy", "BRIDGE_EXTRA": 0.0, "JOINT_OVERLAP": 0.0, "WELD_STRIPS": 1},
 }

@@ -103,3 +103,15 @@ def test_flush_baseline_canopy_is_watertight_after_stl_roundtrip(tmp_path):
     mesh.export(str(out), file_type="stl_ascii")
     again = trimesh.load(str(out), file_type="stl")
     assert again.is_watertight and abs(again.volume - mesh.volume) < 1e-4
+
+
+def test_welded_legacy_matches_users_onshape_export():
+    # The user's Onshape-exported STL has 15360 triangles in 705 pieces, 111 of them with inverted
+    # orientation, volume 0.7744 in^3 and a 0.0296 in^3 centre cap (checked vertex by vertex, 1.7e-6 in).
+    mesh, info = build_solid(LEGACY_3D_RING_DATA, {"EXTRUDE_METHOD": "legacy", "BRIDGE_EXTRA": 0.0,
+                                                  "WELD_STRIPS": 1})
+    pieces = sorted(mesh.split(only_watertight=False), key=lambda m: -len(m.faces))
+    assert len(mesh.faces) == 15360 and len(pieces) == 705
+    assert sum(p.volume < 0 for p in pieces) == 111
+    assert abs(pieces[0].volume - 0.0296) < 1e-3
+    assert abs(mesh.volume - 0.7744) < 1e-3
