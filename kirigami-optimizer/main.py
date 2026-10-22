@@ -126,6 +126,8 @@ def cmd_single(args):
     params = design_params(_preset(args.preset))
     if args.simplify_tol is not None:
         params["SIMPLIFY_TOLERANCE"] = args.simplify_tol
+    if args.user_style:  # same canopy as `manual-step --user-style` (reference area / diameter come from it)
+        params.update(config.ONSHAPE["CANOPY_OVERRIDES"])
     for item in args.set or []:
         key, _, value = item.partition("=")
         params[key] = float(value)
@@ -591,6 +593,7 @@ def main(argv=None):
     p.add_argument("--max-core-hours", type=float, default=None,
                    help="per-design CPU-hour cap for this run (default: config MAX_CORE_HOURS_PER_RUN)")
     p.add_argument("--simplify-tol", type=float, default=None, help="canopy simplification (inches)")
+    p.add_argument("--user-style", action="store_true", help="build the canopy like `manual-step --user-style`")
     p.add_argument("--set", nargs="+", metavar="KEY=VALUE", help="numeric overrides, e.g. BRIDGE_EXTRA=0 JOINT_OVERLAP=0")
     p.set_defaults(fn=cmd_single)
 
