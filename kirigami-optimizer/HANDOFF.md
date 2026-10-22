@@ -128,3 +128,15 @@ Analysis (scripts were scratch, results below):
 - The live enforcement is separate: during the run, `run_cap = MAX_CORE_HOURS_PER_RUN - mesh hours`, and the run is cancelled if exceeded.
 - Options awaiting the user: (a) keep the 5 CPU h limit enforced live but skip the pre-run estimate gate (new flag), or (b) raise the cap to ~20.
 - Total spent about 15.9 of 800 CPU h.
+
+## Update: SOLVER RUN ON THE WELDED CANOPY SUCCEEDED (design_0002)
+- `main.py single --from-manual weld2 --user-style --uz 6.148 --max-core-hours 5 --skip-estimate-check` (user-approved: skip only the
+  pre-run estimate gate, 5 CPU h enforced live). New flag `--skip-estimate-check` (`SKIP_ESTIMATE_GATE` in `simscale/runner.py`).
+- Result: **FINISHED, no divergence** (500 iterations, 12 min run): **Cd = 0.7327** (final iter 0.7332, window std 0.0003), Cl -0.0002, Cm 0.0003,
+  Aref 72.90 in^2 (per-design projected area, as the user chose). Force scales with Cd: about 0.779 N vs the reference check on the user's
+  manual geometry 0.789 N (Cd 0.742) and Run 11 0.797 N -> 1.3% / 2.3% lower. The canopy volume differs from Run 11 (0.774 vs 0.8826 in^3, thickness
+  was forgotten by the user; accepted - the comparison is canopy-to-canopy with the same pipeline).
+- Run used 3.51 CPU h (estimate was 18.66, the real cost matches the reference run's 3.5); with meshes this attempt about 3.8 CPU h.
+  Total spent about 19.7 of 800 CPU h. The pipeline is now validated end to end on a script-generated canopy with a manual flow volume.
+- The flow volume is still made by hand in the web app (one per geometry; saving replaces the geometry ID). Per-design automation of that step is the
+  remaining blocker for `optimize`.
