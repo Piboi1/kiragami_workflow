@@ -120,3 +120,11 @@ Analysis (scripts were scratch, results below):
 - Next (needs user approval + CPU-h cap; the reference check cost ~3.5 CPU h): `main.py single --from-manual weld2 --uz 6.148 --max-core-hours N`
   to check the solver does not diverge in rings 7-8, then compare force/Cd with Run 11 (0.797 N). Cd uses the per-design projected area.
 - Still open: canopy volume 0.774 in^3 (script) vs 0.8826 in^3 reported for Run 11.
+
+## Update: `single --from-manual weld2 --user-style --uz 6.148 --max-core-hours 5` refused before the solver ran
+- Mesh finished (0.26 CPU h billed). The solver was NOT started: SimScale's pre-run estimate was **18.66 CPU h > cap 5.0**
+  (`_estimate_ok` in `simscale/runner.py`). The same estimate (18.66) blocked the earlier reference-check at cap 18; that run was then
+  allowed to go and actually used only 3.5 CPU h, so the estimate is a worst-case bound (max run time), not the expected cost.
+- The live enforcement is separate: during the run, `run_cap = MAX_CORE_HOURS_PER_RUN - mesh hours`, and the run is cancelled if exceeded.
+- Options awaiting the user: (a) keep the 5 CPU h limit enforced live but skip the pre-run estimate gate (new flag), or (b) raise the cap to ~20.
+- Total spent about 15.9 of 800 CPU h.
