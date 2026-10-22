@@ -1,0 +1,7 @@
+CPU-hour cap for this design (mesh + run, checked against SimScale's estimate and enforced live): 5
+Pre-run solver estimate gate skipped; the cap is still enforced live during the run.
+Using flow-volume geometry c9f66466-2163-4b95-98fd-e68d2cf95bca from manual-step weld2
+Resuming design_0002 (SimScale state: ['geometry_id'])
+[design_0002] generating pattern + solid
+[design_0002] rings=30 Aref=72.90 in^2 Uz=-6.148 m/s (Cd for Uz 0.307)
+  meshing: QUEUED 0%

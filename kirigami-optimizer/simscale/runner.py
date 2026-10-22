@@ -471,7 +471,11 @@ class SimScaleClient:
             raise
         core_hours = est.compute_resource.value if est.compute_resource is not None else None
         if cap is not None and core_hours is not None and core_hours > cap:
-            raise SimScaleError(f"{what} estimate {core_hours} core hours exceeds cap {cap}")
+            if what != "simulation" or not self.cfg.get("SKIP_ESTIMATE_GATE"):
+                raise SimScaleError(f"{what} estimate {core_hours} core hours exceeds cap {cap}")
+            # The estimate is a worst case (the reference run estimated 18.66 and used 3.5); the live cap in _poll still applies.
+            self.log(f"  simulation estimate {core_hours:.2f} core hours exceeds cap {cap:g}; estimate gate skipped on request, "
+                     f"the run is cancelled live at the cap")
         max_rt = default_max
         if est.duration is not None:
             max_rt = max(default_max, 2 * isodate.parse_duration(est.duration.interval_max).total_seconds())

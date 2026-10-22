@@ -135,6 +135,9 @@ def cmd_single(args):
         ctx.simscale.cfg["MAX_CORE_HOURS_PER_RUN"] = args.max_core_hours
         print(f"CPU-hour cap for this design (mesh + run, checked against SimScale's estimate and enforced live): "
               f"{args.max_core_hours:g}")
+    if args.skip_estimate_check:  # only the pre-run estimate gate of the solver; the live cap still cancels the run
+        ctx.simscale.cfg["SKIP_ESTIMATE_GATE"] = True
+        print("Pre-run solver estimate gate skipped; the cap is still enforced live during the run.")
     resume = None
     if args.from_manual:  # reuse the flow volume made by `manual-step --design-id ...`
         from pipeline import start_with_geometry
@@ -594,6 +597,9 @@ def main(argv=None):
                    help="per-design CPU-hour cap for this run (default: config MAX_CORE_HOURS_PER_RUN)")
     p.add_argument("--simplify-tol", type=float, default=None, help="canopy simplification (inches)")
     p.add_argument("--user-style", action="store_true", help="build the canopy like `manual-step --user-style`")
+    p.add_argument("--skip-estimate-check", action="store_true",
+                   help="do not refuse the solver run because SimScale's (worst-case) estimate exceeds the cap; "
+                        "the cap is still enforced live")
     p.add_argument("--set", nargs="+", metavar="KEY=VALUE", help="numeric overrides, e.g. BRIDGE_EXTRA=0 JOINT_OVERLAP=0")
     p.set_defaults(fn=cmd_single)
 
