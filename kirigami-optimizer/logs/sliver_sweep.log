@@ -1,3 +1,15 @@
 == tol 0.0001: tris 19648 wt True bodies 1 vol 0.8826 (union 0.8826) slivers<1e-3,<1e-4,min (1031, 48, 4.6025570216822796e-05)
   uploading flow_sting_0.0001.stl (6 MB, STL, sewing=True, improve=True)
   geometry import: RUNNING
+  geometry import: FAILED
+   import failed: SimScaleError geometry import FAILED: {'code': 'unexpected-error',  'details': {},  'message': 'An unexpected error occurred. Please contact support for '             'assistance.',  'severity': 'ERROR'}
+== tol 0.0005: tris 19598 wt True bodies 1 vol 0.8826 (union 0.8826) slivers<1e-3,<1e-4,min (978, 24, 9.06034140967408e-05)
+  uploading flow_sting_0.0005.stl (6 MB, STL, sewing=True, improve=True)
+  geometry import: RUNNING
+  geometry import: FAILED
+   import failed: SimScaleError geometry import FAILED: {'code': 'unexpected-error',  'details': {},  'message': 'An unexpected error occurred. Please contact support for '             'assistance.',  'severity': 'ERROR'}
+== tol 0.002: tris 18782 wt True bodies 1 vol 0.8826 (union 0.8826) slivers<1e-3,<1e-4,min (437, 24, 9.06034140967408e-05)
+  uploading flow_sting_0.002.stl (5 MB, STL, sewing=True, improve=True)
+  geometry import: RUNNING
+  geometry import: FINISHED
+   IMPORTED 762944c1-5dee-4c3d-b232-cd4ffab2dd31 faces 961 {'inlet': 1, 'outlet': 1, 'side_xmin': 1, 'side_xmax': 1, 'side_ymin': 1, 'side_ymax': 1, 'canopy': 950, 'sting': 0} bodies ['B9_TE6'] unlabeled 5

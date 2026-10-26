@@ -87,6 +87,10 @@ def build_geometry(params, design_dir, design_id):
         domain_file = design_dir / f"{design_id}_flow_domain.step"
         info.update(write_step(fluid, labels, domain_file))
     else:
+        if solid_params.get("EXTRUDE_METHOD") == "legacy":  # overlapping slabs: the boolean needs their (cleaned) union
+            canopy = weld_union(canopy, simplify_tolerance=config.SIMSCALE["AUTO_FLOW_SIMPLIFY_TOL"])
+            info["volume_in3"] = float(canopy.volume)
+            info["triangle_count"] = int(len(canopy.faces))
         fluid, labels, bounds = build_flow_domain(canopy, resolved["PARACHUTE_DIAMETER"], domain_params,
                                                   sting_anchor=info["sting_anchor_in"])
         domain_file = write_named_stl(fluid, labels, design_dir / f"{design_id}_flow_domain.stl")

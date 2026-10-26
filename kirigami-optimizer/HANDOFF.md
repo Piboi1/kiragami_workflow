@@ -176,3 +176,14 @@ Analysis (scripts were scratch, results below):
 - Recommendation: keep the validated semi-manual route (`manual-step --user-style`, one web-app flow-volume step, then `single --from-manual
   <id> --user-style --uz 6.148 --max-core-hours 5 --skip-estimate-check`). Only remaining automation ideas: remesh/clean the union (decimate slivers) before the
   STL import, or ask SimScale support whether the CAD-feature endpoints (schemas exist in the OpenAPI spec) can be enabled for API keys.
+
+## Update: sliver cleanup WORKED - automated flow volume (sting STL route) imports as ONE flow region with ~960 faces
+- Sweep `logs/sliver_sweep.log` (union of the welded pieces, `booleans.simplify` tolerance -> box - canopy - sting STL -> SimScale import with
+  sewing + facet split): tolerance 1e-4 and 5e-4 in -> SimScale `unexpected-error`; **2e-3 in -> imports** as one flow region (`B9_TE6`),
+  961 faces: inlet/outlet/4 sides = 1 face each, canopy 950 (manual route: 948-954), 5 unlabeled (the sting; the `sting` group name is not
+  recognised, so those faces get SimScale's default boundary - to be checked). Volume stays 0.8826 in^3 (= Run 11). Geometry `762944c1-5dee-4c3d-b232-cd4ffab2dd31`.
+- Pipeline: `weld_union(mesh, simplify_tolerance)`; `config.SIMSCALE["AUTO_FLOW_SIMPLIFY_TOL"]=2e-3`; `GEOMETRY_FORMAT="STL"` now imports with facet split;
+  `--auto-flow` (single / mesh-probe) now selects this route (the STEP route is too heavy: 19.6k faces, 0.61 CPU h at 10% meshed).
+- Caveats to check before trusting Cd: (1) the 0.04 in sting rod in the wake (rim -> outlet) is not in the validated manual geometry; (2) its 5 unlabeled
+  faces must act as no-slip walls. Compare Cd with the manual result 0.7327.
+- Next (needs approval + cap): `mesh-probe --variant M --auto-flow --cap 1.0`, then `single --auto-flow --uz 6.148 --max-core-hours 5 --skip-estimate-check`.

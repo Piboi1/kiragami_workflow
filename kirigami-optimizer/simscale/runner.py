@@ -521,7 +521,7 @@ class SimScaleClient:
             if "geometry_import_id" not in state:
                 storage_id, import_id = self.start_import(
                     project_id, design_id, domain_file, cfg["IMPORT_SEWING"], cfg["IMPORT_IMPROVE"],
-                    cfg.get("GEOMETRY_FORMAT"))
+                    cfg.get("GEOMETRY_FORMAT"), facet_split=cfg.get("GEOMETRY_FORMAT") == "STL")
                 remember(storage_id=storage_id, geometry_import_id=import_id)
             remember(geometry_id=self.wait_for_import(project_id, state["geometry_import_id"]))
 

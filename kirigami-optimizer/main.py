@@ -119,8 +119,8 @@ def cmd_inspect(args):
 
 
 def cmd_single(args):
-    if args.auto_flow:  # build the air volume locally (STEP) instead of waiting for the web-app step
-        config.SIMSCALE["GEOMETRY_FORMAT"] = "STEP"
+    if args.auto_flow:  # build the air volume locally (sting STL, facet split) instead of waiting for the web-app step
+        config.SIMSCALE["GEOMETRY_FORMAT"] = "STL"
     ctx = _live_context()
     if ctx.ledger.pending:
         print("An interrupted design is pending; finishing it first.")
@@ -279,7 +279,7 @@ def cmd_mesh_probe(args):
     under a hard CPU-hour cap; the mesh is cancelled on SimScale if it trips."""
 
     if args.auto_flow:
-        config.SIMSCALE["GEOMETRY_FORMAT"] = "STEP"
+        config.SIMSCALE["GEOMETRY_FORMAT"] = "STL"
 
     from pipeline import build_geometry
     from simscale.runner import SimScaleClient
@@ -605,7 +605,7 @@ def main(argv=None):
     p.add_argument("--simplify-tol", type=float, default=None, help="canopy simplification (inches)")
     p.add_argument("--user-style", action="store_true", help="build the canopy like `manual-step --user-style`")
     p.add_argument("--auto-flow", action="store_true",
-                   help="build box - canopy locally and import it as STEP (no manual flow-volume step); implies --user-style")
+                   help="build box - canopy - sting locally and import it as STL (no manual flow-volume step); implies --user-style")
     p.add_argument("--skip-estimate-check", action="store_true",
                    help="do not refuse the solver run because SimScale's (worst-case) estimate exceeds the cap; "
                         "the cap is still enforced live")
@@ -676,7 +676,7 @@ def main(argv=None):
     p.add_argument("--from-manual", metavar="DESIGN_ID",
                    help="mesh the flow volume made by `manual-step --design-id DESIGN_ID`")
     p.add_argument("--auto-flow", action="store_true",
-                   help="build box - welded user-style canopy locally and import it as STEP (no manual step)")
+                   help="build box - welded user-style canopy - sting locally and import it as STL (no manual step)")
     p.set_defaults(fn=cmd_mesh_probe)
 
     p = sub.add_parser("probe-import")

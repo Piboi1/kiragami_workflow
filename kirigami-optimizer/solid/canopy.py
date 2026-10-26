@@ -295,7 +295,7 @@ def _legacy_extrude(strips, thickness, weld=False):
     return solid
 
 
-def weld_union(mesh):
+def weld_union(mesh, simplify_tolerance=0.0):
     """Boolean union of the pieces of a welded legacy canopy into one clean watertight body.
 
     The legacy canopy is hundreds of closed slabs that overlap and share vertices; some are
@@ -312,6 +312,10 @@ def weld_union(mesh):
             piece.invert()
         pieces.append(piece)
     union = booleans.union(pieces)
+    if simplify_tolerance > 0:
+        # Needle triangles (altitude < 1e-3 in) from the union make SimScale's STL import fail with
+        # "unexpected-error"; 2e-3 in collapses them and still keeps the volume (0.8826 in^3).
+        union = booleans.repair(booleans.simplify(union, simplify_tolerance))
     if not union.is_watertight:
         raise ValueError("union of the canopy pieces is not watertight")
     return union
