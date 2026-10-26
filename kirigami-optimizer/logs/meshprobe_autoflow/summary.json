@@ -1,0 +1,9 @@
+{
+  "variant": "M",
+  "settings": {},
+  "cap_cpu_h": 1.0,
+  "status": "FAILED",
+  "error": "SimScaleError: meshing cancelled: ran longer than 240 s (0.61 CPU h billed)",
+  "mesh_core_hours": 0.6080555555555556,
+  "wall_minutes": 9.7
+}

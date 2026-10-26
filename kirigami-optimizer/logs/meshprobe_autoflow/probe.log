@@ -1,0 +1,17 @@
+Mesh probe M: {}; cap 1.0 CPU h, timeout 240 s, stall 180 s
+  uploading meshprobe_M_flow_domain.step (18 MB, STEP, sewing=False, improve=True)
+  geometry import: RUNNING
+  geometry import: FINISHED
+  meshing: QUEUED 0%
+  meshing: RUNNING 0%
+  meshing: RUNNING 10%
+  meshing: ran longer than 240 s -- cancelling it on SimScale
+{
+  "variant": "M",
+  "settings": {},
+  "cap_cpu_h": 1.0,
+  "status": "FAILED",
+  "error": "SimScaleError: meshing cancelled: ran longer than 240 s (0.61 CPU h billed)",
+  "mesh_core_hours": 0.6080555555555556,
+  "wall_minutes": 9.7
+}

@@ -157,3 +157,13 @@ Analysis (scripts were scratch, results below):
   manual flow volume (reference: 1,683,594 cells, 0.275 CPU h); then `single --auto-flow --uz 6.148 --max-core-hours 5 --skip-estimate-check`
   and compare Cd with the manual route (0.7327). If meshing is too heavy, merge canopy triangles into larger faces (like SimScale's facet split).
 - Git tag `pipeline-works-cd0.7327` exists locally on 8ad6655 but pushing it failed twice ("unexpected disconnect"); branch commits push fine.
+
+## Update: mesh-probe on the automated STEP flow volume was TOO HEAVY (0.61 CPU h billed, cancelled)
+- `mesh-probe --variant M --auto-flow --cap 1.0 --timeout 240` (user-approved 1 CPU h): geometry import fine, but meshing was still at **10%** when the
+  240 s timeout cancelled it; **0.61 CPU h billed** (the manual 954-face flow volume meshes completely in 2.7 min for 0.275 CPU h).
+  Cause (most likely): the STEP B-rep has one planar face per canopy triangle (19,575 faces vs 954 from SimScale's facet split), which the
+  surface mesher handles slowly. Logs: `logs/meshprobe_autoflow/`. Total spent about 20.3 of 800 CPU h.
+- The manual route (`manual-step --user-style` + web app flow volume, then `single --from-manual`) remains the validated one (Cd 0.7327).
+- Ideas to make the automated route cheap (all free to test up to the import): group canopy triangles into ~1000 faces like SimScale's facet split
+  (needs a face representation that is not "one planar triangle each", e.g. the tessellated-STEP writer `write_tessellated_step`), or import
+  the canopy as the 948-face solid (works) and find another way to get box - canopy (the web-app CAD edit is not in the public API).
