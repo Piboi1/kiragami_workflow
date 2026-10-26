@@ -1,0 +1,3 @@
+Mesh probe M: {}; cap 1.0 CPU h, timeout 240 s, stall 180 s
+  uploading meshprobe_M_flow_domain.stl (5 MB, STL, sewing=True, improve=True)
+  geometry import: RUNNING
