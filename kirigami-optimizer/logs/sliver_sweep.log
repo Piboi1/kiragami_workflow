@@ -1,0 +1,3 @@
+== tol 0.0001: tris 19648 wt True bodies 1 vol 0.8826 (union 0.8826) slivers<1e-3,<1e-4,min (1031, 48, 4.6025570216822796e-05)
+  uploading flow_sting_0.0001.stl (6 MB, STL, sewing=True, improve=True)
+  geometry import: RUNNING
