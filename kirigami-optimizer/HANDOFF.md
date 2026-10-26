@@ -187,3 +187,15 @@ Analysis (scripts were scratch, results below):
 - Caveats to check before trusting Cd: (1) the 0.04 in sting rod in the wake (rim -> outlet) is not in the validated manual geometry; (2) its 5 unlabeled
   faces must act as no-slip walls. Compare Cd with the manual result 0.7327.
 - Next (needs approval + cap): `mesh-probe --variant M --auto-flow --cap 1.0`, then `single --auto-flow --uz 6.148 --max-core-hours 5 --skip-estimate-check`.
+
+## Update: sting-STL auto flow volume FAILS SimScale's mesh setup check (0 CPU h billed)
+- `mesh-probe --variant M --auto-flow --cap 1.0` (user-approved 1 CPU h): import fine (fluid region, ~960 faces) but the mesh setup check rejects it:
+  `missing-material-assignment` for entities **canopy (B7)** and **sting (B8)** - SimScale's sewing leaves the canopy block and the sting block as separate SOLID
+  bodies next to the fluid region; the simulation must assign a material to every body. Incompressible only accepts fluid materials (`IncompressibleFluidMaterials`),
+  and giving the slab/sting interiors air would be physically wrong (internal fluid regions behind the "canopy" wall faces). The manual web-app flow volume avoids this with
+  "Delete bodies". Same finding as the old `stl_single` probes (logs/importprobe2: box and canopy arrive as separate solids).
+- Billed: 0 (setup check fails before meshing). Total spent still about 20.3 of 800 CPU h. `--auto-flow` is now marked EXPERIMENTAL in `--help`.
+- Summary of the automation attempts: STEP B-rep (single fluid body, 19.6k faces, too heavy: 0.61 CPU h at 10%), tessellated STEP (rejected), sting STL (extra solid bodies),
+  all need either SimScale's CAD "Delete bodies" feature or a cheaper face structure. The validated semi-manual route remains the way to run designs.
+- Remaining ideas: (1) ask SimScale support to enable the CAD-feature API (OpenAPI schemas `CadFeatureRequest`/`CadQueryRequest` exist with no paths);
+  (2) try the STEP B-rep with a bigger MESH_SMALL_FEATURE_TOLERANCE_MM and longer timeout (expensive, unproven); (3) a human-in-the-loop flow volume per design (current).

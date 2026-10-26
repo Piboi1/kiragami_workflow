@@ -605,7 +605,7 @@ def main(argv=None):
     p.add_argument("--simplify-tol", type=float, default=None, help="canopy simplification (inches)")
     p.add_argument("--user-style", action="store_true", help="build the canopy like `manual-step --user-style`")
     p.add_argument("--auto-flow", action="store_true",
-                   help="build box - canopy - sting locally and import it as STL (no manual flow-volume step); implies --user-style")
+                   help="EXPERIMENTAL, currently fails SimScale's mesh setup check (extra canopy/sting solid bodies without material); see HANDOFF.md. Builds box - canopy - sting locally and imports it as STL; implies --user-style")
     p.add_argument("--skip-estimate-check", action="store_true",
                    help="do not refuse the solver run because SimScale's (worst-case) estimate exceeds the cap; "
                         "the cap is still enforced live")
@@ -676,7 +676,7 @@ def main(argv=None):
     p.add_argument("--from-manual", metavar="DESIGN_ID",
                    help="mesh the flow volume made by `manual-step --design-id DESIGN_ID`")
     p.add_argument("--auto-flow", action="store_true",
-                   help="build box - welded user-style canopy - sting locally and import it as STL (no manual step)")
+                   help="EXPERIMENTAL, currently fails SimScale's mesh setup check (extra canopy/sting solid bodies without material); see HANDOFF.md")
     p.set_defaults(fn=cmd_mesh_probe)
 
     p = sub.add_parser("probe-import")

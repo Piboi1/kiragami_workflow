@@ -1,0 +1,9 @@
+{
+  "variant": "M",
+  "settings": {},
+  "cap_cpu_h": 1.0,
+  "status": "FAILED",
+  "error": "SimScaleError: mesh setup check failed: [{'code': 'missing-material-assignment',\n 'details': {'parameterValuesCombinations': [],\n             'path': '$.model.materials',\n             'topoEntities': [{'label': 'canopy', 'name': 'B7'},\n                              {'label': 'sting', 'name': 'B8'}]},\n 'message': 'Please ensure that all CAD entities are assigned a material or '\n            'advanced concept. Missing material or advanced concepts were '\n            'detected for the following entities: canopy, sting',\n 'severity': 'ERROR'}]",
+  "mesh_core_hours": null,
+  "wall_minutes": 3.7
+}
