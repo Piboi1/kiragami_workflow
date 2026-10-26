@@ -13,7 +13,7 @@ from pathlib import Path
 import config
 from generator import generate_pattern
 from optimizer.space import from_params, normalize
-from solid import InfeasibleGeometry, build_flow_domain, build_solid, export_stl, write_named_stl
+from solid import InfeasibleGeometry, build_flow_domain, build_solid, export_stl, weld_union, write_named_stl
 from solid.canopy import DEFAULT_SOLID_PARAMS
 from simscale.results import core_hours_used
 from solid.depth_model import get_depth_model
@@ -79,6 +79,10 @@ def build_geometry(params, design_dir, design_id):
     elif fmt == "STEP":
         # One solid with the canopy as an internal void: no sting, no sewing.
         domain_params["STING_RADIUS"] = 0.0
+        if solid_params.get("EXTRUDE_METHOD") == "legacy":  # overlapping slabs: the boolean needs their union
+            canopy = weld_union(canopy)
+            info["volume_in3"] = float(canopy.volume)
+            info["triangle_count"] = int(len(canopy.faces))
         fluid, labels, bounds = build_flow_domain(canopy, resolved["PARACHUTE_DIAMETER"], domain_params)
         domain_file = design_dir / f"{design_id}_flow_domain.step"
         info.update(write_step(fluid, labels, domain_file))

@@ -115,3 +115,13 @@ def test_welded_legacy_matches_users_onshape_export():
     assert sum(p.volume < 0 for p in pieces) == 111
     assert abs(pieces[0].volume - 0.0296) < 1e-3
     assert abs(mesh.volume - 0.7744) < 1e-3
+
+
+def test_weld_union_gives_the_run11_volume():
+    # The sewn solid SimScale builds from the user's STL has 0.8826 in^3, the volume reported for Run 11.
+    from solid import weld_union
+
+    mesh, _ = build_solid(LEGACY_3D_RING_DATA, {"EXTRUDE_METHOD": "legacy", "BRIDGE_EXTRA": 0.0, "WELD_STRIPS": 1})
+    union = weld_union(mesh)
+    assert union.is_watertight and union.body_count == 1
+    assert abs(union.volume - 0.8826) < 2e-3

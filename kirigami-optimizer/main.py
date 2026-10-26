@@ -119,6 +119,8 @@ def cmd_inspect(args):
 
 
 def cmd_single(args):
+    if args.auto_flow:  # build the air volume locally (STEP) instead of waiting for the web-app step
+        config.SIMSCALE["GEOMETRY_FORMAT"] = "STEP"
     ctx = _live_context()
     if ctx.ledger.pending:
         print("An interrupted design is pending; finishing it first.")
@@ -126,7 +128,7 @@ def cmd_single(args):
     params = design_params(_preset(args.preset))
     if args.simplify_tol is not None:
         params["SIMPLIFY_TOLERANCE"] = args.simplify_tol
-    if args.user_style:  # same canopy as `manual-step --user-style` (reference area / diameter come from it)
+    if args.user_style or args.auto_flow:  # same canopy as `manual-step --user-style` (reference area / diameter come from it)
         params.update(config.ONSHAPE["CANOPY_OVERRIDES"])
     for item in args.set or []:
         key, _, value = item.partition("=")
@@ -276,6 +278,9 @@ def cmd_mesh_probe(args):
     """Meshes the baseline design ONLY (no solver) with a settings variant,
     under a hard CPU-hour cap; the mesh is cancelled on SimScale if it trips."""
 
+    if args.auto_flow:
+        config.SIMSCALE["GEOMETRY_FORMAT"] = "STEP"
+
     from pipeline import build_geometry
     from simscale.runner import SimScaleClient
 
@@ -291,6 +296,8 @@ def cmd_mesh_probe(args):
     print(f"Mesh probe {args.variant}: {MESH_PROBE_VARIANTS[args.variant]}; cap {args.cap} CPU h, "
           f"timeout {args.timeout} s, stall {args.stall} s")
     params = design_params(_preset("baseline"))
+    if args.auto_flow:
+        params.update(config.ONSHAPE["CANOPY_OVERRIDES"])
     _, info, _, paths = build_geometry(params, out, f"meshprobe_{args.variant}")
     state = {}
     if args.from_manual:  # reuse the flow volume made by `manual-step` (skips import and the wait)
@@ -597,6 +604,8 @@ def main(argv=None):
                    help="per-design CPU-hour cap for this run (default: config MAX_CORE_HOURS_PER_RUN)")
     p.add_argument("--simplify-tol", type=float, default=None, help="canopy simplification (inches)")
     p.add_argument("--user-style", action="store_true", help="build the canopy like `manual-step --user-style`")
+    p.add_argument("--auto-flow", action="store_true",
+                   help="build box - canopy locally and import it as STEP (no manual flow-volume step); implies --user-style")
     p.add_argument("--skip-estimate-check", action="store_true",
                    help="do not refuse the solver run because SimScale's (worst-case) estimate exceeds the cap; "
                         "the cap is still enforced live")
@@ -666,6 +675,8 @@ def main(argv=None):
     p.add_argument("--stall", type=int, default=180, help="seconds without progress before cancelling")
     p.add_argument("--from-manual", metavar="DESIGN_ID",
                    help="mesh the flow volume made by `manual-step --design-id DESIGN_ID`")
+    p.add_argument("--auto-flow", action="store_true",
+                   help="build box - welded user-style canopy locally and import it as STEP (no manual step)")
     p.set_defaults(fn=cmd_mesh_probe)
 
     p = sub.add_parser("probe-import")

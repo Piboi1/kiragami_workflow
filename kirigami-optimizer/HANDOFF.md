@@ -140,3 +140,20 @@ Analysis (scripts were scratch, results below):
   Total spent about 19.7 of 800 CPU h. The pipeline is now validated end to end on a script-generated canopy with a manual flow volume.
 - The flow volume is still made by hand in the web app (one per geometry; saving replaces the geometry ID). Per-design automation of that step is the
   remaining blocker for `optimize`.
+
+## Update: flow-volume automation (local box - canopy, STEP import) + Run 11 volume mystery solved
+- **Volume solved:** the union of the 705 welded pieces (each oriented outward; 111 are stored inside-out so the signed mesh volume
+  0.774 understates it) is **0.8826 in^3 = exactly the Run 11 volume**. The canopy IS Run 11's; the thickness was fine. (`solid.weld_union`)
+- SimScale's public API/SDK/OpenAPI spec has CAD schemas (`CadFeatureRequest`, `CadQueryRequest`, ...) but NO endpoints for them, so
+  the web app's "External flow volume" cannot be called. Instead: `GEOMETRY_FORMAT="STEP"` builds box - union(canopy) locally with float64
+  manifold3d booleans (`solid/flow_domain.py`) and writes a B-rep STEP (`solid/step_export.py`).
+- **Free import test passed:** SimScale imported that STEP (21 MB, 19,581 faces) as ONE flow region (`B1_TE77947`) with inlet/outlet/
+  side_xmin/xmax/ymin/ymax = 1 face each, canopy = 19,575 faces, no unlabeled faces (geometry `12da3752-924d-488d-83c6-602e8fbe5347`,
+  `auto_flow_step`). The manual route gives 954 faces (facet-split groups); the STEP route has one face per canopy triangle (the ribbon
+  triangles are non-planar so nothing merges), which may make meshing slower/heavier. NOT meshed yet.
+- Wired in: `main.py mesh-probe --auto-flow ...` and `main.py single --auto-flow ...` (implies the user-style canopy; `pipeline.build_geometry`
+  unions the legacy pieces for STEP). Test `test_weld_union_gives_the_run11_volume`.
+- Next (needs user approval + CPU-h cap): `mesh-probe --variant M --auto-flow --cap 1.0` to see whether the 19.6k-face STEP meshes like the
+  manual flow volume (reference: 1,683,594 cells, 0.275 CPU h); then `single --auto-flow --uz 6.148 --max-core-hours 5 --skip-estimate-check`
+  and compare Cd with the manual route (0.7327). If meshing is too heavy, merge canopy triangles into larger faces (like SimScale's facet split).
+- Git tag `pipeline-works-cd0.7327` exists locally on 8ad6655 but pushing it failed twice ("unexpected disconnect"); branch commits push fine.

@@ -295,6 +295,28 @@ def _legacy_extrude(strips, thickness, weld=False):
     return solid
 
 
+def weld_union(mesh):
+    """Boolean union of the pieces of a welded legacy canopy into one clean watertight body.
+
+    The legacy canopy is hundreds of closed slabs that overlap and share vertices; some are
+    wound inside-out (negative signed volume), so ``mesh.volume`` understates the real volume.
+    Orienting every piece outwards and taking the union gives the volume SimScale's sewn solid
+    has (0.8826 in^3 for the baseline, the volume reported for Run 11) and a surface that the
+    flow-domain boolean accepts.
+    """
+
+    pieces = []
+    for piece in mesh.split(only_watertight=False):
+        piece = piece.copy()
+        if piece.volume < 0:
+            piece.invert()
+        pieces.append(piece)
+    union = booleans.union(pieces)
+    if not union.is_watertight:
+        raise ValueError("union of the canopy pieces is not watertight")
+    return union
+
+
 def check_feasible(rings, kerf_factor, min_cap_radius):
     """Raises InfeasibleGeometry if ribbons would cross the canopy center."""
 
