@@ -167,3 +167,12 @@ Analysis (scripts were scratch, results below):
 - Ideas to make the automated route cheap (all free to test up to the import): group canopy triangles into ~1000 faces like SimScale's facet split
   (needs a face representation that is not "one planar triangle each", e.g. the tessellated-STEP writer `write_tessellated_step`), or import
   the canopy as the 948-face solid (works) and find another way to get box - canopy (the web-app CAD edit is not in the public API).
+
+## Update: other local flow-volume routes tested (all free imports) - none works yet
+- Lesson I missed before spending the 0.61 CPU h: `solid/step_export.py` already said the one-planar-face-per-triangle B-rep is too heavy to mesh.
+- AP242 tessellated STEP (`write_tessellated_step`, 7 faces): SimScale rejects it (`invalid-file`, both with and without facet split).
+- Multi-solid STL with sting (box - union canopy - sting, sewing + facet split): SimScale import FAILS (`unexpected-error`). The union has ~1000
+  triangles with altitude < 1e-3 in (48 < 1e-4); a sting would also change the physics slightly versus the validated runs.
+- Recommendation: keep the validated semi-manual route (`manual-step --user-style`, one web-app flow-volume step, then `single --from-manual
+  <id> --user-style --uz 6.148 --max-core-hours 5 --skip-estimate-check`). Only remaining automation ideas: remesh/clean the union (decimate slivers) before the
+  STL import, or ask SimScale support whether the CAD-feature endpoints (schemas exist in the OpenAPI spec) can be enabled for API keys.
