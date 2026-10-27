@@ -47,6 +47,10 @@ def fast_geometry(monkeypatch):
 
 def test_crash_and_resume(isolated_paths, monkeypatch):
     monkeypatch.setitem(config.FIXED_PARAMS, "INNER_OVERLAP_RATIO", 0.3)
+    # This test is about resuming; it builds the (sting) flow domain, which needs the unioned canopy.
+    monkeypatch.setitem(config.FIXED_PARAMS, "EXTRUDE_METHOD", "union")
+    monkeypatch.setitem(config.FIXED_PARAMS, "JOINT_OVERLAP", 0.03)
+    monkeypatch.setitem(config.FIXED_PARAMS, "BRIDGE_EXTRA", 1.0)
 
     sim = FakeSimScale(crash_on_call=3)
     try:
@@ -63,7 +67,7 @@ def test_crash_and_resume(isolated_paths, monkeypatch):
     assert ledger.pending is None
     assert len(ledger.records) == 5
     assert [r["design_id"] for r in ledger.records] == [f"design_{i:04d}" for i in range(1, 6)]
-    assert all(r["status"] == "ok" for r in ledger.records)
+    assert all(r["status"] == "ok" for r in ledger.records), [(r["design_id"], r["status"], r.get("error")) for r in ledger.records]
     assert best["cd"] == max(r["cd"] for r in ledger.records)
     # later records carry a CFD-informed velocity estimate
     assert ledger.records[-1]["velocity"]["nearest_run"] is not None

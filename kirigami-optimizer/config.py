@@ -56,8 +56,12 @@ FIXED_PARAMS = {
     "VERTICAL_DROP": None,
     "KERF_FACTOR": 0.85,
     "SHEET_THICKNESS": 0.015,
-    "EXTRUDE_METHOD": "union",
-    "JOINT_OVERLAP": 0.03,
+    # The user's own script output (welded legacy strips, flush hinges): the canopy of Run 11, which
+    # SimScale imports as a 948-face solid. The old "union" canopy fails SimScale's import/meshing.
+    "EXTRUDE_METHOD": "legacy",
+    "WELD_STRIPS": 1,
+    "BRIDGE_EXTRA": 0.0,
+    "JOINT_OVERLAP": 0.0,
     "MIN_CAP_RADIUS": 0.05,
     "SIMPLIFY_TOLERANCE": 1e-4,   # inches; removes boolean slivers (see solid/canopy.py)
     # flow domain, in multiples of PARACHUTE_DIAMETER (matches Kiragami_CFD box)

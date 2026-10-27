@@ -152,6 +152,34 @@ def cmd_single(args):
     return 0 if record["status"] == "ok" else 1
 
 
+def cmd_prepare_batch(args):
+    """Free: proposes K designs, imports their canopies and writes one checklist for the web-app step."""
+
+    from optimizer.batch import prepare_batch
+
+    ctx = _live_context()
+    batch_id, designs, texts = prepare_batch(ctx, args.n)
+    out = config.RUNS_DIR / "batch" / batch_id
+    print(f"\n{batch_id}: {len(designs)} design(s) ready. Checklist for all of them: {out / 'MANUAL_STEPS.txt'}\n")
+    print(("\n" + "=" * 70 + "\n\n").join(texts))
+    print(f"\nWhen every flow volume is saved: python main.py run-batch --batch {batch_id} "
+          "--max-core-hours 5 --batch-core-hours N --skip-estimate-check   (billed: needs your approval)")
+    return 0 if designs else 1
+
+
+def cmd_run_batch(args):
+    """Billed: runs every design of a batch whose flow volume has been saved, one after the other."""
+
+    from optimizer.batch import run_batch
+
+    ctx = _live_context()
+    batch = run_batch(ctx, args.batch, args.max_core_hours, args.batch_core_hours,
+                      skip_estimate_check=args.skip_estimate_check)
+    for e in batch["designs"]:
+        print(f"{e['name']}: {e.get('status', 'not run')} Cd={e.get('cd')}")
+    return 0
+
+
 def cmd_optimize(args):
     from optimizer.loop import run_optimization
 
@@ -594,6 +622,18 @@ def main(argv=None):
     p = sub.add_parser("inspect-simscale")
     p.add_argument("--project-name", default="Kiragami_CFD")
     p.set_defaults(fn=cmd_inspect)
+
+    p = sub.add_parser("prepare-batch")
+    p.add_argument("--n", type=int, default=4, help="number of designs in the batch")
+    p.set_defaults(fn=cmd_prepare_batch)
+
+    p = sub.add_parser("run-batch")
+    p.add_argument("--batch", required=True, help="batch id printed by prepare-batch")
+    p.add_argument("--max-core-hours", type=float, required=True, help="CPU-hour cap per design (mesh + run)")
+    p.add_argument("--batch-core-hours", type=float, required=True, help="stop starting new designs once the batch has used this many")
+    p.add_argument("--skip-estimate-check", action="store_true",
+                   help="do not refuse a solver run because SimScale's worst-case estimate exceeds the cap; the cap is still enforced live")
+    p.set_defaults(fn=cmd_run_batch)
 
     p = sub.add_parser("single")
     p.add_argument("--preset", default="baseline")

@@ -96,7 +96,7 @@ def test_flush_baseline_canopy_is_watertight_after_stl_roundtrip(tmp_path):
     report = generate_pattern(params, output_dir=tmp_path, name="flush")
     sp = {k: params.get(k, v) for k, v in DEFAULT_SOLID_PARAMS.items()}
     sp.update(CUTS_PER_RING=report["parameters"]["CUTS_PER_RING"], SIMPLIFY_TOLERANCE=3e-3,
-              BRIDGE_EXTRA=0.0, JOINT_OVERLAP=0.0)
+              BRIDGE_EXTRA=0.0, JOINT_OVERLAP=0.0, EXTRUDE_METHOD="union")
     mesh, info = build_solid(report, sp)
     assert info["is_watertight"] and info["body_count"] == 1
     out = tmp_path / "canopy.stl"
