@@ -4,3 +4,8 @@ Resuming design_0007 (SimScale state: ['geometry_id'])
 [design_0007] rings=23 Aref=73.01 in^2 Uz=-5.197 m/s (Cd for Uz 0.307)
   meshing: QUEUED 0%
   meshing: RUNNING 30%
+  meshing: RUNNING 80%
+  meshing: FINISHED
+  simulation estimate 18.66 core hours exceeds cap 5; estimate gate skipped on request, the run is cancelled live at the cap
+  simulation run: QUEUED 0%
+  simulation run: RUNNING 0%
