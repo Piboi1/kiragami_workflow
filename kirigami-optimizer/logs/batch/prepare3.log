@@ -1,0 +1,5 @@
+  skipped [17, 7, 0.6194171466612998, 0.8858799102404169, 0.9309654427973098]: sliver overlaps (8 pairs, smallest 1.1e-07 in^3) would fail SimScale's mesher
+  skipped [20, 12, 0.9291340785277222, 0.24286188595822805, 0.8033194258384986]: sliver overlaps (95 pairs, smallest 7.1e-12 in^3) would fail SimScale's mesher
+  skipped [26, 5, 0.6676075805321099, 0.5053740155801144, 0.7141033861373887]: sliver overlaps (7 pairs, smallest 4.0e-08 in^3) would fail SimScale's mesher
+  skipped [30, 10, 1.386866971510426, 0.8792315233570949, 1.0640998621895816]: sliver overlaps (23 pairs, smallest 2.7e-07 in^3) would fail SimScale's mesher
+  skipped [29, 7, 1.361872720086502, 0.20172674388316195, 0.5590603308552876]: sliver overlaps (21 pairs, smallest 1.7e-07 in^3) would fail SimScale's mesher
