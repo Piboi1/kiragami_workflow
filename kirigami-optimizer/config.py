@@ -248,6 +248,10 @@ OPTIMIZER = {
     # Objective value (Cd) reported to the GP when a run fails or the
     # design is geometrically infeasible (see solid.canopy.check_feasible).
     "FAILURE_CD": 0.0,
+    # prepare-batch rejects designs whose welded canopy has sliver overlaps between ribbon slabs (SimScale's
+    # mesher then fails with "self intersection"); see solid/screen.py for the calibration.
+    "SCREEN_SLIVERS": True,
+    "MIN_PAIR_OVERLAP_IN3": 1e-6,
 }
 
 

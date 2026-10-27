@@ -81,7 +81,10 @@ class Ledger:
     def xy(self):
         """(x0, y0) of all finished records that belong to the search."""
 
-        pairs = [(r["x"], r["y"]) for r in self.records if r.get("x") is not None and r.get("y") is not None]
+        # Meshing failures ("self intersection" from sliver overlaps) are a modelling artifact, not a bad design:
+        # they are kept out of the optimizer's training data (the sliver screen keeps such designs from being proposed).
+        pairs = [(r["x"], r["y"]) for r in self.records if r.get("x") is not None and r.get("y") is not None
+                 and "meshing FAILED" not in (r.get("error") or "")]
         return [p[0] for p in pairs], [p[1] for p in pairs]
 
     def core_hours_used(self):

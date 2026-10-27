@@ -1,2 +1,20 @@
   uploading d01_onshape.stl (2 MB, STL, sewing=True, improve=True)
   geometry import: RUNNING
+  geometry import: FAILED
+== d01 raw+facet_split: FAILED SimScaleError geometry import FAILED: {'code': 'unexpected-error',
+ 'details': {},
+ 'message': 'An unexpected error occurred. Please contact support for '
+            'assistance.',
+ 'severity': 'ERROR'}
+  uploading d01_onshape_presplit.stl (4 MB, STL, sewing=True, improve=True)
+  geometry import: RUNNING
+  geometry import: FINISHED
+== d01 presplit(473): faces 524 solid False warns ['Trying to sew and solidify sheet bodies (surface data) in the model. Some sheet bodies left.'] (b2bf9a21-786e-4412-8307-32071e3896b1)
+  uploading d02_onshape.stl (3 MB, STL, sewing=True, improve=True)
+  geometry import: RUNNING
+  geometry import: FINISHED
+== d02 raw+facet_split: faces 1 solid True warns ['Automatic face split of facet bodies with the default angle of 30 degree did not work for all bodies. If you n'] (291cb67c-554c-430d-a59a-4ba940aba28d)
+  uploading d02_onshape_presplit.stl (4 MB, STL, sewing=True, improve=True)
+  geometry import: RUNNING
+  geometry import: FINISHED
+== d02 presplit(591): faces 634 solid True warns ['Trying to sew and solidify sheet bodies (surface data) in the model. Some sheet bodies left.'] (283cd53c-5e3a-4aa0-bf3a-06cef7394d7d)

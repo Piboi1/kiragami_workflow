@@ -15,7 +15,7 @@ from pathlib import Path
 
 import config
 from pipeline import build_geometry, design_params, evaluate_design, start_with_geometry
-from solid import InfeasibleGeometry
+from solid import InfeasibleGeometry, screen_canopy
 from simscale import manual_flow
 
 from .space import dimensions, to_params
@@ -75,6 +75,19 @@ def prepare_batch(ctx, k, log=print):
         except InfeasibleGeometry as exc:
             log(f"  skipped {x}: infeasible ({exc})")
             continue
+        if config.OPTIMIZER.get("SCREEN_SLIVERS", True):
+            import trimesh
+
+            try:
+                ok, stats = screen_canopy(trimesh.load(paths["canopy_stl"], force="mesh"),
+                                          config.OPTIMIZER["MIN_PAIR_OVERLAP_IN3"])
+            except ImportError:
+                ok, stats = True, None
+                log("  (sliver screen skipped: manifold3d is not installed)")
+            if not ok:
+                log(f"  skipped {x}: sliver overlaps ({stats['slivers']} pairs, smallest {stats['min_overlap_in3']:.1e} in^3) "
+                    "would fail SimScale's mesher")
+                continue
         canopy_name = f"{name}_canopy"
         _, import_id = ctx.simscale.start_import(ctx.project_id, canopy_name, paths["domain_file"], True,
                                                  config.SIMSCALE["IMPORT_IMPROVE"], "STL",

@@ -199,3 +199,20 @@ Analysis (scripts were scratch, results below):
   all need either SimScale's CAD "Delete bodies" feature or a cheaper face structure. The validated semi-manual route remains the way to run designs.
 - Remaining ideas: (1) ask SimScale support to enable the CAD-feature API (OpenAPI schemas `CadFeatureRequest`/`CadQueryRequest` exist with no paths);
   (2) try the STEP B-rep with a bigger MESH_SMALL_FEATURE_TOLERANCE_MM and longer timeout (expensive, unproven); (3) a human-in-the-loop flow volume per design (current).
+
+## Update: first design batch + root cause of the mesh failures + sliver screen (supersedes earlier "next steps")
+- Workflow built: `prepare-batch --n K` (free: propose K designs, screen, pre-split canopy import) -> user does the web-app flow-volume step per geometry ->
+  `run-batch --batch ID --max-core-hours 5 --batch-core-hours 20 --skip-estimate-check` (billed). Canopy STL is imported **pre-split** (one named `solid pNNNN` block per
+  welded piece; `CANOPY_PRESPLIT`): SimScale's 30-degree automatic facet split silently fails on many designs (whole canopy = 1 face), the pre-split import never does.
+- Batch `batch_20261027_003945` (4 designs): **design_0005 (31 rings, 4 cuts) meshed and solved: Cd 0.7812** (baseline 0.7327), 0.12 + 2.78 CPU h. The other three
+  (design_0003/0004/0006) failed in meshing with SimScale "self intersection" at 0 CPU h. Total spent about 23.2 of 800 CPU h. Ledger snapshot: `snapshot/`.
+- **Root cause of those failures:** neighbouring ribbon slabs overlap by tiny slivers (pair overlap volume 1e-8 .. 1e-7 in^3 vs about 1e-5 normally), measured with
+  manifold3d (`solid/screen.py`). Smallest pair overlap: baseline 1.2e-5 (meshed), design_0005 4.9e-6 (meshed), 0006 1.7e-7 / 0003 5.4e-8 / 0004 1.6e-8 (failed).
+- **Screen:** `prepare-batch` now rejects designs with a pair overlap below `OPTIMIZER["MIN_PAIR_OVERLAP_IN3"]` = 1e-6 (calibrated on only 5 designs; re-check with more
+  data). Of 30 proposed designs 13 pass (43%); designs with >= 9 cuts per ring nearly all fail, <= 6 nearly all pass, 7-8 mixed. So the searchable space is smaller than
+  `SEARCH_SPACE` suggests until the canopy model avoids the slivers. Mesh-failed designs are excluded from the optimizer's training data (`Ledger.xy`).
+- **Onshape retry of designs 01/02 (user request) did not fix it:** the exports (`runs/onshape/d01|d02`) keep 40-50 open fragment pieces each; SimScale then imports
+  d01 as NOT a solid (sheet bodies left; raw STL import fails with unexpected-error) and d02 as a solid with leftover sheet bodies. Not a usable repair. 86 Onshape requests used.
+- Jetson: `jetson/setup_jetson.sh` + `jetson/README.md` (untested on hardware). Restore state with `cp snapshot/ledger.json state/ && cp -r snapshot/batch runs/`.
+- Auto-clicking the flow-volume step needs one recorded Playwright session from the user (`playwright codegen`, log in first with --save-storage, then record with --load-storage
+  so the password is not recorded); not built yet. Asking SimScale support to enable the CAD-feature API would remove the step.
