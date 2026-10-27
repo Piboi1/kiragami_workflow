@@ -253,3 +253,14 @@ Results (ledger `snapshot/ledger.json`, results in `runs/results.csv`):
 - **Spend corrected: about 41 of 800 CPU h** (ledger 24.7 + about 16.5 outside it: earlier sessions 15.3, canopy gate 0.31, mesh-probes 0.28 + 0.61). The earlier note "about 29" after round 2 was an undercount (about 32).
 - `run-batch --redo NAME...` runs a design again. Ideas not yet tried: finer mesh (MESH_FINENESS) for diverging designs; first-order upwind for the default divergence scheme (more diffusive, will shift Cd);
   restricting the search to depth 9-11 in (about 27-32 rings) so far fewer designs diverge.
+
+## Update: why does the solver diverge? (traces of failed runs, free)
+SimScale keeps results of failed runs (`FORCE_COEFFICIENTS_PLOT`, `RESIDUALS_PLOT`). Cd traces (scratch analysis): every run, including the diverged ones, is normal for the first ~100 iterations
+(Cd 0.68-0.75); then an error grows exponentially (about x1000 per 100 iterations; Cd -1.6 at it 200 -> -1654 at 300 -> -1e6 at 400): a numerical instability of the steady solve, onset at iteration
+206 (23r/6c), 174 (23r/6c robust), 261 (35r/4c). The residual plot is useless here (normalised by the blown-up field). Converged runs differ in late Cd wobble: baseline 0.5%, 31r/6c 0.2%,
+26r/8c 0.6%, **31r/4c 2.7%** (marginal), baseline with robust numerics 4.5% (and an early overshoot to Cd 0.94 at it 100 - the potential-flow start hurts). Both 4-cut designs are the least stable
+(one marginal, one diverged), which suggests large open passages -> intrinsically unsteady separation that a steady solver cannot settle, but that is a hypothesis.
+- The momentum flux already uses first-order bounded upwind. All other transported quantities (k, omega, ...) use the unlimited second-order `for_default` scheme (linearUpwindV): the prime suspect.
+- New opt-in flag `--stable-scheme` (`FIRST_ORDER_DEFAULT_SCHEME`): first-order upwind for `for_default`. More diffusive; shifts Cd, so it needs a baseline re-anchor. Proposed test (needs approval and caps):
+  design_0007 geometry, design_0008 geometry and the baseline, each with `--stable-scheme`, 5 CPU h cap each.
+- `docs/simscale_support_request.md`: draft message asking SimScale to enable the CAD-feature API for API keys (removes the manual flow-volume step, the real limit on data volume).
