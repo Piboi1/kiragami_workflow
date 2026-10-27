@@ -238,3 +238,18 @@ Results (ledger `snapshot/ledger.json`, results in `runs/results.csv`):
 - Valid Cds so far: baseline 0.7327, design_0005 (31r/4c) 0.7812, design_0009 (31r/6c) 0.7364. All three converged designs have 30-31 rings (depth 10.6-10.7 in);
   both diverged ones have 23 and 35 rings (7.9 and 12.2 in). n = 5, a hint only: check whether depth/ring count is what the mesh settings are tuned for.
 - Total billed so far about 29 CPU h of 800. Open questions: re-run design_0010 (needs approval + cap), the `--robust-numerics` experiment (needs approval + cap).
+
+## Update: re-runs (design 10, robust-numerics test) - results and what they mean
+- **design_0011 (= batch design 10, 26 rings, 8 cuts): Cd 0.7507** (ok, 3.56 CPU h). The earlier failure was my estimator bug, not the design.
+- **design_0012 (= design_0007 geometry, 23r/6c) with `--robust-numerics` (potential-flow init, relaxation p 0.2 / U 0.5): diverged AGAIN**, earlier (62% vs 93%) and in a different
+  place: velocity 1e7 m/s at (-1.74, 0.15, -1.16) in (r 1.75, near the apex) instead of pressure -1e15 at the rim (r 4.6). A moving fault points at poor mesh/scheme robustness for that design,
+  not at one bad spot. 2.02 CPU h.
+- **design_0013 = baseline with `--robust-numerics`: Cd 0.7537 vs 0.7327 with the validated numerics (+2.9%).** The stabilisers do NOT cure the divergence and DO shift the result. Do not use them
+  for optimization runs; Cds from the two settings are not comparable. Differences between designs seen so far (0.73-0.78) are about the size of this numerical sensitivity: treat small Cd
+  differences with caution (re-check promising designs, ideally with a finer mesh).
+- Checked as divergence predictors (n = 6 designs, none works): pair-overlap slivers (they predict MESH failures, not divergence: the design that solved with the smallest overlaps is design_0011),
+  narrowest slit between ribbons, overlap fraction, cut count. The only pattern is canopy depth: diverged 7.90 and 12.19 in; solved 8.97, 10.63, 10.76, 10.76 in. Hint only.
+- Valid Cds (default numerics): baseline 0.7327, design_0005 (31r/4c) 0.7812, design_0009 (31r/6c) 0.7364, design_0011 (26r/8c) 0.7507. Diverged: 23r/6c, 35r/4c.
+- **Spend corrected: about 41 of 800 CPU h** (ledger 24.7 + about 16.5 outside it: earlier sessions 15.3, canopy gate 0.31, mesh-probes 0.28 + 0.61). The earlier note "about 29" after round 2 was an undercount (about 32).
+- `run-batch --redo NAME...` runs a design again. Ideas not yet tried: finer mesh (MESH_FINENESS) for diverging designs; first-order upwind for the default divergence scheme (more diffusive, will shift Cd);
+  restricting the search to depth 9-11 in (about 27-32 rings) so far fewer designs diverge.

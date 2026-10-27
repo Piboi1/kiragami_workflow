@@ -3,3 +3,30 @@ Resuming design_0011 (SimScale state: ['geometry_id'])
 [design_0011] generating pattern + solid
 [design_0011] rings=26 Aref=73.38 in^2 Uz=-5.183 m/s (Cd for Uz 0.307)
   meshing: QUEUED 0%
+  meshing: RUNNING 0%
+  meshing: RUNNING 30%
+  meshing: RUNNING 80%
+  meshing: RUNNING 95%
+  meshing: FINISHED
+  simulation estimate 13.05 core hours exceeds cap 5; estimate gate skipped on request, the run is cancelled live at the cap
+  simulation run: QUEUED 0%
+  simulation run: RUNNING 0%
+  simulation run: RUNNING 3%
+  simulation run: RUNNING 10%
+  simulation run: RUNNING 17%
+  simulation run: RUNNING 25%
+  simulation run: RUNNING 33%
+  simulation run: RUNNING 40%
+  simulation run: RUNNING 48%
+  simulation run: RUNNING 57%
+  simulation run: RUNNING 64%
+  simulation run: RUNNING 73%
+  simulation run: RUNNING 81%
+  simulation run: RUNNING 88%
+  simulation run: RUNNING 98%
+  simulation run: RUNNING 100%
+  simulation run: FINISHED
+[design_0011] Cd=0.7507 Cl=0.0004 Cm=0.0004
+batch_20261027_040156_02: ok Cd=0.750650528469444
+batch_20261027_040156_01: ok Cd=0.7363630461649577
+batch_20261027_040156_02: ok Cd=0.750650528469444

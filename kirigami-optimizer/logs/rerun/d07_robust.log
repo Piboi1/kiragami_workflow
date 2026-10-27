@@ -1,0 +1,28 @@
+Robust solver numerics on: {'POTENTIAL_FOAM_INIT': True, 'RELAX_PRESSURE': 0.2, 'RELAX_VELOCITY': 0.5}
+batch_20261027_035855_01: running on flow-volume geometry 80182528-fdfc-4981-883b-d9570aab0f33
+Resuming design_0012 (SimScale state: ['geometry_id'])
+[design_0012] generating pattern + solid
+[design_0012] rings=23 Aref=73.01 in^2 Uz=-5.197 m/s (Cd for Uz 0.307)
+  mesh check warning: The sum of (U) Velocity equation and (P) Pressure field relaxation factors is either greater than 1.1 or smaller than 0.9. This can lead to instabilities. Please consider keeping this sum between 0.9 and 1.1
+  meshing: QUEUED 0%
+  meshing: RUNNING 10%
+  meshing: RUNNING 30%
+  meshing: RUNNING 95%
+  meshing: FINISHED
+  simulation check warning: The sum of (U) Velocity equation and (P) Pressure field relaxation factors is either greater than 1.1 or smaller than 0.9. This can lead to instabilities. Please consider keeping this sum between 0.9 and 1.1
+  simulation run: QUEUED 0%
+  simulation run: RUNNING 0%
+  simulation run: RUNNING 4%
+  simulation run: RUNNING 11%
+  simulation run: RUNNING 19%
+  simulation run: RUNNING 27%
+  simulation run: RUNNING 34%
+  simulation run: RUNNING 41%
+  simulation run: RUNNING 48%
+  simulation run: RUNNING 61%
+  simulation run: RUNNING 62%
+  simulation run: FAILED
+[design_0012] FAILED: SimScaleError: simulation run FAILED
+batch_20261027_035855_01: failed Cd=None
+batch_20261027_035855_01: failed Cd=None
+batch_20261027_035855_02: ok Cd=-1843276.6886843843
