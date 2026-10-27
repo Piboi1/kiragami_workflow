@@ -1,2 +1,20 @@
   uploading base_ctrl_canopy.stl (1 MB, STL, sewing=True, improve=True)
   geometry import: RUNNING
+  geometry import: FINISHED
+== base_ctrl: tris 15360 rings 30 -> faces 948 solid True (28a986bc-e6a1-477a-90f5-f60f28d43587)
+  uploading base_rings20_canopy.stl (1 MB, STL, sewing=True, improve=True)
+  geometry import: RUNNING
+  geometry import: FINISHED
+== base_rings20: tris 10240 rings 20 -> faces 1236 solid True (ce7a94b0-e293-4fe4-86da-5e75df67a96a)
+  uploading base_exp0.7_canopy.stl (1 MB, STL, sewing=True, improve=True)
+  geometry import: RUNNING
+  geometry import: FINISHED
+== base_exp0.7: tris 15360 rings 30 -> faces 1 solid True (2129b637-97e9-4bed-8798-f22c46b75cde)
+  uploading base_inner1.11_canopy.stl (1 MB, STL, sewing=True, improve=True)
+  geometry import: RUNNING
+  geometry import: FINISHED
+== base_inner1.11: tris 15360 rings 30 -> faces 1 solid True (79a56da9-d646-4bf2-98db-1d8a52f6cfec)
+  uploading design01_drop10.62_canopy.stl (1 MB, STL, sewing=True, improve=True)
+  geometry import: RUNNING
+  geometry import: FINISHED
+== design01_drop10.62: tris 10240 rings 20 -> faces 1333 solid True (7a58ebe4-4c22-476b-8619-78906d8bf824)
