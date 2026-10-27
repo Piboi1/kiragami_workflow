@@ -6,3 +6,33 @@ Resuming design_0020 (SimScale state: ['geometry_id'])
 [design_0020] rings=23 Aref=73.01 in^2 Uz=-5.197 m/s (Cd for Uz 0.307)
   mesh check warning: The simulation will produce 140 time steps. We recommend 50 or fewer to maintain usable results.
   meshing: QUEUED 0%
+  meshing: RUNNING 0%
+  meshing: RUNNING 30%
+  meshing: RUNNING 80%
+  meshing: RUNNING 95%
+  meshing: FINISHED
+  simulation check warning: The simulation will produce 140 time steps. We recommend 50 or fewer to maintain usable results.
+  simulation run: QUEUED 0%
+  simulation run: RUNNING 0%
+  simulation run: RUNNING 1%
+  simulation run: RUNNING 3%
+  simulation run: RUNNING 4%
+  simulation run: RUNNING 6%
+  simulation run: RUNNING 7%
+  simulation run: RUNNING 9%
+  simulation run: RUNNING 11%
+  simulation run: RUNNING 12%
+  simulation run: RUNNING 14%
+  simulation run: RUNNING 16%
+  simulation run: RUNNING 18%
+  simulation run: RUNNING 19%
+  simulation run: RUNNING 21%
+  simulation run: RUNNING 23%
+  simulation run: RUNNING 25%
+  simulation run: RUNNING 27%
+  simulation run: RUNNING 29%
+  simulation run: RUNNING 30%
+  simulation run: RUNNING 32%
+  simulation run: RUNNING 34%
+  simulation run: RUNNING 35%
+  simulation run: RUNNING 37%
