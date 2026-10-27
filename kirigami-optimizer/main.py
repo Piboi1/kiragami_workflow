@@ -149,6 +149,9 @@ def cmd_single(args):
     if args.no_boundary_layers:
         ctx.simscale.cfg["MESH_BOUNDARY_LAYERS"] = False
         print("Automatic boundary layers: off")
+    if args.iterations is not None:  # steady-state iterations (END_TIME_S with a 1 s step); the CPU cost grows in proportion
+        ctx.simscale.cfg["END_TIME_S"] = args.iterations
+        print(f"Solver iterations: {args.iterations} (default 500)")
     if args.skip_estimate_check:  # only the pre-run estimate gate of the solver; the live cap still cancels the run
         ctx.simscale.cfg["SKIP_ESTIMATE_GATE"] = True
         print("Pre-run solver estimate gate skipped; the cap is still enforced live during the run.")
@@ -201,6 +204,9 @@ def cmd_run_batch(args):
     if args.no_boundary_layers:
         ctx.simscale.cfg["MESH_BOUNDARY_LAYERS"] = False
         print("Automatic boundary layers: off")
+    if args.iterations is not None:  # steady-state iterations (END_TIME_S with a 1 s step); the CPU cost grows in proportion
+        ctx.simscale.cfg["END_TIME_S"] = args.iterations
+        print(f"Solver iterations: {args.iterations} (default 500)")
     batch = run_batch(ctx, args.batch, args.max_core_hours, args.batch_core_hours,
                       skip_estimate_check=args.skip_estimate_check, redo=tuple(args.redo or ()))
     for e in batch["designs"]:
@@ -659,6 +665,8 @@ def main(argv=None):
     p = sub.add_parser("run-batch")
     p.add_argument("--batch", required=True, help="batch id printed by prepare-batch")
     p.add_argument("--max-core-hours", type=float, required=True, help="CPU-hour cap per design (mesh + run)")
+    p.add_argument("--iterations", type=int, default=None,
+                   help="steady-state solver iterations (default 500); the CPU cost grows in proportion")
     p.add_argument("--mesh-fineness", type=float, default=None,
                    help="Simmetrix mesh fineness 0-10 (default from config, 4.5); a finer mesh costs more CPU hours")
     p.add_argument("--no-boundary-layers", action="store_true", help="turn the automatic boundary layers off")
@@ -681,6 +689,8 @@ def main(argv=None):
                    help="per-design CPU-hour cap for this run (default: config MAX_CORE_HOURS_PER_RUN)")
     p.add_argument("--simplify-tol", type=float, default=None, help="canopy simplification (inches)")
     p.add_argument("--user-style", action="store_true", help="build the canopy like `manual-step --user-style`")
+    p.add_argument("--iterations", type=int, default=None,
+                   help="steady-state solver iterations (default 500); the CPU cost grows in proportion")
     p.add_argument("--mesh-fineness", type=float, default=None,
                    help="Simmetrix mesh fineness 0-10 (default from config, 4.5); a finer mesh costs more CPU hours")
     p.add_argument("--no-boundary-layers", action="store_true", help="turn the automatic boundary layers off")
