@@ -3,3 +3,12 @@
   skipped [26, 5, 0.6676075805321099, 0.5053740155801144, 0.7141033861373887]: sliver overlaps (7 pairs, smallest 4.0e-08 in^3) would fail SimScale's mesher
   skipped [30, 10, 1.386866971510426, 0.8792315233570949, 1.0640998621895816]: sliver overlaps (23 pairs, smallest 2.7e-07 in^3) would fail SimScale's mesher
   skipped [29, 7, 1.361872720086502, 0.20172674388316195, 0.5590603308552876]: sliver overlaps (21 pairs, smallest 1.7e-07 in^3) would fail SimScale's mesher
+  skipped [28, 8, 1.4193444323564175, 0.42211004166364735, 0.8731989500180732]: sliver overlaps (1 pairs, smallest 8.9e-07 in^3) would fail SimScale's mesher
+  skipped [17, 8, 1.0949056956251773, 0.5466860102424083, 0.7804699097008614]: sliver overlaps (12 pairs, smallest 7.0e-08 in^3) would fail SimScale's mesher
+  skipped [23, 11, 0.7895182198778266, 0.3866872181353202, 1.1014301934848474]: sliver overlaps (32 pairs, smallest 1.3e-07 in^3) would fail SimScale's mesher
+  uploading batch_20261027_035855_01_canopy_presplit.stl (3 MB, STL, sewing=True, improve=True)
+  geometry import: RUNNING
+  geometry import: FINISHED
+  prepared batch_20261027_035855_01: {'NUM_RINGS': 23, 'CUTS_PER_RING': 6, 'RING_SPACING_EXPONENT': 1.0379356036212593, 'RING_OVERLAP_FRACTION': 0.9264580091609045, 'INNER_RADIUS': 1.224725779768403}, 403 faces
+  uploading batch_20261027_035855_02_canopy_presplit.stl (3 MB, STL, sewing=True, improve=True)
+  geometry import: RUNNING
