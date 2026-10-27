@@ -6,3 +6,15 @@ Resuming design_0019 (SimScale state: ['geometry_id'])
   meshing: QUEUED 0%
   meshing: RUNNING 10%
   meshing: RUNNING 30%
+  meshing: RUNNING 80%
+  meshing: RUNNING 95%
+  meshing: FINISHED
+  simulation estimate 13.05 core hours exceeds cap 8; estimate gate skipped on request, the run is cancelled live at the cap
+  simulation run: QUEUED 0%
+  simulation run: RUNNING 0%
+  simulation run: RUNNING 3%
+  simulation run: RUNNING 8%
+  simulation run: RUNNING 13%
+  simulation run: RUNNING 18%
+  simulation run: RUNNING 23%
+  simulation run: RUNNING 28%
