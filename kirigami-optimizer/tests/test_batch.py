@@ -50,3 +50,20 @@ def test_implausible_cd_is_not_used_for_velocity_or_training(tmp_path):
     ledger.records.extend([ok, bad, insane])
     assert ledger.xy()[0] == [[1]]                             # the failure and the implausible Cd are left out of the GP data
     assert [h[2] for h in ledger.cfd_history()] == ["a"]      # a negative Cd can no longer reach sqrt()
+
+
+def test_convergence_measures_separate_a_settled_run_from_a_drifting_one():
+    import numpy as np
+
+    from simscale.results import parse_force_coefficients
+
+    def csv_text(cd):
+        return "Time (s),FORCE_COEFFICIENT_CD\n" + "\n".join(f"{i + 1},{v}" for i, v in enumerate(cd))
+
+    t = np.arange(500)
+    settled = 0.733 - 0.05 * np.exp(-t / 40.0)                   # baseline-like: flat after about 200 iterations
+    drifting = 0.7 + 0.5 * (t / 500.0) ** 3                      # design_0019-like: still climbing at the end
+    a = parse_force_coefficients(csv_text(settled), 0.1)
+    b = parse_force_coefficients(csv_text(drifting), 0.1)
+    assert a["cd_noise_rel"] < 0.01 and abs(a["cd_drift_rel"]) < 0.01
+    assert abs(b["cd_drift_rel"]) > 0.01

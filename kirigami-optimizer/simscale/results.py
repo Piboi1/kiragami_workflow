@@ -76,6 +76,14 @@ def parse_force_coefficients(csv_text, averaging_fraction=0.1):
         out[key] = float(np.nanmean(tail))
         out[f"{key}_final"] = float(series[~np.isnan(series)][-1])
         out[f"{key}_window_std"] = float(np.nanstd(tail))
+        if key == "cd" and n >= 2 * window:
+            prev = series[-2 * window:-window]
+            mean = out["cd"]
+            # Convergence measures of the drag history: noise inside the averaging window and the change of its mean
+            # against the window before. Converged runs: noise <= 0.05%, drift <= 0.16%. A run that is still moving
+            # (design_0019: Cd 0.71 -> 1.27 over the run) has 3.9% and 11%.
+            out["cd_noise_rel"] = float(np.nanstd(tail) / abs(mean)) if mean else float("inf")
+            out["cd_drift_rel"] = float((mean - np.nanmean(prev)) / abs(mean)) if mean else float("inf")
     return out
 
 

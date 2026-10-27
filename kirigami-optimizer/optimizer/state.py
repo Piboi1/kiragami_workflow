@@ -22,7 +22,7 @@ def _now():
 
 
 # Failures that say something about the solver or mesher, not about the design: kept out of the GP's training data.
-ARTIFACT_ERRORS = ("meshing FAILED", "simulation run FAILED", "implausible Cd")
+ARTIFACT_ERRORS = ("meshing FAILED", "simulation run FAILED", "implausible Cd", "not converged")
 
 
 class Ledger:

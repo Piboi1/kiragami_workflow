@@ -280,3 +280,15 @@ SimScale keeps results of failed runs (`FORCE_COEFFICIENTS_PLOT`, `RESIDUALS_PLO
 - New opt-in mesh flags for `single` and `run-batch`: `--mesh-fineness X` (default 4.5, Simmetrix 0-10) and `--no-boundary-layers`. Defaults unchanged.
 - Next (needs user approval + cap): re-run the design 7 geometry (`run-batch --batch batch_20261027_035855 --redo batch_20261027_035855_01 --mesh-fineness 6 ...`). A finer mesh costs more:
   expect roughly 1.5-2x the cells, so about 4-6 CPU h for the solver; suggest a cap of 8. If it converges, finer meshes for every design halve the number of designs the budget buys.
+
+## Update: fineness-6 run of design 7 FINISHED but is NOT CONVERGED (and the plausibility check was too weak)
+- `run-batch --redo batch_20261027_035855_01 --mesh-fineness 6 --max-core-hours 8`: design_0019 (23r/6c): 2,311,622 cells (1.7x the 1,358,927 at fineness 4.5), 0.20 + 4.39 = 4.6 CPU h,
+  SimScale status FINISHED, reported Cd 1.1875, Cl 0.042, Cm -0.12. **But the Cd trace never settled: 0.71 (it 100) -> 0.75 (200) -> 0.84 (300) -> 1.00 (400) -> 1.27 (500), +27% over the last
+  100 iterations, noise 3.9%.** The same instability as the diverged runs, in slow motion: the finer mesh only delayed the blow-up, it did not remove it. The reported number is not a result.
+- The old check (Cd in 0.05..4) accepted it. New check in `simscale/runner.py`: reject runs with Cd noise > 1% or drift > 1% (mean of last 10% vs the previous 10%) as `not converged`
+  (`results.py` adds `cd_noise_rel`, `cd_drift_rel`). Calibration: baseline 0.04% / +0.12%, 31r/4c 0.04% / +0.14%, 31r/6c 0.03% / +0.11%, 26r/8c 0.05% / +0.16%, baseline robust 0.02% / +0.03%
+  (all accepted); design_0019 3.89% / +11.3% (rejected). design_0019 invalidated in ledger/record/CSV (status failed, raw numbers kept). Test `test_convergence_measures_...`.
+- Reading: the flow around this canopy (and the 35r/4c one) is not steady enough for the steady RANS solve: coarse mesh -> blow-up at the same cell, finer mesh -> slower drift, other numerics -> blow-up elsewhere;
+  Cl and Cm grow too (asymmetric wake). Both unsteady designs are the extremes of depth (7.9 and 12.2 in); all five converged runs are 8.97-10.76 in deep (26-31 rings). Hypothesis: the wake of shallow/deep
+  canopies is intrinsically unsteady; fixing it needs a transient (URANS) run or a much longer run (unknown cost, likely 3x+).
+- Total spent about 48 of 800 CPU h. Valid Cds (default numerics, fineness 4.5): baseline 0.7327, 31r/4c 0.7812, 31r/6c 0.7364, 26r/8c 0.7507.

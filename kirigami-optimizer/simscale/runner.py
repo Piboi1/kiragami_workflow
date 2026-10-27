@@ -49,6 +49,7 @@ from .spec import build_mesh_model, build_model, build_simulation_spec
 
 API_KEY_HEADER = "X-API-KEY"
 TERMINAL = ("FINISHED", "CANCELED", "FAILED")
+MAX_CD_NOISE, MAX_CD_DRIFT = 0.01, 0.01   # converged runs: 0.05% / 0.16%; design_0019 (unconverged) 3.9% / 11%
 MIN_PLAUSIBLE_CD, MAX_PLAUSIBLE_CD = 0.05, 4.0   # kirigami canopies measured 0.73-0.78; anything else is a diverged solve
 FACE_GROUPS = ("inlet", "outlet", "side_xmin", "side_xmax", "side_ymin", "side_ymax", "canopy", "sting")
 REQUIRED_GROUPS = FACE_GROUPS[:-1]  # the sting is optional
@@ -609,6 +610,10 @@ class SimScaleClient:
         if cd is None or not math.isfinite(cd) or not (MIN_PLAUSIBLE_CD <= cd <= MAX_PLAUSIBLE_CD):
             # A diverged solver can still end as FINISHED (design_0008 reported Cd = -1.8e6).
             raise SimScaleError(f"implausible Cd {cd}: the solver diverged although SimScale reported the run as finished")
+        noise, drift = coeffs.get("cd_noise_rel"), coeffs.get("cd_drift_rel")
+        if noise is not None and (noise > MAX_CD_NOISE or abs(drift) > MAX_CD_DRIFT):
+            raise SimScaleError(f"not converged: Cd {cd:.3f} is still moving (noise {noise:.1%}, drift {drift:+.1%} against the previous window); "
+                                "the reported value is not a steady-state result")
         coeffs["run_duration"] = getattr(run, "duration", None)
         coeffs["core_hours_used"] = core_hours_used(state)
         return coeffs
