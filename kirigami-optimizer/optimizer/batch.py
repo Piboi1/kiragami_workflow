@@ -42,7 +42,7 @@ def propose_points(ledger, space, k, prepared=()):
     if x0:
         o.tell(x0, y0)
     out = []
-    for x in o.ask(n_points=max(k * 3, k + 5)):
+    for x in o.ask(n_points=max(k * 8, k + 8)):  # the sliver screen rejects more than half of the candidates
         x = _clean(space, x)
         if tuple(x) not in seen:
             seen.add(tuple(x))
