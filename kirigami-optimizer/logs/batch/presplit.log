@@ -1,2 +1,12 @@
   uploading base_ctrl_presplit.stl (5 MB, STL, sewing=True, improve=True)
   geometry import: RUNNING
+  geometry import: FINISHED
+== base_ctrl presplit pieces 705 facet_split=False: faces 705 solid True bodies 1 warns [] (17419a0f-f0ef-4c55-8cd0-57fc180c6188)
+  uploading base_exp0.7_presplit.stl (5 MB, STL, sewing=True, improve=True)
+  geometry import: RUNNING
+  geometry import: FINISHED
+== base_exp0.7 presplit pieces 705 facet_split=False: faces 705 solid True bodies 1 warns [] (6a9aaef6-2c23-4776-ab95-10a290a11abf)
+  uploading base_inner1.11_presplit.stl (5 MB, STL, sewing=True, improve=True)
+  geometry import: RUNNING
+  geometry import: FINISHED
+== base_inner1.11 presplit pieces 705 facet_split=False: faces 705 solid True bodies 1 warns [] (360decc6-61f3-40ce-b71f-96eaf51fcd68)

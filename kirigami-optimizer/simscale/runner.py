@@ -509,7 +509,7 @@ class SimScaleClient:
                 # volume (box - solid) fails.
                 storage_id, import_id = self.start_import(
                     project_id, f"{design_id}_canopy", domain_file, True, cfg["IMPORT_IMPROVE"], "STL",
-                    facet_split=True)
+                    facet_split=not cfg.get("CANOPY_PRESPLIT"))
                 remember(storage_id=storage_id, geometry_import_id=import_id)
                 remember(canopy_geometry_id=self.wait_for_import(project_id, import_id))
             text = manual_flow.instructions(design_id, f"{design_id}_canopy", manual["bounds_in"], project_id)

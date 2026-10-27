@@ -183,6 +183,9 @@ SIMSCALE = {
     "GEOMETRY_FORMAT": "MANUAL_FLOW_VOLUME",
     "MANUAL_WAIT_S": 6 * 3600,      # how long to wait for the manual step
     "MANUAL_POLL_S": 20,
+    # Import the canopy as one named STL block per welded piece (705 faces for the baseline). SimScale's
+    # automatic 30-degree facet split fails on many designs (whole canopy = 1 face); this never does.
+    "CANOPY_PRESPLIT": True,
     "AUTO_FLOW_SIMPLIFY_TOL": 2e-3,   # inches; union canopy cleanup for the sting-STL route (smaller values fail to import)
     "IMPORT_SEWING": True,   # STL only; needs FIXED_PARAMS["STING_RADIUS"] > 0
     "IMPORT_IMPROVE": True,

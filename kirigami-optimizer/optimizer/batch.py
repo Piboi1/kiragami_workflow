@@ -77,7 +77,8 @@ def prepare_batch(ctx, k, log=print):
             continue
         canopy_name = f"{name}_canopy"
         _, import_id = ctx.simscale.start_import(ctx.project_id, canopy_name, paths["domain_file"], True,
-                                                 config.SIMSCALE["IMPORT_IMPROVE"], "STL", facet_split=True)
+                                                 config.SIMSCALE["IMPORT_IMPROVE"], "STL",
+                                                 facet_split=not config.SIMSCALE.get("CANOPY_PRESPLIT"))
         try:
             geometry_id = ctx.simscale.wait_for_import(ctx.project_id, import_id)
         except Exception as exc:  # a design SimScale cannot import is simply not run

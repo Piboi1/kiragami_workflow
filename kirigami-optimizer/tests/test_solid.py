@@ -125,3 +125,19 @@ def test_weld_union_gives_the_run11_volume():
     union = weld_union(mesh)
     assert union.is_watertight and union.body_count == 1
     assert abs(union.volume - 0.8826) < 2e-3
+
+
+def test_presplit_stl_has_one_closed_block_per_piece(tmp_path):
+    import trimesh
+
+    from solid import write_presplit_stl
+
+    mesh, _ = build_solid(LEGACY_3D_RING_DATA, {"EXTRUDE_METHOD": "legacy", "BRIDGE_EXTRA": 0.0, "WELD_STRIPS": 1})
+    path = tmp_path / "presplit.stl"
+    n = write_presplit_stl(mesh, path)
+    text = path.read_text()
+    assert n == 705 and text.count("\nsolid ") + text.startswith("solid ") == 705
+    # Neighbouring slabs share faces, so every block is a complete closed solid (more facets than the welded mesh).
+    blocks = trimesh.load(path).geometry.values()
+    assert all(b.is_watertight and b.volume > 0 for b in blocks)
+    assert abs(sum(b.volume for b in blocks) - 0.8897) < 2e-3

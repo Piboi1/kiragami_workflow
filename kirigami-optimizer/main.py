@@ -382,7 +382,8 @@ def cmd_manual_step(args):
         if "canopy_geometry_id" not in state:
             state["geometries_before"] = [g.geometry_id for g in client.list_geometry_ids(project_id)]
             _, import_id = client.start_import(project_id, f"{design_id}_canopy", paths["domain_file"], True,
-                                               cfg["IMPORT_IMPROVE"], "STL", facet_split=True)  # sewing -> solid
+                                               cfg["IMPORT_IMPROVE"], "STL",
+                                               facet_split=not cfg.get("CANOPY_PRESPLIT"))  # sewing -> solid
             state["canopy_geometry_id"] = client.wait_for_import(project_id, import_id)
             save(state)
             canopy = client.describe_geometry(project_id, state["canopy_geometry_id"])

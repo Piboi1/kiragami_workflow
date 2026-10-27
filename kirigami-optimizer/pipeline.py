@@ -13,7 +13,7 @@ from pathlib import Path
 import config
 from generator import generate_pattern
 from optimizer.space import from_params, normalize
-from solid import InfeasibleGeometry, build_flow_domain, build_solid, export_stl, weld_union, write_named_stl
+from solid import InfeasibleGeometry, build_flow_domain, build_solid, export_stl, weld_union, write_named_stl, write_presplit_stl
 from solid.canopy import DEFAULT_SOLID_PARAMS
 from simscale.results import core_hours_used
 from solid.depth_model import get_depth_model
@@ -76,6 +76,9 @@ def build_geometry(params, design_dir, design_id):
         lo, hi = domain_box_bounds(resolved["PARACHUTE_DIAMETER"], domain_params)
         info["domain_bounds_in"] = [list(lo), list(hi)]
         domain_file = canopy_stl  # canopy only; the flow volume is made in the SimScale web app
+        if config.SIMSCALE.get("CANOPY_PRESPLIT") and solid_params.get("EXTRUDE_METHOD") == "legacy":
+            domain_file = design_dir / f"{design_id}_canopy_presplit.stl"
+            info["presplit_pieces"] = write_presplit_stl(canopy, domain_file)
     elif fmt == "STEP":
         # One solid with the canopy as an internal void: no sting, no sewing.
         domain_params["STING_RADIUS"] = 0.0

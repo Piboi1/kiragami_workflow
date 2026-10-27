@@ -295,6 +295,31 @@ def _legacy_extrude(strips, thickness, weld=False):
     return solid
 
 
+def write_presplit_stl(mesh, path):
+    """Writes the welded canopy as an ASCII STL with one ``solid pNNNN`` block per piece.
+
+    SimScale's automatic facet split (30 degrees) silently gives up on some designs and returns the whole
+    canopy as ONE face. A pre-split STL (the import log's own advice) always imports as one solid with one
+    named face per piece (705 for the baseline), whatever the design. Pieces are oriented outwards.
+    Returns the number of pieces.
+    """
+
+    pieces = mesh.split(only_watertight=False)
+    with open(path, "w", encoding="ascii") as fh:
+        for i, piece in enumerate(pieces):
+            piece = piece.copy()
+            if piece.volume < 0:
+                piece.invert()
+            fh.write(f"solid p{i:04d}\n")
+            for tri, n in zip(piece.triangles, piece.face_normals):
+                fh.write(f"  facet normal {n[0]:.7e} {n[1]:.7e} {n[2]:.7e}\n    outer loop\n")
+                for v in tri:
+                    fh.write(f"      vertex {v[0]:.9e} {v[1]:.9e} {v[2]:.9e}\n")
+                fh.write("    endloop\n  endfacet\n")
+            fh.write(f"endsolid p{i:04d}\n")
+    return len(pieces)
+
+
 def weld_union(mesh, simplify_tolerance=0.0):
     """Boolean union of the pieces of a welded legacy canopy into one clean watertight body.
 
