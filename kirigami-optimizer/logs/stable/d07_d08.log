@@ -30,3 +30,6 @@ Resuming design_0018 (SimScale state: ['geometry_id'])
   meshing: QUEUED 0%
   meshing: RUNNING 30%
   meshing: RUNNING 95%
+  meshing: FINISHED
+  simulation run: QUEUED 0%
+  simulation run: RUNNING 0%

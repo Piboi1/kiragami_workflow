@@ -273,3 +273,10 @@ SimScale keeps results of failed runs (`FORCE_COEFFICIENTS_PLOT`, `RESIDUALS_PLO
 - So: numerics options (`--robust-numerics`, `--stable-scheme`) are not the fix; keep the validated defaults. Remaining ideas, mesh side: higher `MESH_FINENESS`, boundary layers off, small-feature tolerance,
   or jittering the design (e.g. depth +-0.05 in) so the mesher produces different cells (cheap retry for diverged designs).
 - design_0018 (35r/4c, stable scheme) and a baseline stable-scheme run were still queued/running when this was written.
+
+## Update: stable-scheme test cancelled; mesh options added
+- User cancelled the remaining stable-scheme runs: design_0018 (35r/4c, stable scheme) was stopped at 0% solver progress (0.41 CPU h billed, status `cancelled`, closed in the ledger);
+  the queued baseline stable-scheme run never started. Total spent about 43.5 of 800 CPU h (design_0017 2.3, design_0018 0.4 on top of 41.2).
+- New opt-in mesh flags for `single` and `run-batch`: `--mesh-fineness X` (default 4.5, Simmetrix 0-10) and `--no-boundary-layers`. Defaults unchanged.
+- Next (needs user approval + cap): re-run the design 7 geometry (`run-batch --batch batch_20261027_035855 --redo batch_20261027_035855_01 --mesh-fineness 6 ...`). A finer mesh costs more:
+  expect roughly 1.5-2x the cells, so about 4-6 CPU h for the solver; suggest a cap of 8. If it converges, finer meshes for every design halve the number of designs the budget buys.

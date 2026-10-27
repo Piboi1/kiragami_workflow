@@ -143,6 +143,12 @@ def cmd_single(args):
     if args.stable_scheme:
         ctx.simscale.cfg.update(STABLE_SCHEME)
         print("First-order upwind for the turbulence transport (k, omega): on")
+    if args.mesh_fineness is not None:  # Simmetrix automatic sizing 0-10 (default config.SIMSCALE["MESH_FINENESS"])
+        ctx.simscale.cfg["MESH_FINENESS"] = args.mesh_fineness
+        print(f"Mesh fineness {args.mesh_fineness:g} (default {config.SIMSCALE['MESH_FINENESS']:g}): more cells, more CPU hours")
+    if args.no_boundary_layers:
+        ctx.simscale.cfg["MESH_BOUNDARY_LAYERS"] = False
+        print("Automatic boundary layers: off")
     if args.skip_estimate_check:  # only the pre-run estimate gate of the solver; the live cap still cancels the run
         ctx.simscale.cfg["SKIP_ESTIMATE_GATE"] = True
         print("Pre-run solver estimate gate skipped; the cap is still enforced live during the run.")
@@ -188,7 +194,13 @@ def cmd_run_batch(args):
         print(f"Robust solver numerics on: {ROBUST_NUMERICS}")
     if args.stable_scheme:
         ctx.simscale.cfg.update(STABLE_SCHEME)
-        print("First-order upwind for the default divergence scheme (turbulence): on")
+        print("First-order upwind for the turbulence transport (k, omega): on")
+    if args.mesh_fineness is not None:  # Simmetrix automatic sizing 0-10 (default config.SIMSCALE["MESH_FINENESS"])
+        ctx.simscale.cfg["MESH_FINENESS"] = args.mesh_fineness
+        print(f"Mesh fineness {args.mesh_fineness:g} (default {config.SIMSCALE['MESH_FINENESS']:g}): more cells, more CPU hours")
+    if args.no_boundary_layers:
+        ctx.simscale.cfg["MESH_BOUNDARY_LAYERS"] = False
+        print("Automatic boundary layers: off")
     batch = run_batch(ctx, args.batch, args.max_core_hours, args.batch_core_hours,
                       skip_estimate_check=args.skip_estimate_check, redo=tuple(args.redo or ()))
     for e in batch["designs"]:
@@ -647,6 +659,9 @@ def main(argv=None):
     p = sub.add_parser("run-batch")
     p.add_argument("--batch", required=True, help="batch id printed by prepare-batch")
     p.add_argument("--max-core-hours", type=float, required=True, help="CPU-hour cap per design (mesh + run)")
+    p.add_argument("--mesh-fineness", type=float, default=None,
+                   help="Simmetrix mesh fineness 0-10 (default from config, 4.5); a finer mesh costs more CPU hours")
+    p.add_argument("--no-boundary-layers", action="store_true", help="turn the automatic boundary layers off")
     p.add_argument("--stable-scheme", action="store_true",
                    help="first-order upwind for the turbulence transport (k, omega); more diffusive, shifts Cd")
     p.add_argument("--robust-numerics", action="store_true",
@@ -666,6 +681,9 @@ def main(argv=None):
                    help="per-design CPU-hour cap for this run (default: config MAX_CORE_HOURS_PER_RUN)")
     p.add_argument("--simplify-tol", type=float, default=None, help="canopy simplification (inches)")
     p.add_argument("--user-style", action="store_true", help="build the canopy like `manual-step --user-style`")
+    p.add_argument("--mesh-fineness", type=float, default=None,
+                   help="Simmetrix mesh fineness 0-10 (default from config, 4.5); a finer mesh costs more CPU hours")
+    p.add_argument("--no-boundary-layers", action="store_true", help="turn the automatic boundary layers off")
     p.add_argument("--stable-scheme", action="store_true",
                    help="first-order upwind for the turbulence transport (k, omega); more diffusive, shifts Cd")
     p.add_argument("--robust-numerics", action="store_true",
