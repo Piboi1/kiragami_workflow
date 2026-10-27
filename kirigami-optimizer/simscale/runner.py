@@ -6,6 +6,7 @@ middle of a multi-hour run can be resumed: run_design() skips any step whose
 ID is already present and just resumes polling.
 """
 
+import csv
 import json
 import math
 import os
@@ -44,7 +45,7 @@ from simscale_sdk import (
 from solid.step_export import BOX_FACES, COLOUR_TO_FACE, parse_colour
 
 from . import manual_flow
-from .results import core_hours_used, maybe_unzip, parse_force_coefficients
+from .results import core_hours_used, maybe_unzip, parse_force_coefficients, runaway_reason
 from .spec import build_mesh_model, build_model, build_simulation_spec
 
 API_KEY_HEADER = "X-API-KEY"
@@ -213,7 +214,7 @@ class SimScaleClient:
         resp = self.api_client.rest_client.GET(url=url, headers={API_KEY_HEADER: self.api_key}, _preload_content=False)
         return resp.data
 
-    def _poll(self, what, getter, max_seconds, cancel=None, cpu_cap=None, stall_seconds=None):
+    def _poll(self, what, getter, max_seconds, cancel=None, cpu_cap=None, stall_seconds=None, watch=None, watch_every=90):
         """Waits for a SimScale job; with ``cancel`` it is a watchdog.
 
         The job is cancelled ON SIMSCALE (not just abandoned locally) when it
@@ -226,18 +227,25 @@ class SimScaleClient:
         obj = getter()
         last = None
         last_change = time.time()
+        last_watch = time.time()
         while obj.status not in TERMINAL:
             if obj.status == "RUNNING" and running_since is None:
                 running_since = time.time()
+            watch_reason = None
+            if watch is not None and obj.status == "RUNNING" and time.time() - last_watch >= watch_every:
+                last_watch = time.time()
+                watch_reason = watch()  # e.g. the drag history shows a runaway solve
             progress = getattr(obj, "progress", None)
             if (obj.status, progress) != last:
                 self.log(f"  {what}: {obj.status}" + (f" {progress:.0%}" if isinstance(progress, float) else ""))
                 last = (obj.status, progress)
                 last_change = time.time()
 
-            reason = None
+            reason = watch_reason
             used = _core_hours(obj)
-            if running_since is not None and time.time() - running_since > max_seconds:
+            if reason:
+                pass
+            elif running_since is not None and time.time() - running_since > max_seconds:
                 reason = f"ran longer than {max_seconds:.0f} s"
             elif time.time() - start > max_seconds + 7200:
                 reason = f"still not finished {max_seconds + 7200:.0f} s after submission (queued?)"
@@ -261,6 +269,22 @@ class SimScaleClient:
             obj = getter()
         self.log(f"  {what}: {obj.status}")
         return obj
+
+    def runaway_check(self, project_id, simulation_id, run_id):
+        """Reason to cancel a runaway solve (from the drag history available while it runs), or None.
+
+        Never raises: the guard must not break a healthy run."""
+
+        try:
+            res = self.runs.get_simulation_run_results(
+                project_id, simulation_id, run_id, page=1, limit=100, category="FORCE_COEFFICIENTS_PLOT").embedded or []
+            if not res:
+                return None
+            rows = [row for row in csv.reader(maybe_unzip(self._download(res[0].download.url)).splitlines()) if row]
+            reason = runaway_reason([float(row[1]) for row in rows[1:]])
+            return f"diverging: {reason}" if reason else None
+        except Exception:
+            return None
 
     def _wait_terminal(self, getter, max_seconds=600):
         """After a cancel request, waits (bounded) for the job to stop."""
@@ -586,11 +610,14 @@ class SimScaleClient:
         run_cap = None
         if cfg.get("MAX_CORE_HOURS_PER_RUN") is not None:
             run_cap = max(0.0, cfg["MAX_CORE_HOURS_PER_RUN"] - float(state.get("mesh_core_hours") or 0.0))
+        def runaway_watch():
+            return self.runaway_check(project_id, sim_id, state["run_id"]) if cfg.get("RUNAWAY_GUARD", True) else None
+
         try:
             run = self._poll("simulation run", run_get,
                              state.get("run_max_runtime_s", cfg["MAX_RUN_TIME_S"]) + 3600,
                              cancel=lambda: self.runs.cancel_simulation_run(project_id, sim_id, state["run_id"]),
-                             cpu_cap=run_cap, stall_seconds=cfg["STALL_TIMEOUT_S"])
+                             cpu_cap=run_cap, stall_seconds=cfg["STALL_TIMEOUT_S"], watch=runaway_watch)
         finally:
             remember(run_core_hours=_core_hours(run_get()))
         if run.status != "FINISHED":

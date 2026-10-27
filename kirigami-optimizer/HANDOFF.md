@@ -299,3 +299,12 @@ SimScale keeps results of failed runs (`FORCE_COEFFICIENTS_PLOT`, `RESIDUALS_PLO
   "Cd about 1.19, 60% above the baseline" reading was a point on a runaway curve, NOT a result. Design 7 (23r/6c, 7.9 in deep) cannot be simulated with this steady solve. Do not spend more on it.
 - Total spent about 59.6 of 800 CPU h; about 27 CPU h of that (45%) went into runaway/diverged solves (design_0007, 0008, 0012, 0017, 0018, 0019, 0020).
 - The same traces are available mid-run (`FORCE_COEFFICIENTS_PLOT` of a RUNNING run returns the iterations so far), so runaways can be cancelled early (see below).
+
+## Update: runaway guard (cancels diverging solves early)
+- `results.runaway_reason(cd)` + `SimScaleClient.runaway_check(...)`: while a solve runs, the drag history so far is polled every 90 s (`RUNAWAY_GUARD`); the run is cancelled if Cd leaves -0.2..3 or
+  rises more than 8% over the last 100 iterations (from iteration 300). On the 10 recorded traces no converged run is flagged and all runaways are flagged between iteration 70 and 300
+  (design_0020 would have stopped at 300 of 1400, saving about 9 of its 11.6 CPU h). Checked live against finished runs through the real API (converged -> None, runaways -> reason);
+  not yet exercised inside a live run. Error text `diverging: ...` is excluded from the optimizer's training data like the other artifact failures.
+- Test `test_runaway_guard_flags_exponential_growth_but_not_a_settling_run`. All 53 tests pass.
+- Recommended next steps: keep the validated defaults (500 iterations, fineness 4.5); restrict the search to the depths that converge (about 27-32 rings, 9.3-11.1 in) or accept ~1/3 failures,
+  now cheap thanks to the guard; then more screened batches (`prepare-batch`, flow volumes by hand, `run-batch`). Valid Cds so far: baseline 0.7327, 31r/4c 0.7812, 31r/6c 0.7364, 26r/8c 0.7507.

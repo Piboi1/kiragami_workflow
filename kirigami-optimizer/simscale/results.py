@@ -92,3 +92,26 @@ def core_hours_used(simscale_state):
 
     state = simscale_state or {}
     return float(state.get("mesh_core_hours") or 0.0) + float(state.get("run_core_hours") or 0.0)
+
+
+def runaway_reason(cd, min_iterations=50):
+    """Why a still-running solve should be cancelled, or None. ``cd`` is the drag history so far.
+
+    Converged runs (baseline, 26r/8c, 31r/4c, 31r/6c) stay within about +-2% from iteration 200 on; the runaway
+    solves grow exponentially (x1.5 per 100 iterations) or flip sign. Checked on 10 recorded traces: no converged
+    run is ever flagged, every runaway is flagged by iteration 300.
+    """
+
+    cd = np.asarray(cd, dtype=float)
+    n = len(cd)
+    if n < min_iterations:
+        return None
+    if not np.all(np.isfinite(cd)):
+        return "Cd is not finite"
+    if cd[-1] > 3.0 or cd[-1] < -0.2:
+        return f"Cd = {cd[-1]:.2f} is outside any physical range"
+    if n >= 300:
+        now, before = cd[-20:].mean(), cd[n - 120:n - 100].mean()
+        if before > 0 and now / before > 1.08:
+            return f"Cd rose {now / before - 1:.0%} in the last 100 iterations ({before:.3f} -> {now:.3f}) instead of settling"
+    return None

@@ -67,3 +67,16 @@ def test_convergence_measures_separate_a_settled_run_from_a_drifting_one():
     b = parse_force_coefficients(csv_text(drifting), 0.1)
     assert a["cd_noise_rel"] < 0.01 and abs(a["cd_drift_rel"]) < 0.01
     assert abs(b["cd_drift_rel"]) > 0.01
+
+
+def test_runaway_guard_flags_exponential_growth_but_not_a_settling_run():
+    import numpy as np
+
+    from simscale.results import runaway_reason
+
+    t = np.arange(1, 501)
+    settled = 0.733 - 0.05 * np.exp(-t / 40.0)
+    runaway = 0.7 * np.exp(np.maximum(t - 200, 0) / 250.0)         # design_0019-like: starts to climb after iteration 200
+    assert all(runaway_reason(settled[:n]) is None for n in range(50, 501, 10))
+    assert any(runaway_reason(runaway[:n]) for n in range(50, 501, 10))
+    assert runaway_reason([0.7] * 100 + [-1.6]) is not None           # sign flip, as in design_0007

@@ -201,6 +201,8 @@ SIMSCALE = {
     # linearUpwindV default (SimScale's API only allows linear / linearUpwindV for the default scheme, but accepts
     # upwind per quantity). More diffusive: it shifts Cd, so only compare Cds computed with the same setting.
     "UPWIND_TURBULENCE_SCHEME": False,
+    # Cancel a runaway solve early (the drag history of a running job is polled every 90 s); see results.runaway_reason.
+    "RUNAWAY_GUARD": True,
     "POTENTIAL_FOAM_INIT": False,
     "RELAX_PRESSURE": None,
     "RELAX_VELOCITY": None,
