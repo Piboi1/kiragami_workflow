@@ -48,3 +48,8 @@ Resuming design_0008 (SimScale state: ['geometry_id'])
   simulation run: RUNNING 92%
   simulation run: RUNNING 98%
   simulation run: RUNNING 100%
+  simulation run: FINISHED
+[design_0008] Cd=-1843276.6887 Cl=3249342.3837 Cm=-3691057.5101
+batch_20261027_035855_02: ok Cd=-1843276.6886843843
+batch_20261027_035855_01: failed Cd=None
+batch_20261027_035855_02: ok Cd=-1843276.6886843843

@@ -21,6 +21,10 @@ def _now():
     return datetime.now(timezone.utc).isoformat(timespec="seconds")
 
 
+# Failures that say something about the solver or mesher, not about the design: kept out of the GP's training data.
+ARTIFACT_ERRORS = ("meshing FAILED", "simulation run FAILED", "implausible Cd")
+
+
 class Ledger:
     def __init__(self, path):
         self.path = Path(path)
@@ -84,8 +88,8 @@ class Ledger:
         # Meshing failures ("self intersection" from sliver overlaps) and solver divergences are numerical artifacts,
         # not proof that a design has Cd 0: they are kept out of the optimizer's training data.
         pairs = [(r["x"], r["y"]) for r in self.records if r.get("x") is not None and r.get("y") is not None
-                 and "meshing FAILED" not in (r.get("error") or "")
-                 and "simulation run FAILED" not in (r.get("error") or "")]
+                 and not any(m in (r.get("error") or "") for m in ARTIFACT_ERRORS)
+                 and (r.get("cd") is None or 0.05 <= r["cd"] <= 4.0)]
         return [p[0] for p in pairs], [p[1] for p in pairs]
 
     def core_hours_used(self):
@@ -108,4 +112,5 @@ class Ledger:
         """[(x_norm, cd, design_id)] of successful CFD runs, for the velocity estimator."""
 
         return [(r["x_norm"], r["cd"], r["design_id"]) for r in self.records
-                if r.get("status") == "ok" and r.get("x_norm") is not None and r.get("cd") is not None]
+                if r.get("status") == "ok" and r.get("x_norm") is not None and r.get("cd") is not None
+                and 0.05 <= r["cd"] <= 4.0]

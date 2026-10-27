@@ -37,3 +37,16 @@ def test_sliver_screen_passes_the_baseline_and_rejects_a_known_failure():
     _, _, _, paths = build_geometry(bad, __import__("pathlib").Path(__import__("tempfile").mkdtemp()), "t")
     ok, stats = screen_canopy(trimesh.load(paths["canopy_stl"], force="mesh"), config.OPTIMIZER["MIN_PAIR_OVERLAP_IN3"])
     assert not ok and stats["slivers"] > 0     # batch design 01: SimScale meshing failed with a self-intersection
+
+
+def test_implausible_cd_is_not_used_for_velocity_or_training(tmp_path):
+    from optimizer.state import Ledger
+
+    ledger = Ledger(tmp_path / "ledger.json")
+    ok = {"design_id": "a", "status": "ok", "x": [1], "y": -0.7, "x_norm": [0.1], "cd": 0.7}
+    bad = {"design_id": "b", "status": "failed", "x": [2], "y": 0.0, "x_norm": [0.2], "cd": None,
+           "error": "SimScaleError: implausible Cd -1843276.7: the solver diverged"}
+    insane = {"design_id": "c", "status": "ok", "x": [3], "y": 1.8e6, "x_norm": [0.3], "cd": -1.8e6}
+    ledger.records.extend([ok, bad, insane])
+    assert ledger.xy()[0] == [[1]]                             # the failure and the implausible Cd are left out of the GP data
+    assert [h[2] for h in ledger.cfd_history()] == ["a"]      # a negative Cd can no longer reach sqrt()

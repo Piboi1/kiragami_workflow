@@ -224,3 +224,17 @@ Analysis (scripts were scratch, results below):
   pressure relaxation 0.2 + velocity relaxation 0.5 (`config.SIMSCALE` POTENTIAL_FOAM_INIT / RELAX_PRESSURE / RELAX_VELOCITY). Proposed test (needs user approval and a cap):
   re-run design_0007's geometry with `--robust-numerics`, then re-run the baseline with it to check Cd stays about 0.733. If divergence persists: finer mesh near the rim/wake.
 - Solver divergences are now excluded from the optimizer's training data like mesh failures (`Ledger.xy`), instead of being scored Cd = 0.
+
+## Update: second round of batches (4 designs) and two bugs found
+Results (ledger `snapshot/ledger.json`, results in `runs/results.csv`):
+- design_0009 (31 rings, 6 cuts): **Cd 0.7364** (ok, 3.24 CPU h).
+- design_0007 (23 rings, 6 cuts): solver diverged (2.58 CPU h wasted).
+- design_0008 (35 rings, 4 cuts): SimScale said FINISHED but the coefficients were garbage (**Cd = -1.8e6**): another diverged solve that the pipeline accepted as "ok" (3.17 CPU h).
+  Invalidated in the ledger/record.json/CSV (status failed, raw numbers kept as `cd_raw`).
+- design_0010 (26 rings, 8 cuts): failed with `math domain error` at 0 CPU h, BEFORE any run: the speed estimator scaled a neighbouring Cd, and the garbage negative Cd of
+  design_0008 made `sqrt()` fail. It is not a design failure (its `y` was cleared); it still has to be run.
+- Fixes: `runner.py` now rejects any Cd outside 0.05..4 as a diverged solve (`implausible Cd`, status failed); `Ledger.cfd_history` / `Ledger.xy` ignore implausible Cds and
+  artifact failures ("meshing FAILED", "simulation run FAILED", "implausible Cd"). Test `test_implausible_cd_is_not_used_for_velocity_or_training`.
+- Valid Cds so far: baseline 0.7327, design_0005 (31r/4c) 0.7812, design_0009 (31r/6c) 0.7364. All three converged designs have 30-31 rings (depth 10.6-10.7 in);
+  both diverged ones have 23 and 35 rings (7.9 and 12.2 in). n = 5, a hint only: check whether depth/ring count is what the mesh settings are tuned for.
+- Total billed so far about 29 CPU h of 800. Open questions: re-run design_0010 (needs approval + cap), the `--robust-numerics` experiment (needs approval + cap).

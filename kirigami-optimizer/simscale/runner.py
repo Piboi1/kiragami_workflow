@@ -7,6 +7,7 @@ ID is already present and just resumes polling.
 """
 
 import json
+import math
 import os
 import time
 from pathlib import Path
@@ -48,6 +49,7 @@ from .spec import build_mesh_model, build_model, build_simulation_spec
 
 API_KEY_HEADER = "X-API-KEY"
 TERMINAL = ("FINISHED", "CANCELED", "FAILED")
+MIN_PLAUSIBLE_CD, MAX_PLAUSIBLE_CD = 0.05, 4.0   # kirigami canopies measured 0.73-0.78; anything else is a diverged solve
 FACE_GROUPS = ("inlet", "outlet", "side_xmin", "side_xmax", "side_ymin", "side_ymax", "canopy", "sting")
 REQUIRED_GROUPS = FACE_GROUPS[:-1]  # the sting is optional
 
@@ -603,6 +605,10 @@ class SimScaleClient:
         (work_dir / "force_coefficients.csv").write_text(csv_text)
 
         coeffs = parse_force_coefficients(csv_text, cfg["AVERAGING_FRACTION"])
+        cd = coeffs.get("cd")
+        if cd is None or not math.isfinite(cd) or not (MIN_PLAUSIBLE_CD <= cd <= MAX_PLAUSIBLE_CD):
+            # A diverged solver can still end as FINISHED (design_0008 reported Cd = -1.8e6).
+            raise SimScaleError(f"implausible Cd {cd}: the solver diverged although SimScale reported the run as finished")
         coeffs["run_duration"] = getattr(run, "duration", None)
         coeffs["core_hours_used"] = core_hours_used(state)
         return coeffs

@@ -1,0 +1,35 @@
+batch_20261027_040156_01: running on flow-volume geometry 1b97d4c6-94e6-453e-a6e9-ae5405a8b4f3
+Resuming design_0009 (SimScale state: ['geometry_id'])
+[design_0009] generating pattern + solid
+[design_0009] rings=31 Aref=73.01 in^2 Uz=-5.196 m/s (Cd for Uz 0.307)
+  meshing: QUEUED 0%
+  meshing: RUNNING 30%
+  meshing: RUNNING 95%
+  meshing: FINISHED
+  simulation estimate 18.66 core hours exceeds cap 5; estimate gate skipped on request, the run is cancelled live at the cap
+  simulation run: QUEUED 0%
+  simulation run: RUNNING 0%
+  simulation run: RUNNING 4%
+  simulation run: RUNNING 11%
+  simulation run: RUNNING 18%
+  simulation run: RUNNING 27%
+  simulation run: RUNNING 34%
+  simulation run: RUNNING 42%
+  simulation run: RUNNING 51%
+  simulation run: RUNNING 59%
+  simulation run: RUNNING 67%
+  simulation run: RUNNING 75%
+  simulation run: RUNNING 83%
+  simulation run: RUNNING 92%
+  simulation run: RUNNING 99%
+  simulation run: RUNNING 100%
+  simulation run: FINISHED
+[design_0009] Cd=0.7364 Cl=-0.0011 Cm=0.0006
+batch_20261027_040156_01: ok Cd=0.7363630461649577
+batch_20261027_040156_02: running on flow-volume geometry c4145639-1135-488a-9fe2-97910275330c
+Resuming design_0010 (SimScale state: ['geometry_id'])
+[design_0010] generating pattern + solid
+[design_0010] FAILED: ValueError: math domain error
+batch_20261027_040156_02: failed Cd=None
+batch_20261027_040156_01: ok Cd=0.7363630461649577
+batch_20261027_040156_02: failed Cd=None
