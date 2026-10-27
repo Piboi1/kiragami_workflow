@@ -197,9 +197,10 @@ SIMSCALE = {
     "NON_ORTHOGONAL_CORRECTORS": 2,
     # Solver stabilisers, off by default (the validated Run 11 numerics). `--robust-numerics` turns them on for a run:
     # start from a potential-flow solution and lower the pressure / velocity relaxation (None = SimScale default).
-    # First-order upwind instead of the unlimited second-order linearUpwindV for every transported quantity but the
-    # momentum flux (turbulence k/omega). More diffusive: it shifts Cd, so only compare Cds computed with the same setting.
-    "FIRST_ORDER_DEFAULT_SCHEME": False,
+    # First-order bounded upwind for the turbulence transport (k, omega) instead of the unlimited second-order
+    # linearUpwindV default (SimScale's API only allows linear / linearUpwindV for the default scheme, but accepts
+    # upwind per quantity). More diffusive: it shifts Cd, so only compare Cds computed with the same setting.
+    "UPWIND_TURBULENCE_SCHEME": False,
     "POTENTIAL_FOAM_INIT": False,
     "RELAX_PRESSURE": None,
     "RELAX_VELOCITY": None,

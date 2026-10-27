@@ -20,7 +20,6 @@ from simscale_sdk import (
     AutomaticLayerOn,
     AutomaticMeshSizingSimmetrix,
     BoundedGaussUpwindDivergenceScheme,
-    GaussUpwindDivergenceScheme,
     ComponentVectorFunction,
     ConstantFunction,
     DecimalVector,
@@ -117,9 +116,11 @@ def build_model(sim_cfg, entities, uz_mps, reference_area_in2, reference_length_
                 time_differentiation=TimeDifferentiationSchemes(),
                 gradient=GradientSchemes(),
                 divergence=DivergenceSchemes(
-                    for_default=(GaussUpwindDivergenceScheme() if sim_cfg.get("FIRST_ORDER_DEFAULT_SCHEME")
-                                 else GaussLinearUpwindVUnlimitedDivergenceScheme(limiter_coefficient=1.0)),
+                    for_default=GaussLinearUpwindVUnlimitedDivergenceScheme(limiter_coefficient=1.0),
                     div_phi_velocity=BoundedGaussUpwindDivergenceScheme(),
+                    **({"div_phi_turbulent_kinetic_energy": BoundedGaussUpwindDivergenceScheme(),
+                        "div_phi_omega_dissipation_rate": BoundedGaussUpwindDivergenceScheme()}
+                       if sim_cfg.get("UPWIND_TURBULENCE_SCHEME") else {}),
                 ),
                 laplacian=LaplacianSchemes(),
                 interpolation=InterpolationSchemes(),

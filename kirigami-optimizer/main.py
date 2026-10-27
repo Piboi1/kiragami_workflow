@@ -142,7 +142,7 @@ def cmd_single(args):
         print(f"Robust solver numerics on: {ROBUST_NUMERICS}")
     if args.stable_scheme:
         ctx.simscale.cfg.update(STABLE_SCHEME)
-        print("First-order upwind for the default divergence scheme (turbulence): on")
+        print("First-order upwind for the turbulence transport (k, omega): on")
     if args.skip_estimate_check:  # only the pre-run estimate gate of the solver; the live cap still cancels the run
         ctx.simscale.cfg["SKIP_ESTIMATE_GATE"] = True
         print("Pre-run solver estimate gate skipped; the cap is still enforced live during the run.")
@@ -159,7 +159,7 @@ def cmd_single(args):
 
 
 ROBUST_NUMERICS = {"POTENTIAL_FOAM_INIT": True, "RELAX_PRESSURE": 0.2, "RELAX_VELOCITY": 0.5}
-STABLE_SCHEME = {"FIRST_ORDER_DEFAULT_SCHEME": True}
+STABLE_SCHEME = {"UPWIND_TURBULENCE_SCHEME": True}
 
 
 def cmd_prepare_batch(args):
@@ -648,7 +648,7 @@ def main(argv=None):
     p.add_argument("--batch", required=True, help="batch id printed by prepare-batch")
     p.add_argument("--max-core-hours", type=float, required=True, help="CPU-hour cap per design (mesh + run)")
     p.add_argument("--stable-scheme", action="store_true",
-                   help="first-order upwind for the default divergence scheme (turbulence); more diffusive, shifts Cd")
+                   help="first-order upwind for the turbulence transport (k, omega); more diffusive, shifts Cd")
     p.add_argument("--robust-numerics", action="store_true",
                    help="potential-flow initialisation and lower relaxation factors (for designs whose solver diverged)")
     p.add_argument("--redo", nargs="+", metavar="NAME", help="design names (e.g. batch_..._02) to run again even though they have a result")
@@ -667,7 +667,7 @@ def main(argv=None):
     p.add_argument("--simplify-tol", type=float, default=None, help="canopy simplification (inches)")
     p.add_argument("--user-style", action="store_true", help="build the canopy like `manual-step --user-style`")
     p.add_argument("--stable-scheme", action="store_true",
-                   help="first-order upwind for the default divergence scheme (turbulence); more diffusive, shifts Cd")
+                   help="first-order upwind for the turbulence transport (k, omega); more diffusive, shifts Cd")
     p.add_argument("--robust-numerics", action="store_true",
                    help="potential-flow initialisation and lower relaxation factors (for designs whose solver diverged)")
     p.add_argument("--auto-flow", action="store_true",

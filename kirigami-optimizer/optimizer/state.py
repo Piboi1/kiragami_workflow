@@ -87,7 +87,10 @@ class Ledger:
 
         # Meshing failures ("self intersection" from sliver overlaps) and solver divergences are numerical artifacts,
         # not proof that a design has Cd 0: they are kept out of the optimizer's training data.
+        # Only real results (ok) and designs that are geometrically impossible (infeasible) teach the optimizer anything;
+        # every other failure (mesher, solver, API, bug) says nothing about the design.
         pairs = [(r["x"], r["y"]) for r in self.records if r.get("x") is not None and r.get("y") is not None
+                 and r.get("status") in ("ok", "infeasible")
                  and not any(m in (r.get("error") or "") for m in ARTIFACT_ERRORS)
                  and (r.get("cd") is None or 0.05 <= r["cd"] <= 4.0)]
         return [p[0] for p in pairs], [p[1] for p in pairs]
