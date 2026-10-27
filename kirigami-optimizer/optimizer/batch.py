@@ -125,7 +125,7 @@ def _find_flow_volume(simscale, project_id, entry):
     return None
 
 
-def run_batch(ctx, batch_id, per_design_cap, batch_cap, skip_estimate_check=False, log=print):
+def run_batch(ctx, batch_id, per_design_cap, batch_cap, skip_estimate_check=False, redo=(), log=print):
     path = BATCH_DIR / batch_id / "batch.json"
     batch = json.loads(path.read_text())
     ctx.simscale.cfg["MAX_CORE_HOURS_PER_RUN"] = per_design_cap
@@ -134,7 +134,9 @@ def run_batch(ctx, batch_id, per_design_cap, batch_cap, skip_estimate_check=Fals
     start_hours = ctx.ledger.core_hours_used()
     for entry in batch["designs"]:
         if entry.get("design_id"):
-            continue
+            if entry["name"] not in redo:
+                continue
+            entry.setdefault("previous_design_ids", []).append(entry.pop("design_id"))  # run it again
         used = ctx.ledger.core_hours_used() - start_hours
         if used >= batch_cap:
             log(f"Batch CPU-hour cap reached ({used:.2f} >= {batch_cap:g}); stopping.")

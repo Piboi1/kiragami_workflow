@@ -1,0 +1,5 @@
+batch_20261027_040156_02: running on flow-volume geometry c4145639-1135-488a-9fe2-97910275330c
+Resuming design_0011 (SimScale state: ['geometry_id'])
+[design_0011] generating pattern + solid
+[design_0011] rings=26 Aref=73.38 in^2 Uz=-5.183 m/s (Cd for Uz 0.307)
+  meshing: QUEUED 0%

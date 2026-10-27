@@ -183,7 +183,7 @@ def cmd_run_batch(args):
         ctx.simscale.cfg.update(ROBUST_NUMERICS)
         print(f"Robust solver numerics on: {ROBUST_NUMERICS}")
     batch = run_batch(ctx, args.batch, args.max_core_hours, args.batch_core_hours,
-                      skip_estimate_check=args.skip_estimate_check)
+                      skip_estimate_check=args.skip_estimate_check, redo=tuple(args.redo or ()))
     for e in batch["designs"]:
         print(f"{e['name']}: {e.get('status', 'not run')} Cd={e.get('cd')}")
     return 0
@@ -642,6 +642,7 @@ def main(argv=None):
     p.add_argument("--max-core-hours", type=float, required=True, help="CPU-hour cap per design (mesh + run)")
     p.add_argument("--robust-numerics", action="store_true",
                    help="potential-flow initialisation and lower relaxation factors (for designs whose solver diverged)")
+    p.add_argument("--redo", nargs="+", metavar="NAME", help="design names (e.g. batch_..._02) to run again even though they have a result")
     p.add_argument("--batch-core-hours", type=float, required=True, help="stop starting new designs once the batch has used this many")
     p.add_argument("--skip-estimate-check", action="store_true",
                    help="do not refuse a solver run because SimScale's worst-case estimate exceeds the cap; the cap is still enforced live")
