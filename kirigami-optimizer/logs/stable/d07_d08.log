@@ -5,3 +5,28 @@ Resuming design_0017 (SimScale state: ['geometry_id'])
 [design_0017] rings=23 Aref=73.01 in^2 Uz=-5.197 m/s (Cd for Uz 0.307)
   meshing: QUEUED 0%
   meshing: RUNNING 30%
+  meshing: RUNNING 85%
+  meshing: FINISHED
+  simulation run: QUEUED 0%
+  simulation run: RUNNING 0%
+  simulation run: RUNNING 7%
+  simulation run: RUNNING 16%
+  simulation run: RUNNING 30%
+  simulation run: RUNNING 38%
+  simulation run: RUNNING 45%
+  simulation run: RUNNING 54%
+  simulation run: RUNNING 63%
+  simulation run: RUNNING 72%
+  simulation run: RUNNING 82%
+  simulation run: RUNNING 91%
+  simulation run: RUNNING 95%
+  simulation run: FAILED
+[design_0017] FAILED: SimScaleError: simulation run FAILED
+batch_20261027_035855_01: failed Cd=None
+batch_20261027_035855_02: running on flow-volume geometry 08cd4ef3-1f13-40c9-b69e-599831ba5322
+Resuming design_0018 (SimScale state: ['geometry_id'])
+[design_0018] generating pattern + solid
+[design_0018] rings=35 Aref=71.94 in^2 Uz=-5.234 m/s (Cd for Uz 0.307)
+  meshing: QUEUED 0%
+  meshing: RUNNING 30%
+  meshing: RUNNING 95%

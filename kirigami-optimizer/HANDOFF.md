@@ -264,3 +264,12 @@ SimScale keeps results of failed runs (`FORCE_COEFFICIENTS_PLOT`, `RESIDUALS_PLO
 - New opt-in flag `--stable-scheme` (`FIRST_ORDER_DEFAULT_SCHEME`): first-order upwind for `for_default`. More diffusive; shifts Cd, so it needs a baseline re-anchor. Proposed test (needs approval and caps):
   design_0007 geometry, design_0008 geometry and the baseline, each with `--stable-scheme`, 5 CPU h cap each.
 - `docs/simscale_support_request.md`: draft message asking SimScale to enable the CAD-feature API for API keys (removes the manual flow-volume step, the real limit on data volume).
+
+## Update: stable-scheme test on design 7 FAILED at the SAME spot -> the divergence is a MESH problem, not the numerics
+- `--stable-scheme` (first-order upwind for k/omega; SimScale's API refuses first-order for `for_default`, accepts it per quantity): design_0017 (= design 7 geometry) diverged again:
+  pressure -1.05e15 Pa at **(0.04682, -0.1069, -0.1996) m, the identical position and magnitude of the original failure** (design_0007: -1.02e15 at the same point), blow-up onset iteration 209
+  (206 before), 2.19 CPU h billed. Same mesh each time (same geometry) -> a fixed bad cell/region in the volume mesh, ~0.22 in from the nearest canopy piece (in the air below the rim).
+- Only the potential-flow-init + low-relaxation run moved the failure (to r 1.75 in, velocity blow-up): the mesh has more than one weak spot; numerics only change which is hit first.
+- So: numerics options (`--robust-numerics`, `--stable-scheme`) are not the fix; keep the validated defaults. Remaining ideas, mesh side: higher `MESH_FINENESS`, boundary layers off, small-feature tolerance,
+  or jittering the design (e.g. depth +-0.05 in) so the mesher produces different cells (cheap retry for diverged designs).
+- design_0018 (35r/4c, stable scheme) and a baseline stable-scheme run were still queued/running when this was written.
