@@ -1,2 +1,95 @@
   uploading batch_20261027_003945_01_canopy_presplit.stl (3 MB, STL, sewing=True, improve=True)
   geometry import: RUNNING
+  geometry import: FINISHED
+  prepared batch_20261027_003945_01: {'NUM_RINGS': 20, 'CUTS_PER_RING': 8, 'RING_SPACING_EXPONENT': 0.705827523616112, 'RING_OVERLAP_FRACTION': 0.6811523728477435, 'INNER_RADIUS': 1.1136065334366454}, 472 faces
+  uploading batch_20261027_003945_02_canopy_presplit.stl (4 MB, STL, sewing=True, improve=True)
+  geometry import: RUNNING
+  geometry import: FINISHED
+  prepared batch_20261027_003945_02: {'NUM_RINGS': 20, 'CUTS_PER_RING': 10, 'RING_SPACING_EXPONENT': 1.2080902513553533, 'RING_OVERLAP_FRACTION': 0.5415326037477484, 'INNER_RADIUS': 1.1773303054432207}, 593 faces
+  uploading batch_20261027_003945_03_canopy_presplit.stl (3 MB, STL, sewing=True, improve=True)
+  geometry import: RUNNING
+  geometry import: FINISHED
+  skipped [17, 8, 1.4491743978420046, 0.2842424453562502, 1.1463278543007638]: SimScale imported a sheet body, not a solid
+  uploading batch_20261027_003945_03_canopy_presplit.stl (3 MB, STL, sewing=True, improve=True)
+  geometry import: RUNNING
+  geometry import: FINISHED
+  prepared batch_20261027_003945_03: {'NUM_RINGS': 31, 'CUTS_PER_RING': 4, 'RING_SPACING_EXPONENT': 1.0133166566922407, 'RING_OVERLAP_FRACTION': 0.5182224556277819, 'INNER_RADIUS': 0.587836231605688}, 365 faces
+  uploading batch_20261027_003945_04_canopy_presplit.stl (4 MB, STL, sewing=True, improve=True)
+  geometry import: RUNNING
+  geometry import: FINISHED
+  prepared batch_20261027_003945_04: {'NUM_RINGS': 27, 'CUTS_PER_RING': 7, 'RING_SPACING_EXPONENT': 0.75507915647228, 'RING_OVERLAP_FRACTION': 0.7502227337404459, 'INNER_RADIUS': 0.7860031076650316}, 558 faces
+
+batch_20261027_003945: 4 design(s) ready. Checklist for all of them: /home/user/kiragami_workflow/kirigami-optimizer/runs/batch/batch_20261027_003945/MANUAL_STEPS.txt
+
+MANUAL STEP for batch_20261027_003945_01  (about 2 minutes)
+
+1. Open https://www.simscale.com/workbench/?pid=7871279013725148382 -> project Kiragami_Optimizer -> Geometries.
+2. Open the geometry named "batch_20261027_003945_01_canopy" in CAD mode.
+3. Add an "External flow volume" with a CUSTOM box:
+       X: -25.830 .. +25.830 in    (-0.6561 .. +0.6561 m)
+       Y: -25.830 .. +25.830 in    (-0.6561 .. +0.6561 m)
+       Z: -70.000 .. +31.130 in    (-1.7780 .. +0.7907 m)
+   (same orientation as the Kiragami_CFD runs: Max Z is the inlet.)
+4. Use "Delete bodies" to remove the canopy solid, leaving only the Flow region.
+5. Save/exit the CAD mode so the new geometry is created in the project.
+   Do not start a mesh or simulation; the pipeline does that.
+
+The pipeline polls the project, finds the new geometry by its
+"Max Z@Flow region" ... "Min Y@Flow region" faces, and carries on.
+
+======================================================================
+
+MANUAL STEP for batch_20261027_003945_02  (about 2 minutes)
+
+1. Open https://www.simscale.com/workbench/?pid=7871279013725148382 -> project Kiragami_Optimizer -> Geometries.
+2. Open the geometry named "batch_20261027_003945_02_canopy" in CAD mode.
+3. Add an "External flow volume" with a CUSTOM box:
+       X: -25.830 .. +25.830 in    (-0.6561 .. +0.6561 m)
+       Y: -25.830 .. +25.830 in    (-0.6561 .. +0.6561 m)
+       Z: -70.000 .. +31.130 in    (-1.7780 .. +0.7907 m)
+   (same orientation as the Kiragami_CFD runs: Max Z is the inlet.)
+4. Use "Delete bodies" to remove the canopy solid, leaving only the Flow region.
+5. Save/exit the CAD mode so the new geometry is created in the project.
+   Do not start a mesh or simulation; the pipeline does that.
+
+The pipeline polls the project, finds the new geometry by its
+"Max Z@Flow region" ... "Min Y@Flow region" faces, and carries on.
+
+======================================================================
+
+MANUAL STEP for batch_20261027_003945_03  (about 2 minutes)
+
+1. Open https://www.simscale.com/workbench/?pid=7871279013725148382 -> project Kiragami_Optimizer -> Geometries.
+2. Open the geometry named "batch_20261027_003945_03_canopy" in CAD mode.
+3. Add an "External flow volume" with a CUSTOM box:
+       X: -25.830 .. +25.830 in    (-0.6561 .. +0.6561 m)
+       Y: -25.830 .. +25.830 in    (-0.6561 .. +0.6561 m)
+       Z: -70.000 .. +31.130 in    (-1.7780 .. +0.7907 m)
+   (same orientation as the Kiragami_CFD runs: Max Z is the inlet.)
+4. Use "Delete bodies" to remove the canopy solid, leaving only the Flow region.
+5. Save/exit the CAD mode so the new geometry is created in the project.
+   Do not start a mesh or simulation; the pipeline does that.
+
+The pipeline polls the project, finds the new geometry by its
+"Max Z@Flow region" ... "Min Y@Flow region" faces, and carries on.
+
+======================================================================
+
+MANUAL STEP for batch_20261027_003945_04  (about 2 minutes)
+
+1. Open https://www.simscale.com/workbench/?pid=7871279013725148382 -> project Kiragami_Optimizer -> Geometries.
+2. Open the geometry named "batch_20261027_003945_04_canopy" in CAD mode.
+3. Add an "External flow volume" with a CUSTOM box:
+       X: -25.830 .. +25.830 in    (-0.6561 .. +0.6561 m)
+       Y: -25.830 .. +25.830 in    (-0.6561 .. +0.6561 m)
+       Z: -70.000 .. +31.130 in    (-1.7780 .. +0.7907 m)
+   (same orientation as the Kiragami_CFD runs: Max Z is the inlet.)
+4. Use "Delete bodies" to remove the canopy solid, leaving only the Flow region.
+5. Save/exit the CAD mode so the new geometry is created in the project.
+   Do not start a mesh or simulation; the pipeline does that.
+
+The pipeline polls the project, finds the new geometry by its
+"Max Z@Flow region" ... "Min Y@Flow region" faces, and carries on.
+
+
+When every flow volume is saved: python main.py run-batch --batch batch_20261027_003945 --max-core-hours 5 --batch-core-hours N --skip-estimate-check   (billed: needs your approval)
