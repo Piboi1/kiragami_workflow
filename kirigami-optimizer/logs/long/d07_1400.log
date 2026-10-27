@@ -36,3 +36,49 @@ Resuming design_0020 (SimScale state: ['geometry_id'])
   simulation run: RUNNING 34%
   simulation run: RUNNING 35%
   simulation run: RUNNING 37%
+  simulation run: RUNNING 38%
+  simulation run: RUNNING 40%
+  simulation run: RUNNING 42%
+  simulation run: RUNNING 43%
+  simulation run: RUNNING 45%
+  simulation run: RUNNING 47%
+  simulation run: RUNNING 49%
+  simulation run: RUNNING 50%
+  simulation run: RUNNING 52%
+  simulation run: RUNNING 53%
+  simulation run: RUNNING 55%
+  simulation run: RUNNING 56%
+  simulation run: RUNNING 58%
+  simulation run: RUNNING 60%
+  simulation run: RUNNING 61%
+  simulation run: RUNNING 63%
+  simulation run: RUNNING 64%
+  simulation run: RUNNING 66%
+  simulation run: RUNNING 68%
+  simulation run: RUNNING 69%
+  simulation run: RUNNING 71%
+  simulation run: RUNNING 72%
+  simulation run: RUNNING 74%
+  simulation run: RUNNING 75%
+  simulation run: RUNNING 77%
+  simulation run: RUNNING 79%
+  simulation run: RUNNING 80%
+  simulation run: RUNNING 82%
+  simulation run: RUNNING 83%
+  simulation run: RUNNING 85%
+  simulation run: RUNNING 86%
+  simulation run: RUNNING 88%
+  simulation run: RUNNING 89%
+  simulation run: RUNNING 91%
+  simulation run: RUNNING 92%
+  simulation run: RUNNING 94%
+  simulation run: RUNNING 95%
+  simulation run: RUNNING 97%
+  simulation run: RUNNING 98%
+  simulation run: RUNNING 100%
+  simulation run: RUNNING 100%
+  simulation run: FINISHED
+[design_0020] FAILED: SimScaleError: implausible Cd 33.217751056421065: the solver diverged although SimScale reported the run as finished
+batch_20261027_035855_01: failed Cd=None
+batch_20261027_035855_01: failed Cd=None
+batch_20261027_035855_02: failed Cd=None

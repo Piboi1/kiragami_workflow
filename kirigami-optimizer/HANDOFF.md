@@ -292,3 +292,10 @@ SimScale keeps results of failed runs (`FORCE_COEFFICIENTS_PLOT`, `RESIDUALS_PLO
   Cl and Cm grow too (asymmetric wake). Both unsteady designs are the extremes of depth (7.9 and 12.2 in); all five converged runs are 8.97-10.76 in deep (26-31 rings). Hypothesis: the wake of shallow/deep
   canopies is intrinsically unsteady; fixing it needs a transient (URANS) run or a much longer run (unknown cost, likely 3x+).
 - Total spent about 48 of 800 CPU h. Valid Cds (default numerics, fineness 4.5): baseline 0.7327, 31r/4c 0.7812, 31r/6c 0.7364, 26r/8c 0.7507.
+
+## Update: design 7 at 1400 iterations, fineness 6 (design_0020): RUNAWAY, no valid Cd
+- 2.3M-cell mesh, 1400 iterations, 0.21 + 11.35 = 11.6 CPU h. SimScale: FINISHED; the pipeline rejected it (`implausible Cd 33.2`). The trace is a clean exponential from iteration ~300:
+  Cd 0.84 (300), 1.00 (400), 1.27 (500), 1.76, 2.56, 3.81, 5.69 (800), 8.5, 12.9, 19.3 (1200), 28.9, 43.2 (1400); about x1.5 per 100 iterations, Cl grows too (4.1 at the end). No plateau: the earlier
+  "Cd about 1.19, 60% above the baseline" reading was a point on a runaway curve, NOT a result. Design 7 (23r/6c, 7.9 in deep) cannot be simulated with this steady solve. Do not spend more on it.
+- Total spent about 59.6 of 800 CPU h; about 27 CPU h of that (45%) went into runaway/diverged solves (design_0007, 0008, 0012, 0017, 0018, 0019, 0020).
+- The same traces are available mid-run (`FORCE_COEFFICIENTS_PLOT` of a RUNNING run returns the iterations so far), so runaways can be cancelled early (see below).
