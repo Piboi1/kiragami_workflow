@@ -34,3 +34,9 @@ Resuming design_0008 (SimScale state: ['geometry_id'])
   simulation estimate 18.66 core hours exceeds cap 5; estimate gate skipped on request, the run is cancelled live at the cap
   simulation run: QUEUED 0%
   simulation run: RUNNING 0%
+  simulation run: RUNNING 8%
+  simulation run: RUNNING 16%
+  simulation run: RUNNING 25%
+  simulation run: RUNNING 34%
+  simulation run: RUNNING 42%
+  simulation run: RUNNING 49%

@@ -195,6 +195,11 @@ SIMSCALE = {
     "WRITE_INTERVAL": 10,
     "MAX_RUN_TIME_S": 20000,
     "NON_ORTHOGONAL_CORRECTORS": 2,
+    # Solver stabilisers, off by default (the validated Run 11 numerics). `--robust-numerics` turns them on for a run:
+    # start from a potential-flow solution and lower the pressure / velocity relaxation (None = SimScale default).
+    "POTENTIAL_FOAM_INIT": False,
+    "RELAX_PRESSURE": None,
+    "RELAX_VELOCITY": None,
     "MESH_FINENESS": 4.5,           # Simmetrix automatic sizing, 0-10
     "MESH_BOUNDARY_LAYERS": True,
     "MESH_PHYSICS_BASED": True,

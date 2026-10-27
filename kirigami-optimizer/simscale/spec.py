@@ -90,7 +90,9 @@ def build_model(sim_cfg, entities, uz_mps, reference_area_in2, reference_length_
         initial_conditions=FluidInitialConditions(),
         advanced_concepts=AdvancedConcepts(),
         numerics=FluidNumerics(
-            relaxation_factor=RelaxationFactor(),
+            relaxation_factor=RelaxationFactor(**{k: v for k, v in (
+                ("pressure_field", sim_cfg.get("RELAX_PRESSURE")),
+                ("velocity_equation", sim_cfg.get("RELAX_VELOCITY"))) if v is not None}),
             num_non_orthogonal_correctors=sim_cfg["NON_ORTHOGONAL_CORRECTORS"],
             pressure_reference_cell=0,
             pressure_reference_value=DimensionalPressure(value=0, unit="Pa"),
@@ -156,6 +158,7 @@ def build_model(sim_cfg, entities, uz_mps, reference_area_in2, reference_length_
             write_control=TimeStepWriteControl(write_interval=sim_cfg["WRITE_INTERVAL"]),
             max_run_time=DimensionalTime(value=sim_cfg["MAX_RUN_TIME_S"], unit="s"),
             decompose_algorithm=ScotchDecomposeAlgorithm(),
+            **({"potential_foam_initialization": True} if sim_cfg.get("POTENTIAL_FOAM_INIT") else {}),
         ),
         result_control=FluidResultControls(
             forces_moments=[

@@ -216,3 +216,11 @@ Analysis (scripts were scratch, results below):
 - Jetson: `jetson/setup_jetson.sh` + `jetson/README.md` (untested on hardware). Restore state with `cp snapshot/ledger.json state/ && cp -r snapshot/batch runs/`.
 - Auto-clicking the flow-volume step needs one recorded Playwright session from the user (`playwright codegen`, log in first with --save-storage, then record with --load-storage
   so the password is not recorded); not built yet. Asking SimScale support to enable the CAD-feature API would remove the step.
+
+## Update: design_0007 diverged; solver-stabiliser options added (defaults unchanged)
+- Batch `batch_20261027_035855` design 01 (23 rings, 6 cuts; design_0007): meshed fine (the sliver screen worked) but the SOLVER diverged at 93%
+  (pressure -1e15 Pa in the air ~0.2 in below the rim, (1.84, -4.21, -7.86) in); 2.58 CPU h billed. It used the same numerics as the baseline.
+- New opt-in flags (defaults off, so validated runs are unchanged): `single --robust-numerics`, `run-batch --robust-numerics` = potential-flow initialisation +
+  pressure relaxation 0.2 + velocity relaxation 0.5 (`config.SIMSCALE` POTENTIAL_FOAM_INIT / RELAX_PRESSURE / RELAX_VELOCITY). Proposed test (needs user approval and a cap):
+  re-run design_0007's geometry with `--robust-numerics`, then re-run the baseline with it to check Cd stays about 0.733. If divergence persists: finer mesh near the rim/wake.
+- Solver divergences are now excluded from the optimizer's training data like mesh failures (`Ledger.xy`), instead of being scored Cd = 0.
