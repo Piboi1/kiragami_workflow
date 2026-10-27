@@ -1,0 +1,6 @@
+  uploading batch_20261027_000211_01_canopy.stl (1 MB, STL, sewing=True, improve=True)
+  geometry import: RUNNING
+  geometry import: FINISHED
+  prepared batch_20261027_000211_01: {'NUM_RINGS': 20, 'CUTS_PER_RING': 8, 'RING_SPACING_EXPONENT': 0.705827523616112, 'RING_OVERLAP_FRACTION': 0.6811523728477435, 'INNER_RADIUS': 1.1136065334366454}, 1 faces
+  uploading batch_20261027_000211_02_canopy.stl (1 MB, STL, sewing=True, improve=True)
+  geometry import: RUNNING
