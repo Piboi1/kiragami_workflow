@@ -171,6 +171,30 @@ ROBUST_NUMERICS = {"POTENTIAL_FOAM_INIT": True, "RELAX_PRESSURE": 0.2, "RELAX_VE
 STABLE_SCHEME = {"UPWIND_TURBULENCE_SCHEME": True}
 
 
+def cmd_mesh_test(args):
+    """Billed (small): does SimScale's mesher accept this design? Builds the air volume locally (STEP), imports it, starts only the mesher
+    and stops at --pass-progress (a pass) or when it fails (free). Needs no manual flow-volume step."""
+
+    from optimizer.meshrig import mesh_test
+
+    records = json.loads(Path(config.LEDGER_PATH).read_text())["records"]
+    results = []
+    for design_id in args.design_id:
+        rec = next((r for r in records if r["design_id"] == design_id), None)
+        if rec is None:
+            print(f"{design_id} is not in the ledger")
+            continue
+        params = dict(rec["params"])
+        for item in args.set or []:
+            key, _, value = item.partition("=")
+            params[key] = float(value)
+        res = mesh_test(params, f"{design_id}_{args.route}{args.tag}", route=args.route, cap=args.cap,
+                        pass_progress=args.pass_progress, timeout=args.timeout)
+        results.append(res)
+        print(f"{design_id}: {res['result']:6s} cpu {res['cpu_hours']} h, {res['seconds']} s  {res.get('reason', '')[:200]}")
+    return 0
+
+
 def cmd_export_print(args):
     """Free: a presentation / 3D-print model of a finished design: one fused solid, thicker ribbons, scaled to a chosen height.
 
@@ -708,6 +732,16 @@ def main(argv=None):
     p = sub.add_parser("inspect-simscale")
     p.add_argument("--project-name", default="Kiragami_CFD")
     p.set_defaults(fn=cmd_inspect)
+
+    p = sub.add_parser("mesh-test")
+    p.add_argument("--design-id", nargs="+", required=True, help="ledger design(s) to test, e.g. design_0026")
+    p.add_argument("--route", choices=("step", "stl"), default="step", help="how the air volume is built and imported (default: B-rep STEP)")
+    p.add_argument("--cap", type=float, default=3.0, help="CPU-hour cap per design")
+    p.add_argument("--pass-progress", type=float, default=0.3, help="cancel and report PASS when the mesh reaches this progress")
+    p.add_argument("--timeout", type=int, default=1500, help="seconds of meshing before giving up")
+    p.add_argument("--set", nargs="+", metavar="KEY=VALUE", help="numeric parameter overrides for the design")
+    p.add_argument("--tag", default="", help="suffix for the test name")
+    p.set_defaults(fn=cmd_mesh_test)
 
     p = sub.add_parser("export-print")
     p.add_argument("--design-id", required=True, help="a design in the ledger, e.g. design_0023")

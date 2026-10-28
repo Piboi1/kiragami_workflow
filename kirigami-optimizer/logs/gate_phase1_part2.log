@@ -18,3 +18,35 @@
   uploading batch_20261028_192829_03_canopy_presplit.stl (4 MB, STL, sewing=True, improve=True)
   geometry import: RUNNING
   geometry import: FINISHED
+{
+  "name": "p1b_03",
+  "result": "INCONCLUSIVE",
+  "reason": "stopped at cap/timeout (0.271 CPU h, progress 0.1)",
+  "status": "CANCELED",
+  "progress": 0.1,
+  "cpu_hours": 0.26666666666666666,
+  "geometry_id": "235128cf-f900-4941-af82-9b5aabce34c2",
+  "mesh_operation_id": "d9be8c9d-987a-48a5-b2e7-0e0ae52697dd",
+  "simplify_tol": 0.0001,
+  "joint_overlap": null,
+  "wall_s": 256
+}
+   batch_20261028_192829_03  real mesh: mesh FAIL (design_0027)  -> canopy-only gate: INCONCLUSIVE progress 0.1 cpu 0.27 wall 256s  stopped at cap/timeout (0.271 CPU h, progress 0.1)
+  uploading batch_20261028_192829_04_canopy_presplit.stl (6 MB, STL, sewing=True, improve=True)
+  geometry import: RUNNING
+  geometry import: FINISHED
+{
+  "name": "p1b_04",
+  "result": "INCONCLUSIVE",
+  "reason": "stopped at cap/timeout (0.268 CPU h, progress 0.1)",
+  "status": "CANCELED",
+  "progress": 0.1,
+  "cpu_hours": 0.26666666666666666,
+  "geometry_id": "0d579904-9765-4509-a35a-89b8465cda89",
+  "mesh_operation_id": "b303c2d7-aee3-4b08-b189-e58f50eebcf6",
+  "simplify_tol": 0.0001,
+  "joint_overlap": null,
+  "wall_s": 313
+}
+   batch_20261028_192829_04  real mesh: mesh ok (design_0028)    -> canopy-only gate: INCONCLUSIVE progress 0.1 cpu 0.27 wall 313s  stopped at cap/timeout (0.268 CPU h, progress 0.1)
+DONE

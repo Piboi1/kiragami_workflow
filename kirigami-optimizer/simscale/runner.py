@@ -69,6 +69,10 @@ def describe_api_error(exc):
     return head + (f": {body[:300]}" if body else "")
 
 
+class MeshProgressReached(Exception):
+    """The job was cancelled on purpose because it reached the requested progress (a pass in a mesh test)."""
+
+
 def _core_hours(obj):
     """CPU hours SimScale billed for a finished mesh operation or run."""
 
@@ -214,7 +218,7 @@ class SimScaleClient:
         resp = self.api_client.rest_client.GET(url=url, headers={API_KEY_HEADER: self.api_key}, _preload_content=False)
         return resp.data
 
-    def _poll(self, what, getter, max_seconds, cancel=None, cpu_cap=None, stall_seconds=None, watch=None, watch_every=90):
+    def _poll(self, what, getter, max_seconds, cancel=None, cpu_cap=None, stall_seconds=None, watch=None, watch_every=90, stop_progress=None):
         """Waits for a SimScale job; with ``cancel`` it is a watchdog.
 
         The job is cancelled ON SIMSCALE (not just abandoned locally) when it
@@ -241,6 +245,13 @@ class SimScaleClient:
                 last = (obj.status, progress)
                 last_change = time.time()
 
+            if stop_progress is not None and obj.status == "RUNNING" and isinstance(progress, float) and progress >= stop_progress:
+                self.log(f"  {what}: reached {progress:.0%} (>= {stop_progress:.0%}) -- cancelling it on SimScale (test passed)")
+                try:
+                    cancel()
+                except ApiException as exc:
+                    self.log(f"  cancel request failed: {describe_api_error(exc)}")
+                raise MeshProgressReached(self._wait_terminal(getter))
             reason = watch_reason
             used = _core_hours(obj)
             if reason:
@@ -582,7 +593,12 @@ class SimScaleClient:
                     "meshing", mesh_get,
                     min(state.get("mesh_max_runtime_s", cfg["MESH_MAX_RUN_TIME_S"]), cfg["MESH_TIMEOUT_S"]),
                     cancel=lambda: self.meshes.cancel_mesh_operation(project_id, state["mesh_operation_id"]),
-                    cpu_cap=cfg["MESH_MAX_CORE_HOURS"], stall_seconds=cfg["STALL_TIMEOUT_S"])
+                    cpu_cap=cfg["MESH_MAX_CORE_HOURS"], stall_seconds=cfg["STALL_TIMEOUT_S"],
+                    stop_progress=cfg.get("MESH_PASS_PROGRESS"))
+            except MeshProgressReached as reached:  # mesh tests stop here: the mesher accepted the geometry
+                remember(mesh_core_hours=_core_hours(mesh_get()))
+                return {"mesh_passed": True, "mesh_progress": reached.args[0].progress,
+                        "mesh_core_hours": state.get("mesh_core_hours"), "geometry_id": state["geometry_id"]}
             finally:
                 remember(mesh_core_hours=_core_hours(mesh_get()))
             if op.status != "FINISHED":
