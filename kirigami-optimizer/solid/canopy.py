@@ -433,7 +433,7 @@ def build_solid(ring_data, params=None):
 
         crossings = len(self_intersections(mesh))
         if mesh.body_count != 1 or not mesh.is_watertight or crossings:
-            raise InfeasibleGeometry(f"clean canopy not clean: {mesh.body_count} bodies, watertight {mesh.is_watertight}, "
+            raise RuntimeError(f"clean canopy not clean: {mesh.body_count} bodies, watertight {mesh.is_watertight}, "
                                      f"{crossings} self-intersecting triangle pairs")
 
     radial = np.linalg.norm(mesh.vertices[:, :2], axis=1)

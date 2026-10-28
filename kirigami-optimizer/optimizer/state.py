@@ -32,6 +32,12 @@ class Ledger:
             self.data = json.loads(self.path.read_text(encoding="utf-8"))
         else:
             self.data = {"created_at": _now(), "records": [], "pending": None}
+        # When set (e.g. "clean"), the optimizer's views only count designs built with that canopy construction: legacy and
+        # clean geometries have different thickness, so their Cds must not train the same model.
+        self.geometry_method = None
+
+    def _same_geometry(self, record):
+        return self.geometry_method is None or (record.get("solid_params") or {}).get("EXTRUDE_METHOD") == self.geometry_method
 
     # -- persistence --------------------------------------------------------
     def save(self):
@@ -90,6 +96,7 @@ class Ledger:
         # Only real results (ok) and designs that are geometrically impossible (infeasible) teach the optimizer anything;
         # every other failure (mesher, solver, API, bug) says nothing about the design.
         pairs = [(r["x"], r["y"]) for r in self.records if r.get("x") is not None and r.get("y") is not None
+                 and self._same_geometry(r)
                  and r.get("status") in ("ok", "infeasible")
                  and not any(m in (r.get("error") or "") for m in ARTIFACT_ERRORS)
                  and (r.get("cd") is None or 0.05 <= r["cd"] <= 4.0)]
@@ -107,7 +114,7 @@ class Ledger:
 
     def lookup(self, x):
         for r in self.records:
-            if r.get("x") == list(x) and r.get("y") is not None:
+            if r.get("x") == list(x) and r.get("y") is not None and self._same_geometry(r):
                 return r
         return None
 
@@ -115,5 +122,5 @@ class Ledger:
         """[(x_norm, cd, design_id)] of successful CFD runs, for the velocity estimator."""
 
         return [(r["x_norm"], r["cd"], r["design_id"]) for r in self.records
-                if r.get("status") == "ok" and r.get("x_norm") is not None and r.get("cd") is not None
+                if r.get("status") == "ok" and r.get("x_norm") is not None and r.get("cd") is not None and self._same_geometry(r)
                 and 0.05 <= r["cd"] <= 4.0]

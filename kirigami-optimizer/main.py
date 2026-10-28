@@ -333,7 +333,14 @@ def cmd_run_batch(args):
 def cmd_optimize(args):
     from optimizer.loop import run_optimization
 
+    if args.clean_step:  # clean canopy + local STEP air volume; only clean-geometry results train the optimizer
+        config.SIMSCALE["GEOMETRY_FORMAT"] = "STEP"
+        config.SIMSCALE["STEP_CHECK"] = False
+        config.SIMSCALE["IMPORT_IMPROVE"] = False
+        config.FIXED_PARAMS["EXTRUDE_METHOD"] = "clean"
     ctx = _live_context()
+    if args.clean_step:
+        ctx.ledger.geometry_method = "clean"
     best = run_optimization(ctx, n_calls=args.n_calls, n_initial_points=args.n_initial)
     if best:
         print(f"Best design: {best['design_id']} Cd={best['cd']:.4f}")
@@ -779,9 +786,6 @@ def main(argv=None):
 
     p = sub.add_parser("dry-run")
     p.add_argument("--preset", default="baseline")
-    p.add_argument("--from-design", metavar="DESIGN_ID", help="take the parameters of a ledger design")
-    p.add_argument("--clean-step", action="store_true",
-                   help="clean canopy generator + locally built STEP air volume (no manual flow-volume step)")
     p.add_argument("--uz", type=float, help="force inlet speed (m/s) instead of the estimate")
     p.set_defaults(fn=cmd_dry_run)
 
@@ -844,6 +848,9 @@ def main(argv=None):
 
     p = sub.add_parser("single")
     p.add_argument("--preset", default="baseline")
+    p.add_argument("--from-design", metavar="DESIGN_ID", help="take the parameters of a ledger design")
+    p.add_argument("--clean-step", action="store_true",
+                   help="clean canopy generator + locally built STEP air volume (no manual flow-volume step)")
     p.add_argument("--uz", type=float, help="force inlet speed (m/s), e.g. 6.148 to compare with Run 11")
     p.add_argument("--from-manual", metavar="DESIGN_ID",
                    help="use the flow volume made by `manual-step --design-id DESIGN_ID`")
@@ -871,6 +878,8 @@ def main(argv=None):
     p = sub.add_parser("optimize")
     p.add_argument("--n-calls", type=int, default=None)
     p.add_argument("--n-initial", type=int, default=None)
+    p.add_argument("--clean-step", action="store_true",
+                   help="clean canopy generator + locally built STEP air volume (no manual flow-volume step)")
     p.set_defaults(fn=cmd_optimize)
 
     sub.add_parser("sync-sheet").set_defaults(fn=cmd_sync)

@@ -1,0 +1,9 @@
+CPU-hour cap for this design (mesh + run, checked against SimScale's estimate and enforced live): 5
+[design_0029] generating pattern + solid
+[design_0029] rings=29 Aref=73.31 in^2 Uz=-5.187 m/s (Cd for Uz 0.311)
+  uploading design_0029_flow_domain.step (25 MB, STEP, sewing=False, improve=False)
+  geometry import: RUNNING
+  geometry import: FINISHED
+  meshing: QUEUED 0%
+  meshing: RUNNING 0%
+  meshing: RUNNING 10%
