@@ -18,3 +18,53 @@ HTTP response headers: HTTPHeaderDict({'Content-Type': 'application/json', 'Cont
    design_0026 CAP_OVERLAP 0.03: gate NOT A SOLID  cpu None   (geometry dc1f11a7-0ec4-4cf7-ae33-fc1e19dc78b1)
   uploading p2_26_cap08_canopy_presplit.stl (4 MB, STL, sewing=True, improve=True)
   geometry import: RUNNING
+  geometry import: FINISHED
+{
+  "name": "p2_26_cap08",
+  "result": "INCONCLUSIVE",
+  "reason": "stopped at cap/timeout (0.206 CPU h, progress 0.1)",
+  "status": "CANCELED",
+  "progress": 0.1,
+  "cpu_hours": 0.2,
+  "geometry_id": "1cacf72d-d94b-42f5-9d31-ca68d9790c35",
+  "mesh_operation_id": "3eaaa62d-77ff-4b2c-9ec4-76a1c7cfca8f",
+  "simplify_tol": 0.0001,
+  "joint_overlap": null,
+  "wall_s": 198
+}
+   design_0026 CAP_OVERLAP 0.08: gate INCONCLUSIVE cpu 0.2 stopped at cap/timeout (0.206 CPU h, progress 0.1)  (geometry 1cacf72d-d94b-42f5-9d31-ca68d9790c35)
+  uploading p2_27_cap03_canopy_presplit.stl (4 MB, STL, sewing=True, improve=True)
+  geometry import: RUNNING
+  geometry import: FINISHED
+{
+  "name": "p2_27_cap03",
+  "result": "INCONCLUSIVE",
+  "reason": "stopped at cap/timeout (0.209 CPU h, progress 0.1)",
+  "status": "CANCELED",
+  "progress": 0.1,
+  "cpu_hours": 0.2,
+  "geometry_id": "44e249fb-bf4e-481e-9efa-3a5ea0c63924",
+  "mesh_operation_id": "2bf4ff57-238e-4e2b-882f-0b5b67d9a469",
+  "simplify_tol": 0.0001,
+  "joint_overlap": null,
+  "wall_s": 250
+}
+   design_0027 CAP_OVERLAP 0.03: gate INCONCLUSIVE cpu 0.2 stopped at cap/timeout (0.209 CPU h, progress 0.1)  (geometry 44e249fb-bf4e-481e-9efa-3a5ea0c63924)
+  uploading p2_27_cap08_canopy_presplit.stl (4 MB, STL, sewing=True, improve=True)
+  geometry import: RUNNING
+  geometry import: FINISHED
+{
+  "name": "p2_27_cap08",
+  "result": "INCONCLUSIVE",
+  "reason": "stopped at cap/timeout (0.206 CPU h, progress 0.1)",
+  "status": "CANCELED",
+  "progress": 0.1,
+  "cpu_hours": 0.2,
+  "geometry_id": "77ee2641-55a3-4ac5-a3e4-14ccd33dcc5c",
+  "mesh_operation_id": "a339d3a3-3fb3-438d-8f75-901659aec026",
+  "simplify_tol": 0.0001,
+  "joint_overlap": null,
+  "wall_s": 197
+}
+   design_0027 CAP_OVERLAP 0.08: gate INCONCLUSIVE cpu 0.2 stopped at cap/timeout (0.206 CPU h, progress 0.1)  (geometry 77ee2641-55a3-4ac5-a3e4-14ccd33dcc5c)
+DONE
