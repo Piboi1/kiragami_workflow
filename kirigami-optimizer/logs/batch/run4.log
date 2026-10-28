@@ -3,3 +3,4 @@ Resuming design_0021 (SimScale state: ['geometry_id'])
 [design_0021] generating pattern + solid
 [design_0021] rings=29 Aref=73.49 in^2 Uz=-5.179 m/s (Cd for Uz 0.307)
   meshing: QUEUED 0%
+  meshing: RUNNING 30%
