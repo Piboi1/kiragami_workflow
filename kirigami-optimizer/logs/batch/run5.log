@@ -46,3 +46,30 @@ Resuming design_0028 (SimScale state: ['geometry_id'])
 [design_0028] rings=32 Aref=73.30 in^2 Uz=-5.186 m/s (Cd for Uz 0.307)
   meshing: QUEUED 0%
   meshing: RUNNING 30%
+  meshing: RUNNING 95%
+  meshing: FINISHED
+  simulation estimate 13.05 core hours exceeds cap 5; estimate gate skipped on request, the run is cancelled live at the cap
+  simulation run: QUEUED 0%
+  simulation run: RUNNING 0%
+  simulation run: RUNNING 6%
+  simulation run: RUNNING 12%
+  simulation run: RUNNING 18%
+  simulation run: RUNNING 25%
+  simulation run: RUNNING 32%
+  simulation run: RUNNING 38%
+  simulation run: RUNNING 45%
+  simulation run: RUNNING 52%
+  simulation run: RUNNING 61%
+  simulation run: RUNNING 69%
+  simulation run: RUNNING 75%
+  simulation run: RUNNING 82%
+  simulation run: RUNNING 88%
+  simulation run: RUNNING 95%
+  simulation run: RUNNING 100%
+  simulation run: FINISHED
+[design_0028] Cd=0.7316 Cl=0.0002 Cm=0.0009
+batch_20261028_192829_04: ok Cd=0.73155259070201
+batch_20261028_192829_01: ok Cd=0.7456658677844659
+batch_20261028_192829_02: failed Cd=None
+batch_20261028_192829_03: failed Cd=None
+batch_20261028_192829_04: ok Cd=0.73155259070201

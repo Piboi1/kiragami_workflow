@@ -347,3 +347,13 @@ SimScale keeps results of failed runs (`FORCE_COEFFICIENTS_PLOT`, `RESIDUALS_PLO
 - Size: 6 ring counts x 5 cut counts = 30 discrete combinations x 3 continuous parameters (about 43,000 grid points at steps of 0.1 / 0.1 / 0.05); the optimizer needs 50-100 evaluations; the budget allows
   about 150-200 valid simulations (about 730 CPU h left at about 3.5 CPU h per valid result including failures).
 - The valid results so far all lie inside this region except design_0011 (26 rings), which is kept in the ledger but out of the optimizer's training data.
+
+## Update: batch_20261028_192829 (rings 27-32, cuts 4-8) - 2 valid, 2 mesh failures that passed the sliver screen
+- design_0025 (27r/4c, exp 1.14, ov 0.52, inner 0.57): **Cd 0.7457** (2.71 CPU h). design_0028 (32r/8c, exp 1.42, ov 0.84, inner 0.60): **Cd 0.7316** (3.89 CPU h) - converged despite the high overlap fraction (so "high overlap = unstable" was wrong).
+- design_0026 (30r/6c, inner 0.69) and design_0027 (30r/6c, inner 1.16): SimScale meshing FAILED (self-intersection) at 0 CPU h although both passed the sliver screen. Positions: design_0026 r 0.74 in z -0.28; design_0027 r 0.21 z -0.13;
+  with design_0022 (r 0.24, z -0.14) that makes 3 of 12 screen-passing designs failing the mesher, all within r < 0.75 in of the apex (centre cap / first ring), which the pair-overlap screen does not model.
+  Local test (distance between non-adjacent cap triangles, 10 designs): no difference between failing and working designs (all about the sheet thickness, 0.0147 in), so no cheap local predictor found.
+- Idea (needs approval + cap): a mesher pre-gate. `canopy-gate --geometry-id <canopy-only geometry from prepare-batch>` fails in seconds at 0 CPU h when the mesher rejects the surface; a pass would be cancelled at 30% progress
+  (about 0.05-0.3 CPU h). Run inside `prepare-batch` it would spare the user the manual flow-volume step for designs that cannot be meshed. Test first on designs 25/28 (ok) vs 26/27 (fail).
+- Valid Cds so far (default numerics, fineness 4.5, 500 it): 0.7863 (29r/6c), 0.7812 (31r/4c), 0.7507 (26r/8c), 0.7457 (27r/4c), 0.7364 (31r/6c), 0.7327 (baseline 30r/8c), 0.7316 (32r/8c). All within 7.5%.
+- Total spent about 73.4 of 800 CPU h.

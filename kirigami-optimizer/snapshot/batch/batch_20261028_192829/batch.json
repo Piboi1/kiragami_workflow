@@ -1,0 +1,265 @@
+{
+  "batch_id": "batch_20261028_192829",
+  "designs": [
+    {
+      "name": "batch_20261028_192829_01",
+      "canopy_name": "batch_20261028_192829_01_canopy",
+      "x": [
+        27,
+        4,
+        1.1376700614909785,
+        0.5187377860141572,
+        0.5722575878016788
+      ],
+      "params": {
+        "PARACHUTE_DIAMETER": 10.0,
+        "RIM_WIDTH": 0.25,
+        "INNER_RADIUS": 0.5722575878016788,
+        "NUM_RINGS": 27,
+        "RING_SPACING_MODE": "parabolic",
+        "RING_SPACING_EXPONENT": 1.1376700614909785,
+        "CUTS_PER_RING": 4,
+        "MIN_CUT_LENGTH": 0.05,
+        "MAX_CUT_LENGTH": 2.95,
+        "PARABOLIC_EXPONENT": 1.75,
+        "ENFORCE_RING_OVERLAP": true,
+        "RING_OVERLAP_DEGREES": 15.0,
+        "INNER_RING_OVERLAP_DEGREES": 2.5,
+        "INNER_RING_COUNT": 5,
+        "MIN_GAP_DEGREES": 6.0,
+        "INNER_GAP_DEGREES": 20.0,
+        "INNER_GAP_RING_COUNT": 5,
+        "INNER_OVERLAP_RATIO": 0.16666666666666666,
+        "VERTICAL_DROP": null,
+        "KERF_FACTOR": 0.85,
+        "SHEET_THICKNESS": 0.015,
+        "EXTRUDE_METHOD": "legacy",
+        "WELD_STRIPS": 1,
+        "BRIDGE_EXTRA": 0.0,
+        "JOINT_OVERLAP": 0.0,
+        "MIN_CAP_RADIUS": 0.05,
+        "SIMPLIFY_TOLERANCE": 0.0001,
+        "DOMAIN_LATERAL_HALF_WIDTH_D": 2.583,
+        "DOMAIN_UPSTREAM_D": 3.113,
+        "DOMAIN_DOWNSTREAM_D": 7.0,
+        "STING_RADIUS": 0.04,
+        "RING_OVERLAP_FRACTION": 0.5187377860141572
+      },
+      "canopy_geometry_id": "b236eefc-0df7-4cb1-919b-2798905b5521",
+      "canopy_faces": 317,
+      "bounds_in": [
+        [
+          -25.830000000000002,
+          -25.830000000000002,
+          -70.0
+        ],
+        [
+          25.830000000000002,
+          25.830000000000002,
+          31.13
+        ]
+      ],
+      "volume_in3": 0.627045434359223,
+      "projected_diameter_in": 9.655006443647297,
+      "design_id": "design_0025",
+      "status": "ok",
+      "cd": 0.7456658677844659,
+      "flow_volume_geometry_id": "6e22459e-70f4-430d-9b0e-50b4f2540f1a"
+    },
+    {
+      "name": "batch_20261028_192829_02",
+      "canopy_name": "batch_20261028_192829_02_canopy",
+      "x": [
+        30,
+        6,
+        1.1783632577944805,
+        0.3310315781425577,
+        0.6897593895881783
+      ],
+      "params": {
+        "PARACHUTE_DIAMETER": 10.0,
+        "RIM_WIDTH": 0.25,
+        "INNER_RADIUS": 0.6897593895881783,
+        "NUM_RINGS": 30,
+        "RING_SPACING_MODE": "parabolic",
+        "RING_SPACING_EXPONENT": 1.1783632577944805,
+        "CUTS_PER_RING": 6,
+        "MIN_CUT_LENGTH": 0.05,
+        "MAX_CUT_LENGTH": 2.95,
+        "PARABOLIC_EXPONENT": 1.75,
+        "ENFORCE_RING_OVERLAP": true,
+        "RING_OVERLAP_DEGREES": 15.0,
+        "INNER_RING_OVERLAP_DEGREES": 2.5,
+        "INNER_RING_COUNT": 5,
+        "MIN_GAP_DEGREES": 6.0,
+        "INNER_GAP_DEGREES": 20.0,
+        "INNER_GAP_RING_COUNT": 5,
+        "INNER_OVERLAP_RATIO": 0.16666666666666666,
+        "VERTICAL_DROP": null,
+        "KERF_FACTOR": 0.85,
+        "SHEET_THICKNESS": 0.015,
+        "EXTRUDE_METHOD": "legacy",
+        "WELD_STRIPS": 1,
+        "BRIDGE_EXTRA": 0.0,
+        "JOINT_OVERLAP": 0.0,
+        "MIN_CAP_RADIUS": 0.05,
+        "SIMPLIFY_TOLERANCE": 0.0001,
+        "DOMAIN_LATERAL_HALF_WIDTH_D": 2.583,
+        "DOMAIN_UPSTREAM_D": 3.113,
+        "DOMAIN_DOWNSTREAM_D": 7.0,
+        "STING_RADIUS": 0.04,
+        "RING_OVERLAP_FRACTION": 0.3310315781425577
+      },
+      "canopy_geometry_id": "5a69d615-a15c-4a9c-83c6-5f3eeef64062",
+      "canopy_faces": 529,
+      "bounds_in": [
+        [
+          -25.830000000000002,
+          -25.830000000000002,
+          -70.0
+        ],
+        [
+          25.830000000000002,
+          25.830000000000002,
+          31.13
+        ]
+      ],
+      "volume_in3": 0.5830351923703638,
+      "projected_diameter_in": 9.639846299528086,
+      "design_id": "design_0026",
+      "status": "failed",
+      "cd": null,
+      "flow_volume_geometry_id": "3feb439c-0bf6-4646-869e-b59e12c91257"
+    },
+    {
+      "name": "batch_20261028_192829_03",
+      "canopy_name": "batch_20261028_192829_03_canopy",
+      "x": [
+        30,
+        6,
+        1.2843936602716761,
+        0.45134407183999325,
+        1.1556900225062001
+      ],
+      "params": {
+        "PARACHUTE_DIAMETER": 10.0,
+        "RIM_WIDTH": 0.25,
+        "INNER_RADIUS": 1.1556900225062001,
+        "NUM_RINGS": 30,
+        "RING_SPACING_MODE": "parabolic",
+        "RING_SPACING_EXPONENT": 1.2843936602716761,
+        "CUTS_PER_RING": 6,
+        "MIN_CUT_LENGTH": 0.05,
+        "MAX_CUT_LENGTH": 2.95,
+        "PARABOLIC_EXPONENT": 1.75,
+        "ENFORCE_RING_OVERLAP": true,
+        "RING_OVERLAP_DEGREES": 15.0,
+        "INNER_RING_OVERLAP_DEGREES": 2.5,
+        "INNER_RING_COUNT": 5,
+        "MIN_GAP_DEGREES": 6.0,
+        "INNER_GAP_DEGREES": 20.0,
+        "INNER_GAP_RING_COUNT": 5,
+        "INNER_OVERLAP_RATIO": 0.16666666666666666,
+        "VERTICAL_DROP": null,
+        "KERF_FACTOR": 0.85,
+        "SHEET_THICKNESS": 0.015,
+        "EXTRUDE_METHOD": "legacy",
+        "WELD_STRIPS": 1,
+        "BRIDGE_EXTRA": 0.0,
+        "JOINT_OVERLAP": 0.0,
+        "MIN_CAP_RADIUS": 0.05,
+        "SIMPLIFY_TOLERANCE": 0.0001,
+        "DOMAIN_LATERAL_HALF_WIDTH_D": 2.583,
+        "DOMAIN_UPSTREAM_D": 3.113,
+        "DOMAIN_DOWNSTREAM_D": 7.0,
+        "STING_RADIUS": 0.04,
+        "RING_OVERLAP_FRACTION": 0.45134407183999325
+      },
+      "canopy_geometry_id": "151e65c8-4b72-44d0-b6e6-95203ce863ba",
+      "canopy_faces": 529,
+      "bounds_in": [
+        [
+          -25.830000000000002,
+          -25.830000000000002,
+          -70.0
+        ],
+        [
+          25.830000000000002,
+          25.830000000000002,
+          31.13
+        ]
+      ],
+      "volume_in3": 0.6090607309029717,
+      "projected_diameter_in": 9.634687393368887,
+      "design_id": "design_0027",
+      "status": "failed",
+      "cd": null,
+      "flow_volume_geometry_id": "355c0ee9-bb5e-408f-a1c5-8b73e951cca4"
+    },
+    {
+      "name": "batch_20261028_192829_04",
+      "canopy_name": "batch_20261028_192829_04_canopy",
+      "x": [
+        32,
+        8,
+        1.421886851384432,
+        0.8428411596845644,
+        0.597756029120982
+      ],
+      "params": {
+        "PARACHUTE_DIAMETER": 10.0,
+        "RIM_WIDTH": 0.25,
+        "INNER_RADIUS": 0.597756029120982,
+        "NUM_RINGS": 32,
+        "RING_SPACING_MODE": "parabolic",
+        "RING_SPACING_EXPONENT": 1.421886851384432,
+        "CUTS_PER_RING": 8,
+        "MIN_CUT_LENGTH": 0.05,
+        "MAX_CUT_LENGTH": 2.95,
+        "PARABOLIC_EXPONENT": 1.75,
+        "ENFORCE_RING_OVERLAP": true,
+        "RING_OVERLAP_DEGREES": 15.0,
+        "INNER_RING_OVERLAP_DEGREES": 2.5,
+        "INNER_RING_COUNT": 5,
+        "MIN_GAP_DEGREES": 6.0,
+        "INNER_GAP_DEGREES": 20.0,
+        "INNER_GAP_RING_COUNT": 5,
+        "INNER_OVERLAP_RATIO": 0.16666666666666666,
+        "VERTICAL_DROP": null,
+        "KERF_FACTOR": 0.85,
+        "SHEET_THICKNESS": 0.015,
+        "EXTRUDE_METHOD": "legacy",
+        "WELD_STRIPS": 1,
+        "BRIDGE_EXTRA": 0.0,
+        "JOINT_OVERLAP": 0.0,
+        "MIN_CAP_RADIUS": 0.05,
+        "SIMPLIFY_TOLERANCE": 0.0001,
+        "DOMAIN_LATERAL_HALF_WIDTH_D": 2.583,
+        "DOMAIN_UPSTREAM_D": 3.113,
+        "DOMAIN_DOWNSTREAM_D": 7.0,
+        "STING_RADIUS": 0.04,
+        "RING_OVERLAP_FRACTION": 0.8428411596845644
+      },
+      "canopy_geometry_id": "c12a4bf7-2471-47f5-acf4-847e8f187389",
+      "canopy_faces": 753,
+      "bounds_in": [
+        [
+          -25.830000000000002,
+          -25.830000000000002,
+          -70.0
+        ],
+        [
+          25.830000000000002,
+          25.830000000000002,
+          31.13
+        ]
+      ],
+      "volume_in3": 0.731366262023892,
+      "projected_diameter_in": 9.660829215400359,
+      "design_id": "design_0028",
+      "status": "ok",
+      "cd": 0.73155259070201,
+      "flow_volume_geometry_id": "15d7076d-63bb-4220-8db9-6b0c9e946edb"
+    }
+  ]
+}
