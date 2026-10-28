@@ -333,3 +333,10 @@ SimScale keeps results of failed runs (`FORCE_COEFFICIENTS_PLOT`, `RESIDUALS_PLO
 - New column `solver_settings` (e.g. "fineness 4.5; 500 it; default numerics"): back-filled for this session's 23 rows (rows 11+; rows 2-10 are an earlier session whose ids repeat design_0001-0005 and are left as they were), design_0012/0013
   = "potential-flow init; relax p 0.2 U 0.5", 0017 = "upwind k/omega", 0019 = "fineness 6", 0020 = "fineness 6; 1400 it", 0014-0016 = never ran. From now on `pipeline._row` fills it from `simscale.spec.describe_settings`.
 - Only compare Cds with the same `solver_settings`.
+
+## Update: can cuts 9-12 be made simulatable? (user: "restrict cuts to 4-12 if possible") - no, not with the present 3D model
+- `SEARCH_SPACE` CUTS_PER_RING is already 4-12 (unchanged). Sliver screen pass rate by cuts (random designs, 27-32 rings): 6 cuts nearly all, 7-8 about half, 9 about 1/6, 10-12 0/18.
+- Tried to rescue 9-12 cuts: narrower ribbons (KERF_FACTOR 0.85 -> 0.72) does not remove the slivers; the largest inner radius (1.25 in) does not either (9 cuts 1/6, 10-12 cuts 0/6).
+  Slivers are ribbon-ribbon (and hinge-ribbon) wedges of 1e-8..1e-7 in^3 in the crowded inner rings (r 0.6-1.2 in), an artifact of building the canopy from overlapping thin slabs.
+  A real fix needs a different canopy construction (single clean fused solid / smooth CAD, cf. `solid/smooth_cad.py`), not a parameter tweak.
+- Open decision for the user: also restrict CUTS_PER_RING to 6-8? Caveat: design_0005 (31r/4c, Cd 0.7812, 2nd best) has 4 cuts; 4-5 cut designs ran away 2 of 3 times but are good when they converge.
