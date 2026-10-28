@@ -1,0 +1,24 @@
+== design_0026
+design_0026: 29448 triangles, bodies 1, watertight True, volume 0.7288 in^3, shortest edge 1.0e-03 in, crossing triangle pairs 2
+== design_0027
+design_0027: 30808 triangles, bodies 1, watertight True, volume 0.7604 in^3, shortest edge 7.0e-04 in, crossing triangle pairs 0
+== design_0022
+design_0022: 34156 triangles, bodies 1, watertight True, volume 0.9114 in^3, shortest edge 1.0e-03 in, crossing triangle pairs 0
+== design_0025
+design_0025: 17698 triangles, bodies 1, watertight True, volume 0.7442 in^3, shortest edge 1.0e-03 in, crossing triangle pairs 12
+== design_0028
+design_0028: 43844 triangles, bodies 1, watertight True, volume 0.9102 in^3, shortest edge 1.0e-03 in, crossing triangle pairs 12
+== design_0023
+                             f"{crossings} self-intersecting triangle pairs")
+== design_0005
+design_0005: 20466 triangles, bodies 1, watertight True, volume 0.7246 in^3, shortest edge 1.0e-03 in, crossing triangle pairs 12
+== design_0009
+design_0009: 32466 triangles, bodies 1, watertight True, volume 0.8021 in^3, shortest edge 5.1e-04 in, crossing triangle pairs 0
+== design_0002
+design_0002: 41078 triangles, bodies 1, watertight True, volume 0.9037 in^3, shortest edge 1.0e-03 in, crossing triangle pairs 4
+== design_0011
+design_0011: 36002 triangles, bodies 1, watertight True, volume 0.8324 in^3, shortest edge 1.0e-03 in, crossing triangle pairs 4
+== design_0021
+design_0021: 23562 triangles, bodies 1, watertight True, volume 0.8400 in^3, shortest edge 5.0e-04 in, crossing triangle pairs 3
+== design_0024
+design_0024: 19596 triangles, bodies 1, watertight True, volume 0.7065 in^3, shortest edge 1.0e-03 in, crossing triangle pairs 12

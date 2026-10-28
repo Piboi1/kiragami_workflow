@@ -1,2 +1,7 @@
 slabs 673 0s
 occ solids built 4s
+Traceback (most recent call last):
+  File "/tmp/claude-0/-home-user-kiragami-workflow/4f360926-88a3-5619-ab00-50c28b57956d/scratchpad/occfuse.py", line 57, in <module>
+    print('fuse done %.0fs'%(time.time()-t0),'error',fuse.HasErrors(),flush=True)
+                                                     ^^^^^^^^^^^^^^
+AttributeError: 'OCP.OCP.BRepAlgoAPI.BRepAlgoAPI_Fuse' object has no attribute 'HasErrors'

@@ -365,13 +365,16 @@ CLEAN_JOINT_OVERLAP_IN = 0.01  # ribbon ends reach this far past each node so th
 CLEAN_MIN_EDGES_IN = (1e-3, 7e-4, 5e-4, 3e-4)  # the union leaves edges down to 1e-7 in, which STEP importers reject: merge the shortest ones
 
 
+CLEAN_MIN_ALTITUDE_IN = 5e-4  # no triangle thinner than this (the legacy weld has down to 4e-5 and meshes)
+
+
 def _clean_needles(mesh):
     """Merges short edges, trying the largest threshold that leaves no crossing triangles (a merge can fold a sliver through a neighbour)."""
 
     from solid.selfcheck import self_intersections
 
     for eps in CLEAN_MIN_EDGES_IN:
-        cand = booleans.collapse_short_edges(mesh, eps)
+        cand = booleans.collapse_short_edges(mesh, eps, rounds=8, min_altitude=CLEAN_MIN_ALTITUDE_IN)
         if not self_intersections(cand, limit=1):
             return cand
     return mesh

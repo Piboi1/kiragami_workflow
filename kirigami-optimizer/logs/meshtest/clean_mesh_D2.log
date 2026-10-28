@@ -1,0 +1,8 @@
+  uploading design_0026_step_cleanD2_flow_domain.step (25 MB, STEP, sewing=False, improve=False)
+  geometry import: RUNNING
+  geometry import: FINISHED
+  meshing: QUEUED 0%
+  meshing: RUNNING 0%
+  meshing: RUNNING 10%
+  meshing: FAILED
+design_0026: FAIL   cpu 0.0 h, 543 s  The meshing failed because the mesh element size is too close to the cad tolerance of some entities. Try to improve (reduce) the model tolerance with your CAD tool, or make the mesh coarser. Otherwise

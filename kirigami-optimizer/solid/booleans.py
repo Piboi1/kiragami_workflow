@@ -71,16 +71,26 @@ def repair(mesh):
     return mesh
 
 
-def collapse_short_edges(mesh, min_edge, rounds=4):
+def collapse_short_edges(mesh, min_edge, rounds=4, min_altitude=0.0):
     """Merges the endpoints of every edge shorter than ``min_edge`` (mesh units), then drops the triangles that degenerate.
 
     A boolean of near-coincident faces leaves needle triangles with edges of 1e-7 in; STEP importers reject those edges
-    ("fault-edge-invalid"). Returns the cleaned mesh, or ``mesh`` unchanged if the result is not one watertight body.
+    ("fault-edge-invalid"). With ``min_altitude`` the shortest edge of every sliver (a triangle whose smallest height is below
+    it, however long its edges) is merged too; the mesher refuses faces thinner than its CAD tolerance.
+    Returns the cleaned mesh, or ``mesh`` unchanged if the result is not one watertight body.
     """
 
     cur = mesh
     for _ in range(rounds):
         short = cur.edges_unique[cur.edges_unique_length < min_edge]
+        if min_altitude > 0:
+            tri = cur.triangles
+            lengths = np.stack([np.linalg.norm(tri[:, 1] - tri[:, 0], axis=1), np.linalg.norm(tri[:, 2] - tri[:, 1], axis=1),
+                                np.linalg.norm(tri[:, 0] - tri[:, 2], axis=1)], axis=1)
+            sliver = np.nonzero(2 * cur.area_faces / lengths.max(axis=1) < min_altitude)[0]
+            pairs = np.array([[(0, 1), (1, 2), (2, 0)][k] for k in lengths[sliver].argmin(axis=1)]).reshape(-1, 2)
+            extra = cur.faces[sliver[:, None], pairs] if len(sliver) else np.zeros((0, 2), dtype=int)
+            short = np.vstack([short, extra]) if len(short) else extra
         if not len(short):
             break
         parent = np.arange(len(cur.vertices))
