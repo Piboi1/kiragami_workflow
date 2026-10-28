@@ -361,6 +361,9 @@ def check_feasible(rings, kerf_factor, min_cap_radius):
 CLEAN_JOINT_OVERLAP_IN = 0.01  # ribbon ends reach this far past each node so the slabs fuse into one body (0.7 sheet thicknesses)
 
 
+CLEAN_MIN_EDGE_IN = 1e-3  # the union leaves edges down to 1e-7 in, which STEP importers reject; merge anything shorter than this
+
+
 def build_solid(ring_data, params=None):
     """Builds the watertight 3D canopy solid.
 
@@ -402,6 +405,8 @@ def build_solid(ring_data, params=None):
         if float(p["SIMPLIFY_TOLERANCE"]) > 0:
             mesh = booleans.simplify(mesh, float(p["SIMPLIFY_TOLERANCE"]))
         mesh = booleans.repair(mesh)
+        if p["EXTRUDE_METHOD"] == "clean":
+            mesh = booleans.collapse_short_edges(mesh, CLEAN_MIN_EDGE_IN)
     elif method == "legacy":
         mesh = _legacy_extrude(strips, thickness, weld=bool(round(float(p["WELD_STRIPS"]))))
     else:

@@ -69,3 +69,42 @@ def repair(mesh):
     if fixed.is_watertight and fixed.body_count == mesh.body_count and abs(fixed.volume - mesh.volume) < 1e-3 * abs(mesh.volume):
         return fixed
     return mesh
+
+
+def collapse_short_edges(mesh, min_edge, rounds=4):
+    """Merges the endpoints of every edge shorter than ``min_edge`` (mesh units), then drops the triangles that degenerate.
+
+    A boolean of near-coincident faces leaves needle triangles with edges of 1e-7 in; STEP importers reject those edges
+    ("fault-edge-invalid"). Returns the cleaned mesh, or ``mesh`` unchanged if the result is not one watertight body.
+    """
+
+    cur = mesh
+    for _ in range(rounds):
+        short = cur.edges_unique[cur.edges_unique_length < min_edge]
+        if not len(short):
+            break
+        parent = np.arange(len(cur.vertices))
+
+        def find(a):
+            while parent[a] != a:
+                parent[a] = parent[parent[a]]
+                a = parent[a]
+            return a
+
+        for a, b in short:
+            ra, rb = find(a), find(b)
+            if ra != rb:
+                parent[rb] = ra
+        roots = np.array([find(i) for i in range(len(parent))])
+        counts = np.bincount(roots, minlength=len(parent))
+        centres = np.column_stack([np.bincount(roots, weights=cur.vertices[:, k], minlength=len(parent)) for k in range(3)])
+        centres /= np.maximum(counts, 1)[:, None]
+        faces = roots[cur.faces]
+        ok = (faces[:, 0] != faces[:, 1]) & (faces[:, 1] != faces[:, 2]) & (faces[:, 0] != faces[:, 2])
+        out = trimesh.Trimesh(centres, faces[ok], process=False)
+        out.remove_unreferenced_vertices()
+        out = repair(out)
+        if not (out.is_watertight and out.body_count == mesh.body_count and abs(out.volume - mesh.volume) < 5e-3 * abs(mesh.volume)):
+            return cur
+        cur = out
+    return cur

@@ -1,2 +1,16 @@
   uploading design_0026_step_clean_flow_domain.step (29 MB, STEP, sewing=False, improve=True)
   geometry import: RUNNING
+  geometry import: FAILED
+design_0026: ERROR  cpu 0.0 h, 205 s  SimScaleError: geometry import FAILED: {'code': 'model-has-invalid-geometry',
+ 'details': {'faults': [{'code': 'fault-edge-invalid',
+                         'entityIds': ['B1_TE40463'],
+             
+  uploading design_0027_step_clean_flow_domain.step (29 MB, STEP, sewing=False, improve=True)
+  geometry import: RUNNING
+  geometry import: FAILED
+design_0027: ERROR  cpu 0.0 h, 209 s  SimScaleError: geometry import FAILED: {'code': 'model-has-invalid-geometry',
+ 'details': {'faults': [{'code': 'fault-face-self_int',
+                         'entityIds': ['B1_TE12312'],
+            
+  uploading design_0022_step_clean_flow_domain.step (35 MB, STEP, sewing=False, improve=True)
+  geometry import: RUNNING

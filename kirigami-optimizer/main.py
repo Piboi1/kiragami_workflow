@@ -192,7 +192,7 @@ def cmd_mesh_test(args):
             except ValueError:
                 params[key] = value
         res = mesh_test(params, f"{design_id}_{args.route}{args.tag}", route=args.route, cap=args.cap,
-                        pass_progress=args.pass_progress, timeout=args.timeout)
+                        pass_progress=args.pass_progress, timeout=args.timeout, import_only=args.import_only)
         results.append(res)
         print(f"{design_id}: {res['result']:6s} cpu {res['cpu_hours']} h, {res['seconds']} s  {res.get('reason', '')[:200]}")
     return 0
@@ -744,6 +744,7 @@ def main(argv=None):
     p.add_argument("--timeout", type=int, default=1500, help="seconds of meshing before giving up")
     p.add_argument("--set", nargs="+", metavar="KEY=VALUE", help="numeric parameter overrides for the design")
     p.add_argument("--tag", default="", help="suffix for the test name")
+    p.add_argument("--import-only", action="store_true", help="only check that SimScale accepts the geometry (free, no meshing)")
     p.set_defaults(fn=cmd_mesh_test)
 
     p = sub.add_parser("export-print")

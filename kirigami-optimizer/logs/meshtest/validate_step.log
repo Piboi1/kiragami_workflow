@@ -11,3 +11,21 @@ design_0026: ERROR  cpu 0.0 h, 135 s  SimScaleError: geometry import FAILED: {'c
   meshing: QUEUED 0%
   meshing: RUNNING 0%
   meshing: RUNNING 10%
+  meshing: RUNNING 30%
+  meshing: reached 30% (>= 30%) -- cancelling it on SimScale (test passed)
+design_0027: PASS   cpu 2.292 h, 796 s  
+  uploading design_0025_step_flow_domain.step (8 MB, STEP, sewing=False, improve=True)
+  geometry import: RUNNING
+  geometry import: FINISHED
+  meshing: QUEUED 0%
+  meshing: RUNNING 0%
+  meshing: RUNNING 10%
+  meshing: RUNNING 30%
+  meshing: reached 30% (>= 30%) -- cancelling it on SimScale (test passed)
+design_0025: PASS   cpu 1.709 h, 545 s  
+  uploading design_0028_step_flow_domain.step (19 MB, STEP, sewing=False, improve=True)
+  geometry import: RUNNING
+  geometry import: FINISHED
+  meshing: QUEUED 0%
+  meshing: RUNNING 0%
+  meshing: RUNNING 10%

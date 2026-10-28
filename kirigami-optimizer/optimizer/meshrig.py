@@ -15,7 +15,7 @@ from pipeline import build_geometry
 from simscale.runner import SimScaleClient
 
 
-def mesh_test(params, name, route="step", cap=3.0, pass_progress=0.3, timeout=1500, log=print):
+def mesh_test(params, name, route="step", cap=3.0, pass_progress=0.3, timeout=1500, log=print, import_only=False):
     """Returns {"result": PASS|FAIL|ERROR, "reason", "cpu_hours", "seconds", ...}."""
 
     saved = config.SIMSCALE["GEOMETRY_FORMAT"]
@@ -31,6 +31,16 @@ def mesh_test(params, name, route="step", cap=3.0, pass_progress=0.3, timeout=15
         client = SimScaleClient(cfg)
         pid = client.ensure_project(config.SIMSCALE["PROJECT_ID"], config.SIMSCALE["NEW_PROJECT_NAME"], config.STATE_DIR / "simscale_project.json")
         state = {}
+        if import_only:  # free: SimScale's geometry validity check only, no mesher
+            result = {"name": name, "route": route, "volume_in3": round(info["volume_in3"], 4), "triangles": info.get("triangle_count")}
+            try:
+                _, import_id = client.start_import(pid, name, paths["domain_file"], False, True, fmt=config.SIMSCALE["GEOMETRY_FORMAT"])
+                result.update(result="IMPORT OK", reason="", geometry_id=client.wait_for_import(pid, import_id))
+            except Exception as exc:
+                result.update(result="IMPORT FAIL", reason=str(exc).replace("\n", " ")[:600])
+            result.update(cpu_hours=0.0, seconds=round(time.time() - t0))
+            (out / "mesh_test.json").write_text(json.dumps(result, indent=2, default=str) + "\n")
+            return result
         result = {"name": name, "route": route, "triangles": info.get("triangle_count"), "volume_in3": round(info["volume_in3"], 4)}
         try:
             run = client.run_design(pid, name, paths["domain_file"], -6.148, info["reference_area_in2"], info["projected_diameter_in"],
