@@ -84,7 +84,9 @@ FIXED_PARAMS = {
 # Overlap is searched as a fraction of what the cut count allows so there
 # are no dead zones where the generator would clamp it.
 SEARCH_SPACE = [
-    {"name": "NUM_RINGS", "type": "int", "low": 16, "high": 36},
+    # 27-32 rings = 9.3-11.1 in deep. Every steady solve that converged was 9.0-10.8 in deep; the 7.9 in (23 rings) and
+    # 12.2 in (35 rings) designs ran away exponentially (see HANDOFF.md), so the search is restricted to this band.
+    {"name": "NUM_RINGS", "type": "int", "low": 27, "high": 32},
     {"name": "CUTS_PER_RING", "type": "int", "low": 4, "high": 12},
     {"name": "RING_SPACING_EXPONENT", "type": "real", "low": 0.6, "high": 1.5},
     {"name": "RING_OVERLAP_FRACTION", "type": "real", "low": 0.2, "high": 1.0},

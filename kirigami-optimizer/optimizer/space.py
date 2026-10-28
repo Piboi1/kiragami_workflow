@@ -28,3 +28,16 @@ def normalize(search_space, x):
     """Scales each coordinate to [0, 1] (used for design similarity)."""
 
     return [(float(v) - d["low"]) / (d["high"] - d["low"]) for d, v in zip(search_space, x)]
+
+
+def inside(search_space, x):
+    """True when every coordinate of x lies within the bounds of its dimension."""
+
+    return all(d["low"] <= v <= d["high"] for d, v in zip(search_space, x))
+
+
+def restrict(search_space, x0, y0):
+    """The (x, y) pairs whose x lies inside the search space (skopt refuses to be told points outside it)."""
+
+    pairs = [(x, y) for x, y in zip(x0, y0) if inside(search_space, x)]
+    return [p[0] for p in pairs], [p[1] for p in pairs]

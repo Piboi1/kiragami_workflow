@@ -18,7 +18,7 @@ from pipeline import build_geometry, design_params, evaluate_design, start_with_
 from solid import InfeasibleGeometry, screen_canopy
 from simscale import manual_flow
 
-from .space import dimensions, to_params
+from .space import dimensions, restrict, to_params
 
 BATCH_DIR = config.RUNS_DIR / "batch"
 
@@ -33,7 +33,7 @@ def propose_points(ledger, space, k, prepared=()):
     from skopt import Optimizer
 
     opt = config.OPTIMIZER
-    x0, y0 = ledger.xy()
+    x0, y0 = restrict(space, *ledger.xy())  # results outside the (narrowed) space cannot teach skopt anything
     seen = {tuple(x) for x in x0} | {tuple(x) for x in prepared}
     o = Optimizer(dimensions(space), base_estimator="GP", acq_func=opt["ACQ_FUNC"],
                   n_initial_points=max(opt["N_INITIAL_POINTS"], k + len(x0)),

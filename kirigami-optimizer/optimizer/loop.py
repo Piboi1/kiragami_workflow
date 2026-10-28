@@ -15,7 +15,7 @@ from skopt.callbacks import CheckpointSaver
 import config
 from pipeline import design_params, evaluate_design, resume_pending
 
-from .space import dimensions, to_params
+from .space import dimensions, restrict, to_params
 
 
 def run_optimization(ctx, n_calls=None, n_initial_points=None):
@@ -32,7 +32,7 @@ def run_optimization(ctx, n_calls=None, n_initial_points=None):
     if budget_exhausted(ctx, budget):
         return best_so_far(ctx)
 
-    x0, y0 = ctx.ledger.xy()
+    x0, y0 = restrict(space, *ctx.ledger.xy())  # ignore results outside the (narrowed) search space
     remaining = n_calls - len(x0)
     ctx.log(f"{len(x0)} designs already evaluated, {max(remaining, 0)} to go (target {n_calls}).")
     if remaining <= 0:

@@ -80,3 +80,14 @@ def test_runaway_guard_flags_exponential_growth_but_not_a_settling_run():
     assert all(runaway_reason(settled[:n]) is None for n in range(50, 501, 10))
     assert any(runaway_reason(runaway[:n]) for n in range(50, 501, 10))
     assert runaway_reason([0.7] * 100 + [-1.6]) is not None           # sign flip, as in design_0007
+
+
+def test_results_outside_the_narrowed_space_are_not_given_to_skopt(tmp_path):
+    from optimizer.space import restrict
+
+    space = config.SEARCH_SPACE
+    assert [d for d in space if d["name"] == "NUM_RINGS"][0]["low"] == 27
+    inside_x = [31, 6, 1.0, 0.6, 1.0]
+    outside_x = [26, 8, 1.2, 0.55, 0.7]            # design_0011: converged, but 26 rings is below the band
+    x0, y0 = restrict(space, [inside_x, outside_x], [-0.74, -0.75])
+    assert x0 == [inside_x] and y0 == [-0.74]

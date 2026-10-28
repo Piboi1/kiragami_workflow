@@ -308,3 +308,9 @@ SimScale keeps results of failed runs (`FORCE_COEFFICIENTS_PLOT`, `RESIDUALS_PLO
 - Test `test_runaway_guard_flags_exponential_growth_but_not_a_settling_run`. All 53 tests pass.
 - Recommended next steps: keep the validated defaults (500 iterations, fineness 4.5); restrict the search to the depths that converge (about 27-32 rings, 9.3-11.1 in) or accept ~1/3 failures,
   now cheap thanks to the guard; then more screened batches (`prepare-batch`, flow volumes by hand, `run-batch`). Valid Cds so far: baseline 0.7327, 31r/4c 0.7812, 31r/6c 0.7364, 26r/8c 0.7507.
+
+## Update: search restricted to 27-32 rings (user decision)
+- `config.SEARCH_SPACE` NUM_RINGS 16-36 -> **27-32** (9.3-11.1 in deep; all converged solves were 9.0-10.8 in, the unsimulable ones 7.9 and 12.2 in). `optimizer.space.restrict` keeps results outside
+  the space (e.g. design_0011, 26 rings, Cd 0.7507) out of skopt's training data (skopt rejects points outside its bounds); they stay in the ledger.
+- Sliver screen pass rate in the new space: 12 of 30 candidates (40%); cuts per ring decides it: >= 9 reject almost always, <= 6 pass almost always, 7-8 mixed. Narrowing CUTS_PER_RING to 4-8 would
+  lift the pass rate to about 75% and stop the optimizer proposing regions that can never be run (not done; user decision).
