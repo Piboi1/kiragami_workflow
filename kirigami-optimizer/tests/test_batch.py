@@ -91,3 +91,13 @@ def test_results_outside_the_narrowed_space_are_not_given_to_skopt(tmp_path):
     outside_x = [26, 8, 1.2, 0.55, 0.7]            # design_0011: converged, but 26 rings is below the band
     x0, y0 = restrict(space, [inside_x, outside_x], [-0.74, -0.75])
     assert x0 == [inside_x] and y0 == [-0.74]
+
+
+def test_settings_description_names_every_non_default_setting():
+    from simscale.spec import describe_settings
+
+    base = dict(config.SIMSCALE)
+    assert describe_settings(base) == "fineness 4.5; 500 it; default numerics"
+    odd = dict(base, MESH_FINENESS=6, END_TIME_S=1400, POTENTIAL_FOAM_INIT=True, RELAX_PRESSURE=0.2, RELAX_VELOCITY=0.5)
+    text = describe_settings(odd)
+    assert "fineness 6" in text and "1400 it" in text and "potential-flow init" in text and "relax p 0.2 U 0.5" in text

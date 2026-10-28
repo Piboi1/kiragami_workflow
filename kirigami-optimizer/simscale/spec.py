@@ -201,3 +201,20 @@ def build_mesh_model(sim_cfg):
         max_meshing_run_time=DimensionalTime(value=sim_cfg["MESH_MAX_RUN_TIME_S"], unit="s"),
         advanced_simmetrix_settings=advanced,
     )
+
+
+def describe_settings(sim_cfg):
+    """One line naming the mesh and solver settings of a run (goes to the results sheet, so rows stay comparable)."""
+
+    parts = [f"fineness {sim_cfg['MESH_FINENESS']:g}", f"{sim_cfg['END_TIME_S']} it"]
+    if not sim_cfg.get("MESH_BOUNDARY_LAYERS", True):
+        parts.append("no boundary layers")
+    numerics = []
+    if sim_cfg.get("POTENTIAL_FOAM_INIT"):
+        numerics.append("potential-flow init")
+    if sim_cfg.get("RELAX_PRESSURE") is not None or sim_cfg.get("RELAX_VELOCITY") is not None:
+        numerics.append(f"relax p {sim_cfg.get('RELAX_PRESSURE')} U {sim_cfg.get('RELAX_VELOCITY')}")
+    if sim_cfg.get("UPWIND_TURBULENCE_SCHEME"):
+        numerics.append("upwind k/omega")
+    parts.extend(numerics or ["default numerics"])
+    return "; ".join(parts)

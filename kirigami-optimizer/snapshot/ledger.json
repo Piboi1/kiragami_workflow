@@ -4340,7 +4340,9 @@
         "estimated_core_hours": 4.29,
         "run_core_hours": 0.41
       },
-      "finished_at": "2026-10-27T16:57:12+00:00"
+      "finished_at": "2026-10-27T16:57:12+00:00",
+      "settings": "fineness 4.5; 500 it; upwind k/omega",
+      "sheet_synced": true
     },
     {
       "design_id": "design_0019",
@@ -5899,5 +5901,5 @@
     }
   ],
   "pending": null,
-  "updated_at": "2026-10-28T16:21:04+00:00"
+  "updated_at": "2026-10-28T18:51:41+00:00"
 }

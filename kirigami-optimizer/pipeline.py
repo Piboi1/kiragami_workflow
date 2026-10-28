@@ -157,6 +157,7 @@ def _row(record):
         "core_hours_used": core_hours_used(ids) if ids else None,
         "run_duration": c.get("run_duration"),
         "error": record.get("error"),
+        "solver_settings": record.get("settings"),
     })
     return row
 
@@ -205,6 +206,11 @@ def evaluate_design(ctx, params, mode="single", uz_override=None, resume=None):
                                  "cd_source": f"override ({velocity['cd_source']})"})
             ledger.update_pending(velocity=velocity)
         record["velocity"] = velocity
+        sim_cfg = getattr(ctx.simscale, "cfg", None)
+        if sim_cfg:
+            from simscale.spec import describe_settings
+
+            record["settings"] = describe_settings(sim_cfg)
         ctx.log(f"[{design_id}] rings={record['ring_count']} Aref={solid_info['reference_area_in2']:.2f} in^2 "
                 f"Uz={velocity['uz_mps']:.3f} m/s (Cd for Uz {velocity['cd_used_for_velocity']:.3f})")
 

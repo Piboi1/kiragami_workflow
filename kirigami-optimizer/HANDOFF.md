@@ -326,3 +326,10 @@ SimScale keeps results of failed runs (`FORCE_COEFFICIENTS_PLOT`, `RESIDUALS_PLO
   6 cuts 2/2 converged in the 27-32 band (31r, 29r; the 23r one was outside the band), 8 cuts 2/2 (baseline, 26r), 4 cuts 1/3 (31r ok; 35r, 30r ran away), 5 cuts 0/1. Small numbers, but
   cuts 6-8 look reliable and the sliver screen passes 6-cut designs almost always, so restricting CUTS_PER_RING to 6-8 is the obvious next narrowing (not done; user decision).
 - Cost model with the guard: a converging design about 3 CPU h, a runaway about 1.4-2.6 CPU h (was 3-11).
+
+## Update: Google Sheet ("Kirigami CFD runs", tab `runs`) cleaned up and given a settings column
+- Every finished run is pushed to the sheet automatically (`RunLogger`; credentials in the environment). Found and fixed (user approved): design_0008 and design_0019 were still `ok` with Cd -1,843,280 and 1.1875
+  (invalidated locally earlier) - now `failed`, Cd/Cl/Cm cleared, reason in `error`. Backup of the sheet before the edit: scratchpad `sheet_backup_before_edit.csv` (not in the repo).
+- New column `solver_settings` (e.g. "fineness 4.5; 500 it; default numerics"): back-filled for this session's 23 rows (rows 11+; rows 2-10 are an earlier session whose ids repeat design_0001-0005 and are left as they were), design_0012/0013
+  = "potential-flow init; relax p 0.2 U 0.5", 0017 = "upwind k/omega", 0019 = "fineness 6", 0020 = "fineness 6; 1400 it", 0014-0016 = never ran. From now on `pipeline._row` fills it from `simscale.spec.describe_settings`.
+- Only compare Cds with the same `solver_settings`.
