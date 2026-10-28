@@ -4,3 +4,78 @@ Resuming design_0021 (SimScale state: ['geometry_id'])
 [design_0021] rings=29 Aref=73.49 in^2 Uz=-5.179 m/s (Cd for Uz 0.307)
   meshing: QUEUED 0%
   meshing: RUNNING 30%
+  meshing: RUNNING 95%
+  meshing: FINISHED
+  simulation run: QUEUED 0%
+  simulation run: RUNNING 0%
+  simulation run: RUNNING 1%
+  simulation run: RUNNING 8%
+  simulation run: RUNNING 15%
+  simulation run: RUNNING 22%
+  simulation run: diverging: Cd = -62.63 is outside any physical range -- cancelling it on SimScale
+[design_0021] FAILED: SimScaleError: simulation run cancelled: diverging: Cd = -62.63 is outside any physical range (1.27 CPU h billed)
+batch_20261028_032516_01: failed Cd=None
+batch_20261028_032516_02: running on flow-volume geometry 2f5295ba-3992-4364-9366-7795d16d8d45
+Resuming design_0022 (SimScale state: ['geometry_id'])
+[design_0022] generating pattern + solid
+[design_0022] rings=32 Aref=73.12 in^2 Uz=-5.194 m/s (Cd for Uz 0.307)
+  meshing: QUEUED 0%
+  meshing: RUNNING 10%
+  meshing: FAILED
+[design_0022] FAILED: SimScaleError: meshing FAILED
+batch_20261028_032516_02: failed Cd=None
+batch_20261028_032516_03: running on flow-volume geometry 436afea7-6bad-4bc5-bcac-1c855f65cff3
+Resuming design_0023 (SimScale state: ['geometry_id'])
+[design_0023] generating pattern + solid
+[design_0023] rings=29 Aref=73.25 in^2 Uz=-5.187 m/s (Cd for Uz 0.307)
+  meshing: QUEUED 0%
+  meshing: RUNNING 10%
+  meshing: RUNNING 30%
+  meshing: RUNNING 80%
+  meshing: FINISHED
+  simulation run: QUEUED 0%
+  simulation run: RUNNING 0%
+  simulation run: RUNNING 1%
+  simulation run: RUNNING 9%
+  simulation run: RUNNING 18%
+  simulation run: RUNNING 27%
+  simulation run: RUNNING 36%
+  simulation run: RUNNING 46%
+  simulation run: RUNNING 54%
+  simulation run: RUNNING 63%
+  simulation run: RUNNING 71%
+  simulation run: RUNNING 81%
+  simulation run: RUNNING 91%
+  simulation run: RUNNING 99%
+  simulation run: RUNNING 100%
+  simulation run: FINISHED
+[design_0023] Cd=0.7863 Cl=0.0002 Cm=-0.0002
+batch_20261028_032516_03: ok Cd=0.7863034126142141
+batch_20261028_032516_04: running on flow-volume geometry 5dc1d89f-9b1d-458a-a0ef-b5ec032d64a3
+Resuming design_0024 (SimScale state: ['geometry_id'])
+[design_0024] generating pattern + solid
+[design_0024] rings=30 Aref=72.38 in^2 Uz=-5.211 m/s (Cd for Uz 0.308)
+  meshing: QUEUED 0%
+  meshing: RUNNING 30%
+  meshing: RUNNING 80%
+  meshing: RUNNING 95%
+  meshing: FINISHED
+  simulation run: QUEUED 0%
+  simulation run: RUNNING 0%
+  simulation run: RUNNING 3%
+  simulation run: RUNNING 11%
+  simulation run: RUNNING 19%
+  simulation run: RUNNING 26%
+  simulation run: RUNNING 35%
+  simulation run: RUNNING 44%
+  simulation run: RUNNING 52%
+  simulation run: RUNNING 58%
+  simulation run: RUNNING 67%
+  simulation run: RUNNING 74%
+  simulation run: diverging: Cd = 10.98 is outside any physical range -- cancelling it on SimScale
+[design_0024] FAILED: SimScaleError: simulation run cancelled: diverging: Cd = 10.98 is outside any physical range (2.08 CPU h billed)
+batch_20261028_032516_04: failed Cd=None
+batch_20261028_032516_01: failed Cd=None
+batch_20261028_032516_02: failed Cd=None
+batch_20261028_032516_03: ok Cd=0.7863034126142141
+batch_20261028_032516_04: failed Cd=None

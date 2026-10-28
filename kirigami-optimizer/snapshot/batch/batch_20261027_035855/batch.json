@@ -65,9 +65,13 @@
       "cd": null,
       "flow_volume_geometry_id": "80182528-fdfc-4981-883b-d9570aab0f33",
       "previous_design_ids": [
-        "design_0007"
+        "design_0007",
+        "design_0012",
+        "design_0014",
+        "design_0017",
+        "design_0019"
       ],
-      "design_id": "design_0012"
+      "design_id": "design_0020"
     },
     {
       "name": "batch_20261027_035855_02",
@@ -129,10 +133,13 @@
       ],
       "volume_in3": 0.6400968010813449,
       "projected_diameter_in": 9.570930129042196,
-      "design_id": "design_0008",
-      "status": "ok",
-      "cd": -1843276.6886843843,
-      "flow_volume_geometry_id": "08cd4ef3-1f13-40c9-b69e-599831ba5322"
+      "status": "failed",
+      "cd": null,
+      "flow_volume_geometry_id": "08cd4ef3-1f13-40c9-b69e-599831ba5322",
+      "previous_design_ids": [
+        "design_0008"
+      ],
+      "design_id": "design_0015"
     }
   ]
 }

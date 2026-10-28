@@ -314,3 +314,15 @@ SimScale keeps results of failed runs (`FORCE_COEFFICIENTS_PLOT`, `RESIDUALS_PLO
   the space (e.g. design_0011, 26 rings, Cd 0.7507) out of skopt's training data (skopt rejects points outside its bounds); they stay in the ledger.
 - Sliver screen pass rate in the new space: 12 of 30 candidates (40%); cuts per ring decides it: >= 9 reject almost always, <= 6 pass almost always, 7-8 mixed. Narrowing CUTS_PER_RING to 4-8 would
   lift the pass rate to about 75% and stop the optimizer proposing regions that can never be run (not done; user decision).
+
+## Update: batch_20261028_032516 (first batch in the 27-32 ring band) and the first live use of the runaway guard
+- design_0023 (29 rings, 6 cuts, exp 1.30, overlap 0.38, inner 0.74): **Cd 0.7863** (ok, 2.93 CPU h) - best valid result so far.
+- design_0021 (29r/5c): the runaway guard cancelled it at Cd -62.6 (1.40 CPU h instead of about 3). design_0024 (30r/4c): cancelled at Cd 10.98 (2.21 CPU h). The guard works live.
+- design_0022 (32r/7c): passed the sliver screen but SimScale's mesher failed with a self-intersection NEAR THE APEX (r about 0.24 in, z -0.14 in), i.e. in the centre cap region,
+  which the pair-overlap screen does not look at. 0 CPU h.
+- Total spent about 66.8 of 800 CPU h (ledger 50.3 + about 16.5 outside it).
+- Valid Cds (default numerics, fineness 4.5, 500 iterations): baseline 0.7327 (30r/8c), 26r/8c 0.7507, 31r/6c 0.7364, 31r/4c 0.7812, 29r/6c 0.7863.
+- Convergence is NOT predicted by any single geometric measure (checked on 9 designs: depth, ring spacing, overlap and cut angle at the rim, gaps, radius ratio). By cuts per ring:
+  6 cuts 2/2 converged in the 27-32 band (31r, 29r; the 23r one was outside the band), 8 cuts 2/2 (baseline, 26r), 4 cuts 1/3 (31r ok; 35r, 30r ran away), 5 cuts 0/1. Small numbers, but
+  cuts 6-8 look reliable and the sliver screen passes 6-cut designs almost always, so restricting CUTS_PER_RING to 6-8 is the obvious next narrowing (not done; user decision).
+- Cost model with the guard: a converging design about 3 CPU h, a runaway about 1.4-2.6 CPU h (was 3-11).
