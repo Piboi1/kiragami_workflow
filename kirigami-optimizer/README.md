@@ -90,7 +90,7 @@ python main.py sync-sheet              # re-send any rows that failed to reach t
 | Parameter | Range | Notes |
 |---|---|---|
 | `NUM_RINGS` | 27–32 | 9.3–11.1 in deep. Outside the 9–11 in band the steady solve runs away (HANDOFF.md). |
-| `CUTS_PER_RING` | 4–12 | |
+| `CUTS_PER_RING` | 4–8 | 9+ cuts crowd the inner rings so much that SimScale's mesher rejects the canopy (HANDOFF.md). |
 | `RING_SPACING_EXPONENT` | 0.6–1.5 | |
 | `RING_OVERLAP_FRACTION` | 0.2–1.0 | Overlap as a fraction of what the cut count allows: `180/N − MIN_GAP`. This avoids clamped dead zones. |
 | `INNER_RADIUS` | 0.5–1.25 in | |

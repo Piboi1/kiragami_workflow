@@ -340,3 +340,10 @@ SimScale keeps results of failed runs (`FORCE_COEFFICIENTS_PLOT`, `RESIDUALS_PLO
   Slivers are ribbon-ribbon (and hinge-ribbon) wedges of 1e-8..1e-7 in^3 in the crowded inner rings (r 0.6-1.2 in), an artifact of building the canopy from overlapping thin slabs.
   A real fix needs a different canopy construction (single clean fused solid / smooth CAD, cf. `solid/smooth_cad.py`), not a parameter tweak.
 - Open decision for the user: also restrict CUTS_PER_RING to 6-8? Caveat: design_0005 (31r/4c, Cd 0.7812, 2nd best) has 4 cuts; 4-5 cut designs ran away 2 of 3 times but are good when they converge.
+
+## Update: search space is now rings 27-32, cuts 4-8 (user decision: keep 4 cuts in)
+- `SEARCH_SPACE`: NUM_RINGS 27-32, CUTS_PER_RING **4-8** (was 4-12), RING_SPACING_EXPONENT 0.6-1.5, RING_OVERLAP_FRACTION 0.2-1.0, INNER_RADIUS 0.5-1.25. This is the region we can simulate, NOT a proven location of the optimum:
+  designs outside it (9+ cuts, other ring counts) cannot be meshed / converged with the present canopy model, so they are unexplored.
+- Size: 6 ring counts x 5 cut counts = 30 discrete combinations x 3 continuous parameters (about 43,000 grid points at steps of 0.1 / 0.1 / 0.05); the optimizer needs 50-100 evaluations; the budget allows
+  about 150-200 valid simulations (about 730 CPU h left at about 3.5 CPU h per valid result including failures).
+- The valid results so far all lie inside this region except design_0011 (26 rings), which is kept in the ledger but out of the optimizer's training data.

@@ -101,3 +101,9 @@ def test_settings_description_names_every_non_default_setting():
     odd = dict(base, MESH_FINENESS=6, END_TIME_S=1400, POTENTIAL_FOAM_INIT=True, RELAX_PRESSURE=0.2, RELAX_VELOCITY=0.5)
     text = describe_settings(odd)
     assert "fineness 6" in text and "1400 it" in text and "potential-flow init" in text and "relax p 0.2 U 0.5" in text
+
+
+def test_search_space_is_the_simulable_region():
+    bounds = {d["name"]: (d["low"], d["high"]) for d in config.SEARCH_SPACE}
+    assert bounds["NUM_RINGS"] == (27, 32)
+    assert bounds["CUTS_PER_RING"] == (4, 8)

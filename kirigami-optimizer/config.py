@@ -87,7 +87,9 @@ SEARCH_SPACE = [
     # 27-32 rings = 9.3-11.1 in deep. Every steady solve that converged was 9.0-10.8 in deep; the 7.9 in (23 rings) and
     # 12.2 in (35 rings) designs ran away exponentially (see HANDOFF.md), so the search is restricted to this band.
     {"name": "NUM_RINGS", "type": "int", "low": 27, "high": 32},
-    {"name": "CUTS_PER_RING", "type": "int", "low": 4, "high": 12},
+    # 4-8 cuts. With 9 or more cuts the inner rings are so crowded that neighbouring slabs overlap in slivers SimScale's mesher
+    # rejects (0 of 18 test designs with 10-12 cuts passed the screen; see solid/screen.py and HANDOFF.md).
+    {"name": "CUTS_PER_RING", "type": "int", "low": 4, "high": 8},
     {"name": "RING_SPACING_EXPONENT", "type": "real", "low": 0.6, "high": 1.5},
     {"name": "RING_OVERLAP_FRACTION", "type": "real", "low": 0.2, "high": 1.0},
     {"name": "INNER_RADIUS", "type": "real", "low": 0.5, "high": 1.25},
