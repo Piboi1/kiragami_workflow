@@ -1,0 +1,20 @@
+== PHASE 1: gate on the canopy-only geometries of the last batch (known outcome of the real mesh)
+   batch_20261028_192829_01  real mesh: ok (design_0025)     -> gate: ERROR        cpu None  ApiException: (404)
+Reason: 
+HTTP response headers: HTTPHeaderDict({'Content-Type': 'application/json', 'Content-Length': '462', 'Conn
+   batch_20261028_192829_02  real mesh: FAIL (design_0026)   -> gate: ERROR        cpu None  ApiException: (404)
+Reason: 
+HTTP response headers: HTTPHeaderDict({'Content-Type': 'application/json', 'Content-Length': '462', 'Conn
+   batch_20261028_192829_03  real mesh: FAIL (design_0027)   -> gate: ERROR        cpu None  ApiException: (404)
+Reason: 
+HTTP response headers: HTTPHeaderDict({'Content-Type': 'application/json', 'Content-Length': '462', 'Conn
+   batch_20261028_192829_04  real mesh: ok (design_0028)     -> gate: ERROR        cpu None  ApiException: (404)
+Reason: 
+HTTP response headers: HTTPHeaderDict({'Content-Type': 'application/json', 'Content-Length': '462', 'Conn
+== PHASE 2: candidate fixes for the failing designs (cap overlap into the first ring's hinges)
+  uploading p2_26_cap03_canopy_presplit.stl (4 MB, STL, sewing=True, improve=True)
+  geometry import: RUNNING
+  geometry import: FINISHED
+   design_0026 CAP_OVERLAP 0.03: gate NOT A SOLID  cpu None   (geometry dc1f11a7-0ec4-4cf7-ae33-fc1e19dc78b1)
+  uploading p2_26_cap08_canopy_presplit.stl (4 MB, STL, sewing=True, improve=True)
+  geometry import: RUNNING
