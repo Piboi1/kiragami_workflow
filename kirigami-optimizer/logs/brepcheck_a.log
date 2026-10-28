@@ -1,0 +1,5 @@
+design_0026 [MESH FAIL    ] union tris 14802 watertight True bodies 9 | B-rep faces 11536 valid False invalid faces 0 [] (5s)
+design_0027 [MESH FAIL    ] union tris 14746 watertight True bodies 1 | B-rep faces 11484 valid True invalid faces 0 [] (6s)
+design_0022 [MESH FAIL    ] union tris 18422 watertight True bodies 1 | B-rep faces 14295 valid True invalid faces 0 [] (6s)
+design_0023 [ok           ] union tris 14302 watertight True bodies 1 | B-rep faces 11100 valid True invalid faces 0 [] (4s)
+design_0025 [ok           ] union tris 8838 watertight True bodies 1 | B-rep faces 6890 valid True invalid faces 0 [] (3s)

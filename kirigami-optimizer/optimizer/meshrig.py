@@ -20,6 +20,7 @@ def mesh_test(params, name, route="step", cap=3.0, pass_progress=0.3, timeout=15
 
     saved = config.SIMSCALE["GEOMETRY_FORMAT"]
     config.SIMSCALE["GEOMETRY_FORMAT"] = {"step": "STEP", "stl": "STL"}[route]
+    config.SIMSCALE["STEP_CHECK"] = False  # the mesher is the judge; BRepCheck does not separate working from failing designs
     t0 = time.time()
     out = config.RUNS_DIR / "mesh_tests" / name
     out.mkdir(parents=True, exist_ok=True)
@@ -51,6 +52,7 @@ def mesh_test(params, name, route="step", cap=3.0, pass_progress=0.3, timeout=15
         result["cpu_hours"] = round(float(state.get("mesh_core_hours") or 0.0), 3)
     finally:
         config.SIMSCALE["GEOMETRY_FORMAT"] = saved
+        config.SIMSCALE.pop("STEP_CHECK", None)
     result["seconds"] = round(time.time() - t0)
     (out / "mesh_test.json").write_text(json.dumps(result, indent=2, default=str) + "\n")
     return result

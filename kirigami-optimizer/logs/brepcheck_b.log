@@ -1,0 +1,5 @@
+design_0028 [ok           ] union tris 21166 watertight True bodies 1 | B-rep faces 16310 valid True invalid faces 0 [] (8s)
+design_0009 [ok           ] union tris 15274 watertight True bodies 1 | B-rep faces 11862 valid True invalid faces 0 [] (6s)
+design_0005 [ok           ] union tris 10158 watertight True bodies 1 | B-rep faces 7910 valid True invalid faces 0 [] (3s)
+design_0011 [ok           ] union tris 17074 watertight True bodies 8 | B-rep faces 13304 valid False invalid faces 0 [] (6s)
+design_0002 [ok (baseline)] union tris 19662 watertight True bodies 1 | B-rep faces 15310 valid True invalid faces 0 [] (6s)
