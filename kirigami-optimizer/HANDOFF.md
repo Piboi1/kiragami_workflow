@@ -364,3 +364,20 @@ SimScale keeps results of failed runs (`FORCE_COEFFICIENTS_PLOT`, `RESIDUALS_PLO
 - New tab **`results`**: valid designs ranked by Cd with predicted fall speed, parameters, depth, Cd x area, solver settings, CPU hours; valid runs with other solver settings listed below (not comparable).
   Rebuilt from the ledger after every logged run (`pipeline.evaluate_design`, best effort) and on demand with `python main.py sync-results`. Code: `sheets/results.py` (`outcome_of`, `results_table`, `refresh_results_tab`).
 - Backup of the `runs` tab before this clean-up: scratchpad `sheet_backup_before_cleanup.csv` (outside the repo). The `outcome` column is filled by `pipeline._row` for new rows. 58 tests pass.
+
+## Update: why designs fail the mesher, and the clean generator (EXTRUDE_METHOD=clean)
+- **Root cause found.** The legacy canopy thickens every strip along node-averaged vertex normals. Strips only touch at nodes (never along an edge), so those normals
+  sit up to 87 degrees off a ribbon at hinge/diagonal junctions: slabs thin to slivers or fold through themselves (14-18 of 529 pieces self-intersect in design_0026).
+  `solid/selfcheck.py` finds crossing triangles locally: design_0026's welded canopy has 4 crossings at r 0.75 in, z -0.29 in, exactly where the mesher failed (r 0.74, z -0.28).
+  SimScale's STEP import also rejects that geometry (`fault-face-bad_face_face`).
+- **designs 0027 / 0022 fail only on the pre-split STL route** (SimScale's own union of the pieces). Through our exact `weld_union` + STEP air volume (`mesh-test`, no manual
+  flow-volume step) design_0027, 0025 and 0028 all PASS the mesher (2.29 / 1.71 / 1.48 CPU h to 30% progress; costs are billed, cap 3).
+- **Clean generator**: each ribbon is thickened along its OWN normals, ribbon ends overlap 0.01 in so the slabs fuse into one body, then needle edges (< 1e-3 in) and sliver
+  triangles (height < 5e-4 in) are merged and the result is re-checked (1 body, watertight, no crossing triangles; `CLEAN_SIMPLIFY_TOL` 0.002 keeps the face count low).
+  Ribbon layout is unchanged (same `build_open_strips`); thickness is a true 0.015 in everywhere, so volume is about 5% higher than the thinned legacy weld (0.729 vs 0.696 in^3 for design_0026).
+  Cds from clean and legacy geometry are therefore NOT directly comparable; re-run a known design (e.g. design_0023) on clean before mixing them.
+- **design_0026 on clean: mesher PASS** (2.22 CPU h to 30%). Steps that did not work: raw union (SimScale `fault-edge-invalid`, edges to 1e-7 in), edge collapse only (mesher: element size too
+  close to CAD tolerance), more than ~20k B-rep faces (SimScale then drops the box-wall names, so keep the STEP below that).
+- Commands (free): `python main.py build-clean --design-id design_0026 [--step]`; mesh rig (billed, cap per design): `python main.py mesh-test --design-id design_0026 --set EXTRUDE_METHOD=clean --no-improve`;
+  free geometry-acceptance check: add `--import-only`.
+- Not done: running the solver on clean geometry, wiring clean + STEP into prepare-batch/run-batch (would remove the manual flow-volume step), OpenCascade fuse route (prototype ran 15+ min on design_0022 with no result).

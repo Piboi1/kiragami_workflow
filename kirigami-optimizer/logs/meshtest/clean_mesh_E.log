@@ -1,0 +1,9 @@
+  uploading design_0026_step_cleanE_flow_domain.step (24 MB, STEP, sewing=False, improve=False)
+  geometry import: RUNNING
+  geometry import: FINISHED
+  meshing: QUEUED 0%
+  meshing: RUNNING 0%
+  meshing: RUNNING 10%
+  meshing: RUNNING 30%
+  meshing: reached 30% (>= 30%) -- cancelling it on SimScale (test passed)
+design_0026: PASS   cpu 2.216 h, 1237 s  

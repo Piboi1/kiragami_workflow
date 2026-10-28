@@ -57,7 +57,7 @@ DEFAULT_SOLID_PARAMS = {
     # shorter than this (inches). The union of thin overlapping slabs leaves
     # micron-scale slivers that CAD kernels reject as clashing faces.
     "SIMPLIFY_TOLERANCE": 1e-4,
-    "CLEAN_SIMPLIFY_TOL": 0.0,  # EXTRUDE_METHOD "clean" only: collapse features smaller than this after the union (fewer faces)
+    "CLEAN_SIMPLIFY_TOL": 0.002,  # EXTRUDE_METHOD "clean" only: collapse features smaller than this after the union (fewer faces)
     # "legacy" only: 1 builds the shell like the original Colab script (trimesh's default
     # process=True merges coincident vertices, so neighbouring strips share vertices and
     # the extrusion offsets use averaged normals). 0 keeps every strip separate.
