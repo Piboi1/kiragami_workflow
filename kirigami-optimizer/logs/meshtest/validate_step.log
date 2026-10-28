@@ -1,2 +1,13 @@
   uploading design_0026_step_flow_domain.step (13 MB, STEP, sewing=False, improve=True)
   geometry import: RUNNING
+  geometry import: FAILED
+design_0026: ERROR  cpu 0.0 h, 135 s  SimScaleError: geometry import FAILED: {'code': 'model-has-invalid-geometry',
+ 'details': {'faults': [{'code': 'fault-face-bad_face_face',
+                         'entityIds': ['B1_TE48951'],
+       
+  uploading design_0027_step_flow_domain.step (13 MB, STEP, sewing=False, improve=True)
+  geometry import: RUNNING
+  geometry import: FINISHED
+  meshing: QUEUED 0%
+  meshing: RUNNING 0%
+  meshing: RUNNING 10%

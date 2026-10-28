@@ -358,6 +358,9 @@ def check_feasible(rings, kerf_factor, min_cap_radius):
         )
 
 
+CLEAN_JOINT_OVERLAP_IN = 0.01  # ribbon ends reach this far past each node so the slabs fuse into one body (0.7 sheet thicknesses)
+
+
 def build_solid(ring_data, params=None):
     """Builds the watertight 3D canopy solid.
 
@@ -382,6 +385,12 @@ def build_solid(ring_data, params=None):
     rings = normalize_ring_data(ring_data)
     check_feasible(rings, float(p["KERF_FACTOR"]), float(p["MIN_CAP_RADIUS"]))
     method = p["EXTRUDE_METHOD"]
+    if method == "clean":
+        method = "union"
+        # Each ribbon is thickened along its OWN normals (not the node-averaged ones of the legacy build, which sit up to 87 degrees
+        # off the ribbon at hinge/diagonal junctions and thin or fold the slab); ribbons are fused by a short end overlap.
+        p["JOINT_OVERLAP"] = max(float(p["JOINT_OVERLAP"]), CLEAN_JOINT_OVERLAP_IN)
+        p["SIMPLIFY_TOLERANCE"] = 0.0
     joint_overlap = float(p["JOINT_OVERLAP"]) if method == "union" else 0.0
     strips = build_open_strips(rings, cuts, float(p["VERTICAL_DROP"]), float(p["KERF_FACTOR"]), joint_overlap,
                                bridge_extra=float(p["BRIDGE_EXTRA"]),
@@ -397,6 +406,14 @@ def build_solid(ring_data, params=None):
         mesh = _legacy_extrude(strips, thickness, weld=bool(round(float(p["WELD_STRIPS"]))))
     else:
         raise ValueError(f"unknown EXTRUDE_METHOD {method!r}")
+
+    if p["EXTRUDE_METHOD"] == "clean":
+        from solid.selfcheck import self_intersections
+
+        crossings = len(self_intersections(mesh))
+        if mesh.body_count != 1 or not mesh.is_watertight or crossings:
+            raise InfeasibleGeometry(f"clean canopy not clean: {mesh.body_count} bodies, watertight {mesh.is_watertight}, "
+                                     f"{crossings} self-intersecting triangle pairs")
 
     radial = np.linalg.norm(mesh.vertices[:, :2], axis=1)
     projected_radius = float(radial.max())

@@ -187,7 +187,10 @@ def cmd_mesh_test(args):
         params = dict(rec["params"])
         for item in args.set or []:
             key, _, value = item.partition("=")
-            params[key] = float(value)
+            try:
+                params[key] = float(value)
+            except ValueError:
+                params[key] = value
         res = mesh_test(params, f"{design_id}_{args.route}{args.tag}", route=args.route, cap=args.cap,
                         pass_progress=args.pass_progress, timeout=args.timeout)
         results.append(res)

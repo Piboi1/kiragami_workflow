@@ -141,3 +141,27 @@ def test_presplit_stl_has_one_closed_block_per_piece(tmp_path):
     blocks = trimesh.load(path).geometry.values()
     assert all(b.is_watertight and b.volume > 0 for b in blocks)
     assert abs(sum(b.volume for b in blocks) - 0.8897) < 2e-3
+
+
+def test_clean_canopy_is_one_crossing_free_body_with_uniform_thickness():
+    # Legacy thickening uses node-averaged normals (up to 87 deg off a ribbon), so slabs thin and fold; the clean build uses each ribbon's own normals.
+    from solid.selfcheck import self_intersections
+
+    mesh, info = build_solid(LEGACY_3D_RING_DATA, {"EXTRUDE_METHOD": "clean", "BRIDGE_EXTRA": 0.0})
+    assert info["is_watertight"] and info["body_count"] == 1
+    assert not self_intersections(mesh)
+    # ribbons are as thick as modelled: more material than the thinned legacy weld (0.8826 in^3), within about 15%
+    assert 0.88 < mesh.volume < 1.0
+
+
+def test_self_intersection_finder_sees_a_crossing():
+    import trimesh
+
+    from solid.selfcheck import self_intersections
+
+    a = trimesh.creation.box(extents=(1, 1, 1))
+    b = trimesh.creation.box(extents=(1, 1, 1))
+    b.apply_translation((0.31, 0.43, 0.57))
+    assert self_intersections(trimesh.util.concatenate([a, b]))
+    b.apply_translation((3.0, 0, 0))
+    assert not self_intersections(trimesh.util.concatenate([a, b]))
