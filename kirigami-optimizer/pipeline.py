@@ -16,6 +16,7 @@ from optimizer.space import from_params, normalize
 from solid import InfeasibleGeometry, build_flow_domain, build_solid, export_stl, weld_union, write_named_stl, write_presplit_stl
 from solid.canopy import DEFAULT_SOLID_PARAMS
 from simscale.results import core_hours_used
+from sheets.results import outcome_of, refresh_results_tab
 from solid.depth_model import get_depth_model
 from solid.step_export import write_step
 from solid.flow_domain import DEFAULT_DOMAIN_PARAMS, domain_box_bounds
@@ -158,6 +159,7 @@ def _row(record):
         "run_duration": c.get("run_duration"),
         "error": record.get("error"),
         "solver_settings": record.get("settings"),
+        "outcome": outcome_of(record),
     })
     return row
 
@@ -258,6 +260,10 @@ def evaluate_design(ctx, params, mode="single", uz_override=None, resume=None):
     if record["status"] != "dry_run":
         if ctx.logger.log(record["row"]):
             ledger.mark_synced(design_id)
+            try:  # keep the ranked `results` tab current (best effort: never fail a design over a spreadsheet)
+                refresh_results_tab(ctx.logger.sheet.spreadsheet, ledger.records, config.VELOCITY["AIR_DENSITY"])
+            except Exception as exc:
+                ctx.log(f"  (results tab not refreshed: {type(exc).__name__})")
         else:
             ctx.log(f"  (sheet not updated: {ctx.logger.sheet_error}; row kept in {config.LOCAL_RESULTS_CSV})")
     return record

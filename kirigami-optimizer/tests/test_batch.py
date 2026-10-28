@@ -128,3 +128,20 @@ def test_export_print_gives_one_watertight_solid_at_the_requested_height(tmp_pat
     mesh = trimesh.load(out, force="mesh")
     assert mesh.is_watertight and mesh.body_count == 1
     assert abs(mesh.extents[2] - 152.4) < 0.1 and abs(mesh.bounds[0][2]) < 1e-6      # 6 in tall, rim on the build plate
+
+
+def test_results_table_ranks_valid_designs_and_separates_other_settings():
+    from sheets.results import DEFAULT_SETTINGS, outcome_of, results_table
+
+    def rec(did, cd, settings=DEFAULT_SETTINGS, status="ok", error=None):
+        return {"design_id": did, "status": status, "cd": cd if status == "ok" else None, "error": error, "settings": settings,
+                "params": {"NUM_RINGS": 30, "CUTS_PER_RING": 6}, "solid": {"reference_area_in2": 73.0, "canopy_depth_in": 10.0},
+                "velocity": {"mass_kg": 0.0238}, "simscale": {"mesh_core_hours": 0.1, "run_core_hours": 3.0}}
+
+    records = [rec("a", 0.74), rec("b", 0.79), rec("c", 0.80, settings="fineness 6; 500 it; default numerics"),
+               rec("d", None, status="failed", error="SimScaleError: meshing FAILED")]
+    header, good, other = results_table(records, 1.196)
+    assert [r[1] for r in good] == ["b", "a"] and [r[0] for r in good] == [1, 2]      # ranked by Cd, failures left out
+    assert [r[1] for r in other] == ["c"] and "not comparable" in other[0][-1]
+    assert outcome_of(records[3]) == "mesh failed" and outcome_of(records[0]) == "valid"
+    assert good[0][3] < good[1][3]                                                      # higher Cd -> slower predicted fall

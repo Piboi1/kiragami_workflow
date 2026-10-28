@@ -1,3 +1,20 @@
   uploading batch_20261028_192829_02_canopy_presplit.stl (4 MB, STL, sewing=True, improve=True)
   geometry import: RUNNING
   geometry import: FINISHED
+{
+  "name": "p1b_02",
+  "result": "INCONCLUSIVE",
+  "reason": "stopped at cap/timeout (0.272 CPU h, progress 0.1)",
+  "status": "CANCELED",
+  "progress": 0.1,
+  "cpu_hours": 0.26666666666666666,
+  "geometry_id": "1afa4181-8858-4b29-ad34-711d28ddd725",
+  "mesh_operation_id": "8bd0e5c6-9cbf-423d-bf8b-43da821dfe46",
+  "simplify_tol": 0.0001,
+  "joint_overlap": null,
+  "wall_s": 260
+}
+   batch_20261028_192829_02  real mesh: mesh FAIL (design_0026)  -> canopy-only gate: INCONCLUSIVE progress 0.1 cpu 0.27 wall 260s  stopped at cap/timeout (0.272 CPU h, progress 0.1)
+  uploading batch_20261028_192829_03_canopy_presplit.stl (4 MB, STL, sewing=True, improve=True)
+  geometry import: RUNNING
+  geometry import: FINISHED

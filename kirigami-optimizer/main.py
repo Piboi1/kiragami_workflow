@@ -262,6 +262,20 @@ def cmd_optimize(args):
     return 0
 
 
+def cmd_sync_results(args):
+    """Rebuilds the ranked `results` tab of the Google Sheet from the ledger (the raw `runs` tab is not touched)."""
+
+    from sheets.results import refresh_results_tab
+
+    logger = RunLogger(config.LOCAL_RESULTS_CSV, config.SHEETS)
+    if logger.sheet is None:
+        print(f"Google Sheet not available: {logger.sheet_error}")
+        return 1
+    n = refresh_results_tab(logger.sheet.spreadsheet, Ledger(config.LEDGER_PATH).records, config.VELOCITY["AIR_DENSITY"])
+    print(f"results tab refreshed: {n} valid design(s) ranked")
+    return 0
+
+
 def cmd_sync(args):
     ctx = Context(ledger=Ledger(config.LEDGER_PATH), logger=RunLogger(config.LOCAL_RESULTS_CSV, config.SHEETS),
                   estimator=None)
@@ -758,6 +772,7 @@ def main(argv=None):
     p.set_defaults(fn=cmd_optimize)
 
     sub.add_parser("sync-sheet").set_defaults(fn=cmd_sync)
+    sub.add_parser("sync-results").set_defaults(fn=cmd_sync_results)
     sub.add_parser("status").set_defaults(fn=cmd_status)
     sub.add_parser("depth-model").set_defaults(fn=cmd_depth_model)
 

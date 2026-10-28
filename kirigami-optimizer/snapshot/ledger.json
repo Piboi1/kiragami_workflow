@@ -227,7 +227,8 @@
         "run_duration": null,
         "error": "SimScaleError: simulation estimate 18.66 core hours exceeds cap 5.0"
       },
-      "sheet_synced": true
+      "sheet_synced": true,
+      "settings": "fineness 4.5; 500 it; default numerics"
     },
     {
       "design_id": "design_0002",
@@ -487,7 +488,8 @@
         "run_duration": "PT12M10.061469S",
         "error": null
       },
-      "sheet_synced": true
+      "sheet_synced": true,
+      "settings": "fineness 4.5; 500 it; default numerics"
     },
     {
       "design_id": "design_0003",
@@ -730,7 +732,8 @@
         "run_duration": null,
         "error": "SimScaleError: meshing FAILED"
       },
-      "sheet_synced": true
+      "sheet_synced": true,
+      "settings": "fineness 4.5; 500 it; default numerics"
     },
     {
       "design_id": "design_0004",
@@ -973,7 +976,8 @@
         "run_duration": null,
         "error": "SimScaleError: meshing FAILED"
       },
-      "sheet_synced": true
+      "sheet_synced": true,
+      "settings": "fineness 4.5; 500 it; default numerics"
     },
     {
       "design_id": "design_0005",
@@ -1249,7 +1253,8 @@
         "run_duration": "PT10M24.574974S",
         "error": null
       },
-      "sheet_synced": true
+      "sheet_synced": true,
+      "settings": "fineness 4.5; 500 it; default numerics"
     },
     {
       "design_id": "design_0006",
@@ -1494,7 +1499,8 @@
         "run_duration": null,
         "error": "SimScaleError: meshing FAILED"
       },
-      "sheet_synced": true
+      "sheet_synced": true,
+      "settings": "fineness 4.5; 500 it; default numerics"
     },
     {
       "design_id": "design_0007",
@@ -1744,7 +1750,8 @@
         "run_duration": null,
         "error": "SimScaleError: simulation run FAILED"
       },
-      "sheet_synced": true
+      "sheet_synced": true,
+      "settings": "fineness 4.5; 500 it; default numerics"
     },
     {
       "design_id": "design_0008",
@@ -2024,7 +2031,8 @@
         "cm_window_std": 2902533.6096009603,
         "run_duration": "PT11M19.894239S",
         "core_hours_used": 3.17
-      }
+      },
+      "settings": "fineness 4.5; 500 it; default numerics"
     },
     {
       "design_id": "design_0009",
@@ -2302,7 +2310,8 @@
         "run_duration": "PT11M36.155984S",
         "error": null
       },
-      "sheet_synced": true
+      "sheet_synced": true,
+      "settings": "fineness 4.5; 500 it; default numerics"
     },
     {
       "design_id": "design_0010",
@@ -2531,7 +2540,8 @@
         "error": "ValueError: math domain error"
       },
       "sheet_synced": true,
-      "note": "pipeline bug (speed estimator fed the invalid Cd of design_0008), not a design failure; to be re-run"
+      "note": "pipeline bug (speed estimator fed the invalid Cd of design_0008), not a design failure; to be re-run",
+      "settings": "fineness 4.5; 500 it; default numerics"
     },
     {
       "design_id": "design_0011",
@@ -2809,7 +2819,8 @@
         "run_duration": "PT11M47.900337S",
         "error": null
       },
-      "sheet_synced": true
+      "sheet_synced": true,
+      "settings": "fineness 4.5; 500 it; default numerics"
     },
     {
       "design_id": "design_0012",
@@ -3059,7 +3070,8 @@
         "run_duration": null,
         "error": "SimScaleError: simulation run FAILED"
       },
-      "sheet_synced": true
+      "sheet_synced": true,
+      "settings": "fineness 4.5; 500 it; potential-flow init; relax p 0.2 U 0.5"
     },
     {
       "design_id": "design_0013",
@@ -3320,7 +3332,8 @@
         "run_duration": "PT12M25.487634S",
         "error": null
       },
-      "sheet_synced": true
+      "sheet_synced": true,
+      "settings": "fineness 4.5; 500 it; potential-flow init; relax p 0.2 U 0.5"
     },
     {
       "design_id": "design_0014",
@@ -3562,7 +3575,8 @@
         "error": "ApiException: (400)\nReason: \nHTTP response headers: HTTPHeaderDict({'Content-Type': 'application/json', 'Content-Length': '1914', 'Connection': 'keep-alive', 'Date': 'Tue, 27 Oct 2026 16:37:56 GMT', 'Expires': 'Thu, 01 Jan 1970 00:00:00 UTC', 'Trace-Id': '0815c552, 0815c552', 'Span-Id': 'qwzmtx7j, xhk5ikv7', 'Vary': 'Origin, Access-Control-Request-Method, Access-Control-Request-Headers, Authorization, Origin', 'X-Content-Type-Options': 'nosniff', 'X-XSS-Protection': '0', 'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload', 'X-Frame-Options': 'DENY', 'Cache-Control': 'private', 'X-Cache': 'Error from cloudfront', 'Via': '1.1 92e9bd63c231b05a53ff468818f03f94.cloudfront.net (CloudFront)', 'X-Amz-Cf-Pop': 'ORD58-P15', 'Alt-Svc': 'h3=\":443\"; ma=86400', 'X-Amz-Cf-Id': '4itVFAQsmPLz-dVOvE_co1xGz4PFzDIUU3-7gB6TONswNsx_TT5LLQ==', 'Referrer-Policy': 'strict-origin-when-cross-origin'})\nHTTP response body: {\n  \"code\" : \"spec-validation-error\",\n  \"details\" : {\n    \"problems\" : [ {\n      \"severity\" : \"ERROR\",\n      \"code\" : \"invalid-object-subtype\",\n      \"message\" : \"Invalid subtype found: GaussUpwindDivergenceScheme. Valid subtype(s): GaussLinearDivergenceScheme, GaussLinearUpwindVUnlimitedDivergenceScheme.\",\n      \"path\" : \"$.model.numerics.schemes.divergence.forDefault\",\n      \"allowMarkdown\" : false,\n      \"topoEntities\" : [ ],\n      \"details\" : {\n        \"path\" : \"$.model.numerics.schemes.divergence.forDefault\",\n        \"actualSubtype\" : \"GaussUpwindDivergenceScheme\",\n        \"validSubtypes\" : [ \"GaussLinearDivergenceScheme\", \"GaussLinearUpwindVUnlimitedDivergenceScheme\" ],\n        \"parameterValuesCombinations\" : [ ],\n        \"topoEntities\" : [ ]\n      },\n      \"errorMessageAddedToI18N\" : false,\n      \"errorDetails\" : {\n        \"parameters\" : [ ],\n        \"details\" : {\n          \"path\" : \"$.model.numerics.schemes.divergence.forDefault\",\n          \"actualSubtype\" : \"GaussUpwindDivergenceScheme\",\n          \"validSubtypes\" : [ \"GaussLinearDivergenceScheme\", \"GaussLinearUpwindVUnlimitedDivergenceScheme\" ],\n          \"parameterValuesCombinations\" : [ ],\n          \"topoEntities\" : [ ]\n        }\n      }\n    } ],\n    \"parameters\" : [ ]\n  },\n  \"entries\" : [ {\n    \"code\" : \"invalid-object-subtype\",\n    \"details\" : {\n      \"path\" : \"$.model.numerics.schemes.divergence.forDefault\",\n      \"actualSubtype\" : \"GaussUpwindDivergenceScheme\",\n      \"validSubtypes\" : [ \"GaussLinearDivergenceScheme\", \"GaussLinearUpwindVUnlimitedDivergenceScheme\" ],\n      \"parameterValuesCombinations\" : [ ],\n      \"topoEntities\" : [ ]\n    },\n    \"message\" : \"Invalid subtype found: GaussUpwindDivergenceScheme. Valid subtype(s): GaussLinearDivergenceScheme, GaussLinearUpwindVUnlimitedDivergenceScheme.\",\n    \"severity\" : \"ERROR\"\n  } ],\n  \"message\" : \"Unprocessable entity\",\n  \"severity\" : \"ERROR\",\n  \"trace\" : \"0815c552\"\n}\n"
       },
       "sheet_synced": true,
-      "note": "rejected by SimScale spec validation (invalid scheme), 0 CPU h; not a design failure"
+      "note": "rejected by SimScale spec validation (invalid scheme), 0 CPU h; not a design failure",
+      "settings": "never ran: SimScale rejected the spec (stable-scheme attempt)"
     },
     {
       "design_id": "design_0015",
@@ -3804,7 +3818,8 @@
         "error": "ApiException: (400)\nReason: \nHTTP response headers: HTTPHeaderDict({'Content-Type': 'application/json', 'Content-Length': '1914', 'Connection': 'keep-alive', 'Date': 'Tue, 27 Oct 2026 16:38:05 GMT', 'Expires': 'Thu, 01 Jan 1970 00:00:00 UTC', 'Trace-Id': '59f65bf7, 59f65bf7', 'Span-Id': '2lkg73ew, tjmiqrcx', 'Vary': 'Origin, Access-Control-Request-Method, Access-Control-Request-Headers, Authorization, Origin', 'X-Content-Type-Options': 'nosniff', 'X-XSS-Protection': '0', 'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload', 'X-Frame-Options': 'DENY', 'Cache-Control': 'private', 'X-Cache': 'Error from cloudfront', 'Via': '1.1 92e9bd63c231b05a53ff468818f03f94.cloudfront.net (CloudFront)', 'X-Amz-Cf-Pop': 'ORD58-P15', 'Alt-Svc': 'h3=\":443\"; ma=86400', 'X-Amz-Cf-Id': 'FXzMuZZcY2sULz1pdLAtlguqdOLgmoqwJQoSl5h1s-NMR1oi4BsYOA==', 'Referrer-Policy': 'strict-origin-when-cross-origin'})\nHTTP response body: {\n  \"code\" : \"spec-validation-error\",\n  \"details\" : {\n    \"problems\" : [ {\n      \"severity\" : \"ERROR\",\n      \"code\" : \"invalid-object-subtype\",\n      \"message\" : \"Invalid subtype found: GaussUpwindDivergenceScheme. Valid subtype(s): GaussLinearDivergenceScheme, GaussLinearUpwindVUnlimitedDivergenceScheme.\",\n      \"path\" : \"$.model.numerics.schemes.divergence.forDefault\",\n      \"allowMarkdown\" : false,\n      \"topoEntities\" : [ ],\n      \"details\" : {\n        \"path\" : \"$.model.numerics.schemes.divergence.forDefault\",\n        \"actualSubtype\" : \"GaussUpwindDivergenceScheme\",\n        \"validSubtypes\" : [ \"GaussLinearDivergenceScheme\", \"GaussLinearUpwindVUnlimitedDivergenceScheme\" ],\n        \"parameterValuesCombinations\" : [ ],\n        \"topoEntities\" : [ ]\n      },\n      \"errorMessageAddedToI18N\" : false,\n      \"errorDetails\" : {\n        \"parameters\" : [ ],\n        \"details\" : {\n          \"path\" : \"$.model.numerics.schemes.divergence.forDefault\",\n          \"actualSubtype\" : \"GaussUpwindDivergenceScheme\",\n          \"validSubtypes\" : [ \"GaussLinearDivergenceScheme\", \"GaussLinearUpwindVUnlimitedDivergenceScheme\" ],\n          \"parameterValuesCombinations\" : [ ],\n          \"topoEntities\" : [ ]\n        }\n      }\n    } ],\n    \"parameters\" : [ ]\n  },\n  \"entries\" : [ {\n    \"code\" : \"invalid-object-subtype\",\n    \"details\" : {\n      \"path\" : \"$.model.numerics.schemes.divergence.forDefault\",\n      \"actualSubtype\" : \"GaussUpwindDivergenceScheme\",\n      \"validSubtypes\" : [ \"GaussLinearDivergenceScheme\", \"GaussLinearUpwindVUnlimitedDivergenceScheme\" ],\n      \"parameterValuesCombinations\" : [ ],\n      \"topoEntities\" : [ ]\n    },\n    \"message\" : \"Invalid subtype found: GaussUpwindDivergenceScheme. Valid subtype(s): GaussLinearDivergenceScheme, GaussLinearUpwindVUnlimitedDivergenceScheme.\",\n    \"severity\" : \"ERROR\"\n  } ],\n  \"message\" : \"Unprocessable entity\",\n  \"severity\" : \"ERROR\",\n  \"trace\" : \"59f65bf7\"\n}\n"
       },
       "sheet_synced": true,
-      "note": "rejected by SimScale spec validation (invalid scheme), 0 CPU h; not a design failure"
+      "note": "rejected by SimScale spec validation (invalid scheme), 0 CPU h; not a design failure",
+      "settings": "never ran: SimScale rejected the spec (stable-scheme attempt)"
     },
     {
       "design_id": "design_0016",
@@ -4029,7 +4044,8 @@
         "error": "ApiException: (400)\nReason: \nHTTP response headers: HTTPHeaderDict({'Content-Type': 'application/json', 'Content-Length': '1914', 'Connection': 'keep-alive', 'Date': 'Tue, 27 Oct 2026 16:38:16 GMT', 'Expires': 'Thu, 01 Jan 1970 00:00:00 UTC', 'Trace-Id': '2ac29f38, 2ac29f38', 'Span-Id': '2beq62qq, fgxjnrux', 'Vary': 'Origin, Access-Control-Request-Method, Access-Control-Request-Headers, Authorization, Origin', 'X-Content-Type-Options': 'nosniff', 'X-XSS-Protection': '0', 'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload', 'X-Frame-Options': 'DENY', 'Cache-Control': 'private', 'X-Cache': 'Error from cloudfront', 'Via': '1.1 9b9d51d09843a8fb67e0230c8b540698.cloudfront.net (CloudFront)', 'X-Amz-Cf-Pop': 'IAD61-P9', 'Alt-Svc': 'h3=\":443\"; ma=86400', 'X-Amz-Cf-Id': 'mo0awnl4R2vZwOQFW1uOGggXT-cmmScBsQ7IuRnGQQGtXWZ5OJ-OuQ==', 'Referrer-Policy': 'strict-origin-when-cross-origin'})\nHTTP response body: {\n  \"code\" : \"spec-validation-error\",\n  \"details\" : {\n    \"problems\" : [ {\n      \"severity\" : \"ERROR\",\n      \"code\" : \"invalid-object-subtype\",\n      \"message\" : \"Invalid subtype found: GaussUpwindDivergenceScheme. Valid subtype(s): GaussLinearDivergenceScheme, GaussLinearUpwindVUnlimitedDivergenceScheme.\",\n      \"path\" : \"$.model.numerics.schemes.divergence.forDefault\",\n      \"allowMarkdown\" : false,\n      \"topoEntities\" : [ ],\n      \"details\" : {\n        \"path\" : \"$.model.numerics.schemes.divergence.forDefault\",\n        \"actualSubtype\" : \"GaussUpwindDivergenceScheme\",\n        \"validSubtypes\" : [ \"GaussLinearDivergenceScheme\", \"GaussLinearUpwindVUnlimitedDivergenceScheme\" ],\n        \"parameterValuesCombinations\" : [ ],\n        \"topoEntities\" : [ ]\n      },\n      \"errorMessageAddedToI18N\" : false,\n      \"errorDetails\" : {\n        \"parameters\" : [ ],\n        \"details\" : {\n          \"path\" : \"$.model.numerics.schemes.divergence.forDefault\",\n          \"actualSubtype\" : \"GaussUpwindDivergenceScheme\",\n          \"validSubtypes\" : [ \"GaussLinearDivergenceScheme\", \"GaussLinearUpwindVUnlimitedDivergenceScheme\" ],\n          \"parameterValuesCombinations\" : [ ],\n          \"topoEntities\" : [ ]\n        }\n      }\n    } ],\n    \"parameters\" : [ ]\n  },\n  \"entries\" : [ {\n    \"code\" : \"invalid-object-subtype\",\n    \"details\" : {\n      \"path\" : \"$.model.numerics.schemes.divergence.forDefault\",\n      \"actualSubtype\" : \"GaussUpwindDivergenceScheme\",\n      \"validSubtypes\" : [ \"GaussLinearDivergenceScheme\", \"GaussLinearUpwindVUnlimitedDivergenceScheme\" ],\n      \"parameterValuesCombinations\" : [ ],\n      \"topoEntities\" : [ ]\n    },\n    \"message\" : \"Invalid subtype found: GaussUpwindDivergenceScheme. Valid subtype(s): GaussLinearDivergenceScheme, GaussLinearUpwindVUnlimitedDivergenceScheme.\",\n    \"severity\" : \"ERROR\"\n  } ],\n  \"message\" : \"Unprocessable entity\",\n  \"severity\" : \"ERROR\",\n  \"trace\" : \"2ac29f38\"\n}\n"
       },
       "sheet_synced": true,
-      "note": "rejected by SimScale spec validation (invalid scheme), 0 CPU h; not a design failure"
+      "note": "rejected by SimScale spec validation (invalid scheme), 0 CPU h; not a design failure",
+      "settings": "never ran: SimScale rejected the spec (stable-scheme attempt)"
     },
     {
       "design_id": "design_0017",
@@ -4279,7 +4295,8 @@
         "run_duration": null,
         "error": "SimScaleError: simulation run FAILED"
       },
-      "sheet_synced": true
+      "sheet_synced": true,
+      "settings": "fineness 4.5; 500 it; upwind k/omega"
     },
     {
       "design_id": "design_0018",
@@ -4622,7 +4639,8 @@
         "cm_window_std": 0.012237688474601426,
         "run_duration": "PT16M28.69872S",
         "core_hours_used": 4.598611111111111
-      }
+      },
+      "settings": "fineness 6; 500 it; default numerics"
     },
     {
       "design_id": "design_0020",
@@ -4872,7 +4890,8 @@
         "run_duration": null,
         "error": "SimScaleError: implausible Cd 33.217751056421065: the solver diverged although SimScale reported the run as finished"
       },
-      "sheet_synced": true
+      "sheet_synced": true,
+      "settings": "fineness 6; 1400 it; default numerics"
     },
     {
       "design_id": "design_0021",
@@ -5122,7 +5141,8 @@
         "run_duration": null,
         "error": "SimScaleError: simulation run cancelled: diverging: Cd = -62.63 is outside any physical range (1.27 CPU h billed)"
       },
-      "sheet_synced": true
+      "sheet_synced": true,
+      "settings": "fineness 4.5; 500 it; default numerics"
     },
     {
       "design_id": "design_0022",
@@ -5367,7 +5387,8 @@
         "run_duration": null,
         "error": "SimScaleError: meshing FAILED"
       },
-      "sheet_synced": true
+      "sheet_synced": true,
+      "settings": "fineness 4.5; 500 it; default numerics"
     },
     {
       "design_id": "design_0023",
@@ -5647,7 +5668,8 @@
         "run_duration": "PT10M30.977212S",
         "error": null
       },
-      "sheet_synced": true
+      "sheet_synced": true,
+      "settings": "fineness 4.5; 500 it; default numerics"
     },
     {
       "design_id": "design_0024",
@@ -5897,7 +5919,8 @@
         "run_duration": null,
         "error": "SimScaleError: simulation run cancelled: diverging: Cd = 10.98 is outside any physical range (2.08 CPU h billed)"
       },
-      "sheet_synced": true
+      "sheet_synced": true,
+      "settings": "fineness 4.5; 500 it; default numerics"
     },
     {
       "design_id": "design_0025",

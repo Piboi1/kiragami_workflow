@@ -357,3 +357,10 @@ SimScale keeps results of failed runs (`FORCE_COEFFICIENTS_PLOT`, `RESIDUALS_PLO
   (about 0.05-0.3 CPU h). Run inside `prepare-batch` it would spare the user the manual flow-volume step for designs that cannot be meshed. Test first on designs 25/28 (ok) vs 26/27 (fail).
 - Valid Cds so far (default numerics, fineness 4.5, 500 it): 0.7863 (29r/6c), 0.7812 (31r/4c), 0.7507 (26r/8c), 0.7457 (27r/4c), 0.7364 (31r/6c), 0.7327 (baseline 30r/8c), 0.7316 (32r/8c). All within 7.5%.
 - Total spent about 73.4 of 800 CPU h.
+
+## Update: results sheet reorganised (user request: make the designs that went through easy to find among the failed ones)
+- Raw log (tab `runs`) is untouched apart from: new column **`outcome`** right after `status` (valid / mesh failed / runaway (stopped early) / solver diverged / not converged / never ran (setup error) /
+  refused (over the CPU cap) / cancelled by user / earlier session), frozen header + id columns, a filter, valid rows green and bold, all other rows grey text.
+- New tab **`results`**: valid designs ranked by Cd with predicted fall speed, parameters, depth, Cd x area, solver settings, CPU hours; valid runs with other solver settings listed below (not comparable).
+  Rebuilt from the ledger after every logged run (`pipeline.evaluate_design`, best effort) and on demand with `python main.py sync-results`. Code: `sheets/results.py` (`outcome_of`, `results_table`, `refresh_results_tab`).
+- Backup of the `runs` tab before this clean-up: scratchpad `sheet_backup_before_cleanup.csv` (outside the repo). The `outcome` column is filled by `pipeline._row` for new rows. 58 tests pass.
