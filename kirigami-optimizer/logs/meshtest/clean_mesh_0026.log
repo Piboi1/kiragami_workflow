@@ -1,0 +1,4 @@
+  uploading design_0026_step_cleanB_flow_domain.step (32 MB, STEP, sewing=False, improve=True)
+  geometry import: RUNNING
+  geometry import: FINISHED
+design_0026: ERROR  cpu 0.0 h, 843 s  SimScaleError: Could not find faces for ['inlet', 'outlet', 'side_xmin', 'side_xmax', 'side_ymin', 'side_ymax', 'canopy'] in the imported geometry. The face/body mapping was saved to /home/user/kiraga

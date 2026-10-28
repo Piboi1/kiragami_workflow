@@ -1,0 +1,36 @@
+== design_0026
+design_0026: 45948 triangles, bodies 1, watertight True, volume 0.7293 in^3, shortest edge 1.0e-03 in, crossing triangle pairs 14
+canopy STL: /home/user/kiragami_workflow/kirigami-optimizer/runs/clean/design_0026/design_0026_canopy.stl
+== design_0027
+design_0027: 50948 triangles, bodies 1, watertight True, volume 0.7619 in^3, shortest edge 3.0e-04 in, crossing triangle pairs 0
+canopy STL: /home/user/kiragami_workflow/kirigami-optimizer/runs/clean/design_0027/design_0027_canopy.stl
+== design_0022
+design_0022: 65828 triangles, bodies 1, watertight True, volume 0.9149 in^3, shortest edge 1.2e-06 in, crossing triangle pairs 0
+canopy STL: /home/user/kiragami_workflow/kirigami-optimizer/runs/clean/design_0022/design_0022_canopy.stl
+== design_0025
+design_0025: 31902 triangles, bodies 1, watertight True, volume 0.7457 in^3, shortest edge 2.0e-06 in, crossing triangle pairs 0
+canopy STL: /home/user/kiragami_workflow/kirigami-optimizer/runs/clean/design_0025/design_0025_canopy.stl
+== design_0028
+design_0028: 67212 triangles, bodies 1, watertight True, volume 0.9127 in^3, shortest edge 7.0e-04 in, crossing triangle pairs 0
+canopy STL: /home/user/kiragami_workflow/kirigami-optimizer/runs/clean/design_0028/design_0028_canopy.stl
+== design_0005
+design_0005: 31518 triangles, bodies 1, watertight True, volume 0.7263 in^3, shortest edge 5.0e-04 in, crossing triangle pairs 48
+canopy STL: /home/user/kiragami_workflow/kirigami-optimizer/runs/clean/design_0005/design_0005_canopy.stl
+== design_0009
+design_0009: 52826 triangles, bodies 1, watertight True, volume 0.8042 in^3, shortest edge 3.0e-04 in, crossing triangle pairs 2
+canopy STL: /home/user/kiragami_workflow/kirigami-optimizer/runs/clean/design_0009/design_0009_canopy.stl
+== design_0002
+design_0002: 63626 triangles, bodies 1, watertight True, volume 0.9076 in^3, shortest edge 5.0e-04 in, crossing triangle pairs 0
+canopy STL: /home/user/kiragami_workflow/kirigami-optimizer/runs/clean/design_0002/design_0002_canopy.stl
+== design_0011
+design_0011: 56146 triangles, bodies 1, watertight True, volume 0.8354 in^3, shortest edge 7.0e-04 in, crossing triangle pairs 0
+canopy STL: /home/user/kiragami_workflow/kirigami-optimizer/runs/clean/design_0011/design_0011_canopy.stl
+== design_0021
+design_0021: 43550 triangles, bodies 1, watertight True, volume 0.8422 in^3, shortest edge 8.6e-07 in, crossing triangle pairs 0
+canopy STL: /home/user/kiragami_workflow/kirigami-optimizer/runs/clean/design_0021/design_0021_canopy.stl
+== design_0024
+design_0024: 32318 triangles, bodies 1, watertight True, volume 0.7082 in^3, shortest edge 3.0e-04 in, crossing triangle pairs 0
+canopy STL: /home/user/kiragami_workflow/kirigami-optimizer/runs/clean/design_0024/design_0024_canopy.stl
+== design_0001
+design_0001: 63626 triangles, bodies 1, watertight True, volume 0.9076 in^3, shortest edge 5.0e-04 in, crossing triangle pairs 0
+canopy STL: /home/user/kiragami_workflow/kirigami-optimizer/runs/clean/design_0001/design_0001_canopy.stl

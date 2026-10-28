@@ -29,3 +29,6 @@ design_0025: PASS   cpu 1.709 h, 545 s
   meshing: QUEUED 0%
   meshing: RUNNING 0%
   meshing: RUNNING 10%
+  meshing: RUNNING 30%
+  meshing: reached 30% (>= 30%) -- cancelling it on SimScale (test passed)
+design_0028: PASS   cpu 1.482 h, 1051 s  

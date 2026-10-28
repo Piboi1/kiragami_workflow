@@ -2,3 +2,23 @@
   geometry import: RUNNING
   geometry import: FINISHED
 design_0026: IMPORT OK cpu 0.0 h, 842 s  
+Traceback (most recent call last):
+  File "/home/user/kiragami_workflow/kirigami-optimizer/main.py", line 885, in <module>
+    sys.exit(main())
+             ~~~~^^
+  File "/home/user/kiragami_workflow/kirigami-optimizer/main.py", line 881, in main
+    return args.fn(args)
+           ~~~~~~~^^^^^^
+  File "/home/user/kiragami_workflow/kirigami-optimizer/main.py", line 194, in cmd_mesh_test
+    res = mesh_test(params, f"{design_id}_{args.route}{args.tag}", route=args.route, cap=args.cap,
+                    pass_progress=args.pass_progress, timeout=args.timeout, import_only=args.import_only)
+  File "/home/user/kiragami_workflow/kirigami-optimizer/optimizer/meshrig.py", line 28, in mesh_test
+    _, info, _, paths = build_geometry(params, out, name)
+                        ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "/home/user/kiragami_workflow/kirigami-optimizer/pipeline.py", line 70, in build_geometry
+    canopy, info = build_solid(report, solid_params)
+                   ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/kiragami_workflow/kirigami-optimizer/solid/canopy.py", line 420, in build_solid
+    raise InfeasibleGeometry(f"clean canopy not clean: {mesh.body_count} bodies, watertight {mesh.is_watertight}, "
+                             f"{crossings} self-intersecting triangle pairs")
+solid.canopy.InfeasibleGeometry: clean canopy not clean: 1 bodies, watertight True, 72 self-intersecting triangle pairs

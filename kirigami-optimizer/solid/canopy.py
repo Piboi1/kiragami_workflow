@@ -57,6 +57,7 @@ DEFAULT_SOLID_PARAMS = {
     # shorter than this (inches). The union of thin overlapping slabs leaves
     # micron-scale slivers that CAD kernels reject as clashing faces.
     "SIMPLIFY_TOLERANCE": 1e-4,
+    "CLEAN_SIMPLIFY_TOL": 0.0,  # EXTRUDE_METHOD "clean" only: collapse features smaller than this after the union (fewer faces)
     # "legacy" only: 1 builds the shell like the original Colab script (trimesh's default
     # process=True merges coincident vertices, so neighbouring strips share vertices and
     # the extrusion offsets use averaged normals). 0 keeps every strip separate.
@@ -361,7 +362,19 @@ def check_feasible(rings, kerf_factor, min_cap_radius):
 CLEAN_JOINT_OVERLAP_IN = 0.01  # ribbon ends reach this far past each node so the slabs fuse into one body (0.7 sheet thicknesses)
 
 
-CLEAN_MIN_EDGE_IN = 1e-3  # the union leaves edges down to 1e-7 in, which STEP importers reject; merge anything shorter than this
+CLEAN_MIN_EDGES_IN = (1e-3, 7e-4, 5e-4, 3e-4)  # the union leaves edges down to 1e-7 in, which STEP importers reject: merge the shortest ones
+
+
+def _clean_needles(mesh):
+    """Merges short edges, trying the largest threshold that leaves no crossing triangles (a merge can fold a sliver through a neighbour)."""
+
+    from solid.selfcheck import self_intersections
+
+    for eps in CLEAN_MIN_EDGES_IN:
+        cand = booleans.collapse_short_edges(mesh, eps)
+        if not self_intersections(cand, limit=1):
+            return cand
+    return mesh
 
 
 def build_solid(ring_data, params=None):
@@ -393,7 +406,7 @@ def build_solid(ring_data, params=None):
         # Each ribbon is thickened along its OWN normals (not the node-averaged ones of the legacy build, which sit up to 87 degrees
         # off the ribbon at hinge/diagonal junctions and thin or fold the slab); ribbons are fused by a short end overlap.
         p["JOINT_OVERLAP"] = max(float(p["JOINT_OVERLAP"]), CLEAN_JOINT_OVERLAP_IN)
-        p["SIMPLIFY_TOLERANCE"] = 0.0
+        p["SIMPLIFY_TOLERANCE"] = float(p["CLEAN_SIMPLIFY_TOL"])
     joint_overlap = float(p["JOINT_OVERLAP"]) if method == "union" else 0.0
     strips = build_open_strips(rings, cuts, float(p["VERTICAL_DROP"]), float(p["KERF_FACTOR"]), joint_overlap,
                                bridge_extra=float(p["BRIDGE_EXTRA"]),
@@ -406,7 +419,7 @@ def build_solid(ring_data, params=None):
             mesh = booleans.simplify(mesh, float(p["SIMPLIFY_TOLERANCE"]))
         mesh = booleans.repair(mesh)
         if p["EXTRUDE_METHOD"] == "clean":
-            mesh = booleans.collapse_short_edges(mesh, CLEAN_MIN_EDGE_IN)
+            mesh = _clean_needles(mesh)
     elif method == "legacy":
         mesh = _legacy_extrude(strips, thickness, weld=bool(round(float(p["WELD_STRIPS"]))))
     else:

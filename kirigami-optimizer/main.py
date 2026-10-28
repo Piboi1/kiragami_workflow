@@ -192,9 +192,46 @@ def cmd_mesh_test(args):
             except ValueError:
                 params[key] = value
         res = mesh_test(params, f"{design_id}_{args.route}{args.tag}", route=args.route, cap=args.cap,
-                        pass_progress=args.pass_progress, timeout=args.timeout, import_only=args.import_only)
+                        pass_progress=args.pass_progress, timeout=args.timeout, import_only=args.import_only,
+                        improve=False if args.no_improve else None)
         results.append(res)
         print(f"{design_id}: {res['result']:6s} cpu {res['cpu_hours']} h, {res['seconds']} s  {res.get('reason', '')[:200]}")
+    return 0
+
+
+def cmd_build_clean(args):
+    """Free: builds a design with the clean generator (own-normal ribbons, short end overlap, needle edges merged) and checks it.
+
+    Writes one watertight STL (and optionally the STEP air volume) and prints the checks: bodies, watertightness, crossing
+    triangles, volume, shortest edge. Takes a ledger design or a JSON file of parameters.
+    """
+
+    import trimesh
+
+    from pipeline import build_geometry
+    from solid.selfcheck import self_intersections
+
+    if args.params_json:
+        params = json.loads(Path(args.params_json).read_text())
+        name = Path(args.params_json).stem
+    else:
+        record = next((r for r in json.loads(Path(config.LEDGER_PATH).read_text())["records"] if r["design_id"] == args.design_id), None)
+        if record is None:
+            print(f"{args.design_id} is not in the ledger")
+            return 1
+        params, name = dict(record["params"]), args.design_id
+    params["EXTRUDE_METHOD"] = "clean"
+    out = Path(args.out_dir or config.RUNS_DIR / "clean" / name)
+    out.mkdir(parents=True, exist_ok=True)
+    config.SIMSCALE["GEOMETRY_FORMAT"] = "STEP" if args.step else "MANUAL_FLOW_VOLUME"
+    config.SIMSCALE["STEP_CHECK"] = False
+    _, info, _, paths = build_geometry(params, out, name)
+    mesh = trimesh.load(paths["canopy_stl"], process=True)
+    print(f"{name}: {len(mesh.faces)} triangles, bodies {mesh.body_count}, watertight {mesh.is_watertight}, volume {mesh.volume:.4f} in^3, "
+          f"shortest edge {mesh.edges_unique_length.min():.1e} in, crossing triangle pairs {len(self_intersections(mesh))}")
+    print(f"canopy STL: {paths['canopy_stl']}")
+    if args.step:
+        print(f"STEP air volume: {paths['domain_file']}")
     return 0
 
 
@@ -744,8 +781,16 @@ def main(argv=None):
     p.add_argument("--timeout", type=int, default=1500, help="seconds of meshing before giving up")
     p.add_argument("--set", nargs="+", metavar="KEY=VALUE", help="numeric parameter overrides for the design")
     p.add_argument("--tag", default="", help="suffix for the test name")
+    p.add_argument("--no-improve", action="store_true", help="import without SimScale's geometry improvement/healing")
     p.add_argument("--import-only", action="store_true", help="only check that SimScale accepts the geometry (free, no meshing)")
     p.set_defaults(fn=cmd_mesh_test)
+
+    p = sub.add_parser("build-clean")
+    p.add_argument("--design-id", help="a design in the ledger, e.g. design_0026")
+    p.add_argument("--params-json", help="a JSON file of design parameters instead of a ledger design")
+    p.add_argument("--out-dir", help="output folder (default runs/clean/<design>)")
+    p.add_argument("--step", action="store_true", help="also write the STEP air volume for SimScale")
+    p.set_defaults(fn=cmd_build_clean)
 
     p = sub.add_parser("export-print")
     p.add_argument("--design-id", required=True, help="a design in the ledger, e.g. design_0023")
