@@ -121,18 +121,32 @@ def cmd_inspect(args):
 def cmd_single(args):
     if args.auto_flow:  # build the air volume locally (sting STL, facet split) instead of waiting for the web-app step
         config.SIMSCALE["GEOMETRY_FORMAT"] = "STL"
+    if args.clean_step:  # clean canopy + B-rep STEP air volume built locally: no manual flow-volume step
+        config.SIMSCALE["GEOMETRY_FORMAT"] = "STEP"
+        config.SIMSCALE["STEP_CHECK"] = False
+        config.SIMSCALE["IMPORT_IMPROVE"] = False
     ctx = _live_context()
     if ctx.ledger.pending:
         print("An interrupted design is pending; finishing it first.")
         resume_pending(ctx)
     params = design_params(_preset(args.preset))
+    if args.from_design:  # the shape of an earlier design, e.g. to re-run it on clean geometry
+        rec = next((r for r in json.loads(Path(config.LEDGER_PATH).read_text())["records"] if r["design_id"] == args.from_design), None)
+        if rec is None:
+            sys.exit(f"{args.from_design} is not in the ledger")
+        params = dict(rec["params"])
+    if args.clean_step:
+        params["EXTRUDE_METHOD"] = "clean"
     if args.simplify_tol is not None:
         params["SIMPLIFY_TOLERANCE"] = args.simplify_tol
     if args.user_style or args.auto_flow:  # same canopy as `manual-step --user-style` (reference area / diameter come from it)
         params.update(config.ONSHAPE["CANOPY_OVERRIDES"])
     for item in args.set or []:
         key, _, value = item.partition("=")
-        params[key] = float(value)
+        try:
+            params[key] = float(value)
+        except ValueError:
+            params[key] = value
     if args.max_core_hours is not None:  # this run only; the config default stays
         ctx.simscale.cfg["MAX_CORE_HOURS_PER_RUN"] = args.max_core_hours
         print(f"CPU-hour cap for this design (mesh + run, checked against SimScale's estimate and enforced live): "
@@ -765,6 +779,9 @@ def main(argv=None):
 
     p = sub.add_parser("dry-run")
     p.add_argument("--preset", default="baseline")
+    p.add_argument("--from-design", metavar="DESIGN_ID", help="take the parameters of a ledger design")
+    p.add_argument("--clean-step", action="store_true",
+                   help="clean canopy generator + locally built STEP air volume (no manual flow-volume step)")
     p.add_argument("--uz", type=float, help="force inlet speed (m/s) instead of the estimate")
     p.set_defaults(fn=cmd_dry_run)
 
