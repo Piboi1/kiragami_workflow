@@ -107,3 +107,24 @@ def test_search_space_is_the_simulable_region():
     bounds = {d["name"]: (d["low"], d["high"]) for d in config.SEARCH_SPACE}
     assert bounds["NUM_RINGS"] == (27, 32)
     assert bounds["CUTS_PER_RING"] == (4, 8)
+
+
+def test_export_print_gives_one_watertight_solid_at_the_requested_height(tmp_path, monkeypatch):
+    import argparse
+    import json
+
+    import trimesh
+
+    import main
+    from pipeline import design_params
+
+    ledger = tmp_path / "ledger.json"
+    ledger.write_text(json.dumps({"records": [{"design_id": "design_x", "params": design_params(config.PRESETS["baseline"])}]}))
+    monkeypatch.setattr(config, "LEDGER_PATH", ledger)
+    out = tmp_path / "x.stl"
+    args = argparse.Namespace(design_id="design_x", height_in=6.0, thickness_in=0.12, joint_overlap_in=0.12,
+                              bridge_extra=0.0, out=str(out))
+    assert main.cmd_export_print(args) == 0
+    mesh = trimesh.load(out, force="mesh")
+    assert mesh.is_watertight and mesh.body_count == 1
+    assert abs(mesh.extents[2] - 152.4) < 0.1 and abs(mesh.bounds[0][2]) < 1e-6      # 6 in tall, rim on the build plate

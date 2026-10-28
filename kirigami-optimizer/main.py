@@ -171,6 +171,43 @@ ROBUST_NUMERICS = {"POTENTIAL_FOAM_INIT": True, "RELAX_PRESSURE": 0.2, "RELAX_VE
 STABLE_SCHEME = {"UPWIND_TURBULENCE_SCHEME": True}
 
 
+def cmd_export_print(args):
+    """Free: a presentation / 3D-print model of a finished design: one fused solid, thicker ribbons, scaled to a chosen height.
+
+    Not the simulated geometry (that one is 0.015 in thick and built from overlapping slabs); the layout of rings, cuts and
+    ribbons is the same. Written in millimetres, rim on the build plate (z = 0), apex up.
+    """
+
+    import tempfile
+
+    import trimesh
+
+    from pipeline import build_geometry
+
+    record = next((r for r in json.loads(Path(config.LEDGER_PATH).read_text())["records"]
+                   if r["design_id"] == args.design_id), None)
+    if record is None:
+        print(f"{args.design_id} is not in the ledger")
+        return 1
+    params = dict(record["params"])
+    params.update(SHEET_THICKNESS=args.thickness_in, EXTRUDE_METHOD="union", JOINT_OVERLAP=args.joint_overlap_in,
+                  BRIDGE_EXTRA=args.bridge_extra, SIMPLIFY_TOLERANCE=1e-4)
+    with tempfile.TemporaryDirectory() as tmp:
+        _, info, _, paths = build_geometry(params, Path(tmp), f"{args.design_id}_print")
+        mesh = trimesh.load(paths["canopy_stl"], force="mesh")
+    scale = args.height_in * 25.4 / float(mesh.bounds[1][2] - mesh.bounds[0][2])  # model inches -> printed mm
+    mesh.apply_scale(scale)
+    mesh.apply_translation([0.0, 0.0, -mesh.bounds[0][2]])
+    out = Path(args.out) if args.out else Path(__file__).parent / "exports" / f"{args.design_id}_print_{args.height_in:g}in_tall_mm.stl"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    mesh.export(str(out))
+    ext = mesh.extents
+    print(f"{out}\n  bodies {mesh.body_count}, watertight {mesh.is_watertight}, {len(mesh.faces)} triangles, volume {mesh.volume / 1000:.1f} cm^3\n"
+          f"  size {ext[0]:.1f} x {ext[1]:.1f} x {ext[2]:.1f} mm ({ext[0] / 25.4:.2f} x {ext[1] / 25.4:.2f} x {ext[2] / 25.4:.2f} in), "
+          f"sheet thickness {args.thickness_in * scale:.2f} mm, scale {scale / 25.4:.3f}")
+    return 0 if mesh.is_watertight and mesh.body_count == 1 else 2
+
+
 def cmd_prepare_batch(args):
     """Free: proposes K designs, imports their canopies and writes one checklist for the web-app step."""
 
@@ -657,6 +694,15 @@ def main(argv=None):
     p = sub.add_parser("inspect-simscale")
     p.add_argument("--project-name", default="Kiragami_CFD")
     p.set_defaults(fn=cmd_inspect)
+
+    p = sub.add_parser("export-print")
+    p.add_argument("--design-id", required=True, help="a design in the ledger, e.g. design_0023")
+    p.add_argument("--height-in", type=float, default=6.0, help="printed height, apex to rim, in inches")
+    p.add_argument("--thickness-in", type=float, default=0.12, help="sheet thickness before scaling, in model inches (0.12 -> about 1.8 mm at 6 in tall)")
+    p.add_argument("--joint-overlap-in", type=float, default=0.12, help="how far neighbouring ribbons overlap (keeps the model one piece)")
+    p.add_argument("--bridge-extra", type=float, default=0.0, help="0 = hinges as wide as the ribbons (as simulated), 1 = double-wide hinges (sturdier)")
+    p.add_argument("--out", help="output STL (default exports/<design>_print_<h>in_tall_mm.stl)")
+    p.set_defaults(fn=cmd_export_print)
 
     p = sub.add_parser("prepare-batch")
     p.add_argument("--n", type=int, default=4, help="number of designs in the batch")
