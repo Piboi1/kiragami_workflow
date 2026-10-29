@@ -381,3 +381,11 @@ SimScale keeps results of failed runs (`FORCE_COEFFICIENTS_PLOT`, `RESIDUALS_PLO
 - Commands (free): `python main.py build-clean --design-id design_0026 [--step]`; mesh rig (billed, cap per design): `python main.py mesh-test --design-id design_0026 --set EXTRUDE_METHOD=clean --no-improve`;
   free geometry-acceptance check: add `--import-only`.
 - Not done: running the solver on clean geometry, wiring clean + STEP into prepare-batch/run-batch (would remove the manual flow-volume step), OpenCascade fuse route (prototype ran 15+ min on design_0022 with no result).
+
+## Update: first solver attempt on clean geometry - the STEP route is too expensive to mesh (2.02 CPU h billed, no Cd)
+- `single --from-design design_0023 --clean-step --uz 5.187 --max-core-hours 5` (user-approved, 5 CPU h) = design_0029: STEP air volume imported fine, boxes named, meshing passed 30%
+  but the pipeline's mesh cap (`MESH_MAX_CORE_HOURS` 2.0) cancelled it at 2.02 CPU h billed. Failed with no Cd. The mesh of the legacy semi-manual route for the same design cost 0.12 CPU h,
+  so the automatic STEP route costs 20x or more per mesh (one CAD face per triangle: 24k faces). design_0030 (0026 clean) was stopped before any SimScale call (0 billed).
+- STL auto route (clean 0026, `mesh-test --route stl`): rejected by the mesh setup check (`missing-material-assignment`, canopy and sting arrive as extra bodies), same as in the earlier auto-flow probes.
+- New commands (free to build, billed to run): `single --from-design D --clean-step`, `optimize --clean-step` (the optimizer is trained only on clean-geometry designs; `Ledger.geometry_method`).
+- Open decision: (A) raise `MESH_MAX_CORE_HOURS` (about 6+ CPU h per mesh estimated, 10 CPU h per design) and run clean designs fully automatically, or (B) use the clean canopy with the semi-manual flow volume (mesh about 0.1-0.3 CPU h, needs the web-app clicks; untested for clean canopies).

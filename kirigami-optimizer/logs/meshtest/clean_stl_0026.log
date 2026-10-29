@@ -1,0 +1,8 @@
+  uploading design_0026_stl_cleanSTL_flow_domain.stl (8 MB, STL, sewing=True, improve=True)
+  geometry import: RUNNING
+  geometry import: FINISHED
+  mesh check warning: Result controls have been applied on the following topological entity: face2@canopy. These volumes have no material assignment. Result controls assigned to faces that are part of volumes without any material are not supported and will be ignored. However, if they are pertinent to your simulation, please review your result control setup.
+design_0026: ERROR  cpu 0.0 h, 374 s  SimScaleError: mesh setup check failed: [{'code': 'missing-material-assignment',
+ 'details': {'parameterValuesCombinations': [],
+             'path': '$.model.materials',
+             'topoEntities': 
