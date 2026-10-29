@@ -94,6 +94,8 @@ def build_dome_canopy(strips, cap_r, vertical_drop, r_max, thickness, min_featur
     """Returns the closed, outward-oriented canopy solid (trimesh, inches)."""
 
     plan = plan_polygon(strips, cap_r, min_feature)
+    # the outer edge of the rim band sits at the full drop (the old stepped build put the whole rim band at -drop), so the depth is unchanged
+    r_max = float(np.hypot(*np.asarray(plan.exterior.coords).T).max())
     pts, tris = triangulate(plan, h)
     r = np.hypot(pts[:, 0], pts[:, 1])
     z, slope = dome_profile(r, vertical_drop, r_max)

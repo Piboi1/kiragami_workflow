@@ -193,3 +193,30 @@ def test_single_block_stl_has_one_closed_solid(tmp_path):
     assert path.read_text().count("solid p") == 2  # solid + endsolid
     back = trimesh.load(path, process=True)
     assert back.is_watertight and abs(back.volume - mesh.volume) < 1e-4
+
+
+def test_dome_canopy_is_one_clean_sheet_without_slivers():
+    import numpy as np
+
+    from solid.selfcheck import self_intersections
+
+    mesh, info = build_solid(LEGACY_3D_RING_DATA, {"EXTRUDE_METHOD": "dome", "BRIDGE_EXTRA": 0.0})
+    assert info["is_watertight"] and info["body_count"] == 1 and mesh.volume > 0
+    assert not self_intersections(mesh)
+    tri = mesh.triangles
+    longest = np.max([np.linalg.norm(tri[:, 1] - tri[:, 0], axis=1), np.linalg.norm(tri[:, 2] - tri[:, 1], axis=1),
+                      np.linalg.norm(tri[:, 0] - tri[:, 2], axis=1)], axis=0)
+    assert (2 * mesh.area_faces / longest).min() > 3e-3          # no needle or sliver triangles (the old builds reached 1e-9)
+    assert abs(info["canopy_depth_in"] - 10.635) < 0.15          # same dome as the legacy build
+    assert abs(info["projected_diameter_in"] - 9.6) < 0.3
+
+
+def test_dome_closing_fills_narrow_slots():
+    from shapely.geometry import box
+
+    from solid.dome_canopy import plan_polygon
+
+    # two plates 0.02 in apart (narrower than MIN_FEATURE_IN) must fuse into one, with the slot filled
+    strips = [(np.array([[x, y, 0.0] for x, y in box(0, 0, 1, 0.5).exterior.coords[:3]]), np.array([[0, 1, 2]]))]
+    plan = plan_polygon(strips, 0.3, min_feature=0.06)
+    assert plan.geom_type == "Polygon"

@@ -13,8 +13,8 @@ def test_propose_points_are_distinct_and_inside_the_space(tmp_path):
             assert isinstance(v, int) == (d["type"] == "int")
 
 
-def test_default_canopy_is_the_clean_build_with_the_user_style_ribbons():
-    assert config.FIXED_PARAMS["EXTRUDE_METHOD"] == "clean" and config.FIXED_PARAMS["WELD_STRIPS"] == 1
+def test_default_canopy_is_the_dome_build_with_the_user_style_ribbons():
+    assert config.FIXED_PARAMS["EXTRUDE_METHOD"] == "dome" and config.FIXED_PARAMS["WELD_STRIPS"] == 1
     assert config.FIXED_PARAMS["BRIDGE_EXTRA"] == 0.0 and config.FIXED_PARAMS["JOINT_OVERLAP"] == 0.0
 
 
