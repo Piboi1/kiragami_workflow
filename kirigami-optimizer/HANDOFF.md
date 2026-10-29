@@ -430,18 +430,20 @@ SimScale keeps results of failed runs (`FORCE_COEFFICIENTS_PLOT`, `RESIDUALS_PLO
 - Reading: the clean generator fixes the MESHER failures only. The steady-state solver diverges for the thin-ribbon web whatever we do to the surface; legacy designs that converged did so by luck of the mesh.
   Remaining ideas: transient (pseudo-time) or lower-CFL solver settings, a coarser/steadier physics (laminar-ish / lower Re), a lower inlet speed, or SimScale support.
 
-## Update: the generator was rewritten from scratch - EXTRUDE_METHOD "dome" (solid/dome_canopy.py) is now the default
-- **What the error data said** (mesher "self intersection", slit/sliver faces, `fault-edge-invalid`, solver blow-ups on a different ribbon every run, r 1.0-2.3 in, never the apex):
-  every old build made the canopy from hundreds of thickened slabs fused by a boolean, so it contained crossing triangles, needle edges (1e-7 in), slivers (1e-9 in height), inside corners that end
-  in a point (acute wedge voids between ribbons: skewed cells) and a 30-wedge fan at the apex. No surface cleanup removed all of that, and a finer mesh just moved the blow-up.
-- **What the dome build does instead** (same ring/cut pattern, same dome z = -drop (r/r_out)^2, same plan-view hole layout, same depth 10.6 in and diameter 9.6 in):
-  1. plan view = exact 2D union of every ribbon footprint of `build_open_strips` plus the centre disc (shapely);
-  2. morphological closing with radius MIN_FEATURE_IN/2 (0.03 in): slots narrower than 0.06 in fill in, every inside corner becomes a fillet, so no void ends in a point;
-  3. quality triangulation (`triangle`, min angle 28 deg, edge about 0.09 in);
-  4. lift onto the dome and offset +-thickness/2 along the dome's analytic normal, side walls along the boundary: ONE manifold body by construction, no boolean.
-- Local results (designs 0026, 0027, 0023): watertight, 1 body, 0 crossing triangles, shortest edge 1.5e-2 in, minimum triangle height 1.1e-2 in (clean build: 3.5e-4, legacy 3.9e-5), about 47-51k triangles,
-  SimScale manual-route import OK in about 1 min (one solid). The sheet is smooth (no steps between rings) so its volume is about 1.9 in^3 (legacy 0.88): the old build's hinges were flat horizontal bands.
-  Cds from the dome build are NOT comparable with legacy/clean Cds; only dome results train the optimizer (`Ledger.geometry_method`).
-- New params: `MIN_FEATURE_IN` 0.06, `DOME_MESH_H_IN` 0.09. Commands: `main.py build-clean --design-id X [--method dome|clean|legacy] [--step]` (free, checks the canopy), `prepare-batch --from-design ...`.
-- Prepared (free): batch_20261029_211430 = design_0023 shape (`_01`) and design_0026 shape (`_02`) on the dome canopy, inlet speeds as before. Waiting for the flow-volume clicks and an approved CPU cap.
-- Not yet shown: that the dome canopy converges in the solver. That is the test. tests/test_optimizer_resume.py pins the unioned slab canopy (the experimental sting route needs it).
+## Update: generator rewritten from scratch - EXTRUDE_METHOD "lattice" (solid/lattice_canopy.py) is the default
+- First attempt was a "dome" sheet (plan view lifted onto the paraboloid). User review: layers looked thick, the rim was pointed instead of flat, gaps were not hexagons. Reason: the real web is a
+  honeycomb of RADIALLY wide fins (hinge bands flat, diagonal ribbons steep); its hexagons only exist in 3D, the plan view is not the shape. Dome dropped (code removed). The "clean" fused-slab build was also dropped (superseded).
+- What the error data said (mesher self-intersections, slit faces, `fault-edge-invalid`, divergence on a different ribbon every run, never at the apex): every old build fused hundreds of slabs by a boolean
+  along node-averaged normals (up to 87 deg off the ribbon), leaving crossing triangles, needle edges (1e-7 in), slivers (1e-9 in) and a 30-wedge fan at the apex.
+- Lattice build, SAME pattern as the legacy (`build_open_strips`: flat hinge bands, steep diagonal ribbons, hexagon cells, flat rim band, user-style flush hinges):
+  1. each ribbon thickened along ITS OWN normals, ending exactly at its node edges (uniform 0.015 in sheet);
+  2. an octagonal PIN along every node edge (radius 0.9 x thickness, sticks out 0.3 x thickness past the ribbon edges: <= 0.006 in proud of the sheet): both ribbon ends lie inside it, so ribbons fuse through material, not a hair contact;
+  3. centre cap = smooth bell, flat at the apex and flat at the rim (no fan, no point), 1.5 x thickness so it never shares a face plane with the first ring; depth/diameter unchanged (10.41 in / 9.58 in for design_0026, legacy 10.40 / 9.58);
+  4. exact union (manifold3d), then triangles lower than 1.5e-3 in and edges shorter than 1e-3 in are merged (a merge that would cross a neighbour is retried at the cluster's end vertices, then skipped) and
+     remaining flat slivers are re-triangulated in place by edge flips (`booleans.flip_slivers`); the build RAISES if a triangle thinner than 4e-4 in or any crossing / second body is left, retrying with slightly larger pins (1.0/0.5, 1.2/1.0) first.
+- Local results: designs 0026, 0027, 0022, 0023, 0025, 0028, 0005, 0009 all build: 1 body, watertight, 0 crossing triangles, shortest edge 1.5e-3 in, 28-54k triangles (old builds: 3.5e-4 in sliver heights, crossings, 1e-7 in edges).
+  SimScale manual-route import: design_0026 and 0027 OK in about 2 min each (one solid). Volume about 0.75-0.95 in^3 (legacy weld 0.7-0.9: legacy was thinned by the bad normals).
+- Joints: flush up to the pins; the pins are the only deviation from the legacy look (exports/joint_closeup.png). A hair-thin flush contact is exactly what produced the slivers, so a joint is always a block of material.
+- Cds from the lattice build are NOT comparable with legacy results (different thickness/joints); only lattice results train the optimizer (`Ledger.geometry_method`, set from config). The 28 legacy records stay in the ledger and sheet.
+- Prepared (free): batch_20261029_224604 = design_0023 shape (`_01`) and design_0026 shape (`_02`), inlet speeds as before; waiting for the flow-volume clicks and an approved CPU cap. Earlier batches 013921, 192800, 211430, 220106 are obsolete.
+- Not yet shown: that the lattice build converges in the solver (earlier solver runs on the "clean" build diverged for both designs; divergence is also common with legacy). That is the test.

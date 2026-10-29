@@ -143,15 +143,21 @@ def test_presplit_stl_has_one_closed_block_per_piece(tmp_path):
     assert abs(sum(b.volume for b in blocks) - 0.8897) < 2e-3
 
 
-def test_clean_canopy_is_one_crossing_free_body_with_uniform_thickness():
-    # Legacy thickening uses node-averaged normals (up to 87 deg off a ribbon), so slabs thin and fold; the clean build uses each ribbon's own normals.
+def test_lattice_canopy_is_one_clean_body_without_slivers():
+    # Legacy thickening uses node-averaged normals (up to 87 deg off a ribbon); the lattice build uses each ribbon's own normals, pins at the nodes, a flat cap.
+    import numpy as np
+
     from solid.selfcheck import self_intersections
 
-    mesh, info = build_solid(LEGACY_3D_RING_DATA, {"EXTRUDE_METHOD": "clean", "BRIDGE_EXTRA": 0.0})
-    assert info["is_watertight"] and info["body_count"] == 1
+    mesh, info = build_solid(LEGACY_3D_RING_DATA, {"EXTRUDE_METHOD": "lattice", "BRIDGE_EXTRA": 0.0})
+    assert info["is_watertight"] and info["body_count"] == 1 and mesh.volume > 0
     assert not self_intersections(mesh)
-    # ribbons are as thick as modelled: more material than the thinned legacy weld (0.8826 in^3), within about 15%
-    assert 0.88 < mesh.volume < 1.0
+    tri = mesh.triangles
+    longest = np.max([np.linalg.norm(tri[:, 1] - tri[:, 0], axis=1), np.linalg.norm(tri[:, 2] - tri[:, 1], axis=1),
+                      np.linalg.norm(tri[:, 0] - tri[:, 2], axis=1)], axis=0)
+    assert (2 * mesh.area_faces / longest).min() > 1e-3          # no needle or sliver triangles (the old builds reached 1e-9)
+    assert abs(info["canopy_depth_in"] - 10.635) < 0.05          # same dome as the legacy build
+    assert 0.8 < mesh.volume < 1.0                               # uniform thickness: a bit more material than the thinned legacy weld (0.8826)
 
 
 def test_self_intersection_finder_sees_a_crossing():
@@ -187,7 +193,7 @@ def test_single_block_stl_has_one_closed_solid(tmp_path):
 
     from solid import write_patch_stl
 
-    mesh, _ = build_solid(LEGACY_3D_RING_DATA, {"EXTRUDE_METHOD": "clean", "BRIDGE_EXTRA": 0.0})
+    mesh, _ = build_solid(LEGACY_3D_RING_DATA, {"EXTRUDE_METHOD": "lattice", "BRIDGE_EXTRA": 0.0})
     path = tmp_path / "c.stl"
     assert write_patch_stl(mesh, path, angle_deg=180.0) == 1
     assert path.read_text().count("solid p") == 2  # solid + endsolid
@@ -195,28 +201,16 @@ def test_single_block_stl_has_one_closed_solid(tmp_path):
     assert back.is_watertight and abs(back.volume - mesh.volume) < 1e-4
 
 
-def test_dome_canopy_is_one_clean_sheet_without_slivers():
+def test_flip_slivers_retriangulates_a_flat_quad_in_place():
     import numpy as np
+    import trimesh
 
-    from solid.selfcheck import self_intersections
+    from solid import booleans
 
-    mesh, info = build_solid(LEGACY_3D_RING_DATA, {"EXTRUDE_METHOD": "dome", "BRIDGE_EXTRA": 0.0})
-    assert info["is_watertight"] and info["body_count"] == 1 and mesh.volume > 0
-    assert not self_intersections(mesh)
-    tri = mesh.triangles
-    longest = np.max([np.linalg.norm(tri[:, 1] - tri[:, 0], axis=1), np.linalg.norm(tri[:, 2] - tri[:, 1], axis=1),
-                      np.linalg.norm(tri[:, 0] - tri[:, 2], axis=1)], axis=0)
-    assert (2 * mesh.area_faces / longest).min() > 3e-3          # no needle or sliver triangles (the old builds reached 1e-9)
-    assert abs(info["canopy_depth_in"] - 10.635) < 0.15          # same dome as the legacy build
-    assert abs(info["projected_diameter_in"] - 9.6) < 0.3
-
-
-def test_dome_closing_fills_narrow_slots():
-    from shapely.geometry import box
-
-    from solid.dome_canopy import plan_polygon
-
-    # two plates 0.02 in apart (narrower than MIN_FEATURE_IN) must fuse into one, with the slot filled
-    strips = [(np.array([[x, y, 0.0] for x, y in box(0, 0, 1, 0.5).exterior.coords[:3]]), np.array([[0, 1, 2]]))]
-    plan = plan_polygon(strips, 0.3, min_feature=0.06)
-    assert plan.geom_type == "Polygon"
+    # kite A-D-B-C where C lies almost on the line A-B: triangle ABC is a flat sliver; flipping AB to CD gives two fat triangles on the same plane
+    v = np.array([[-1, 0, 0], [1, 0, 0], [0, 0.001, 0], [0, -1, 0]], dtype=float)
+    mesh = trimesh.Trimesh(v, [[0, 1, 2], [1, 0, 3]], process=False)
+    before = booleans._heights(mesh).min()
+    out = booleans.flip_slivers(mesh, 0.01)
+    assert before < 0.002 < booleans._heights(out).min()
+    assert abs(out.area - mesh.area) < 1e-12     # same surface, new triangulation

@@ -71,6 +71,9 @@ def repair(mesh):
     return mesh
 
 
+DEBUG = False
+
+
 def collapse_short_edges(mesh, min_edge, rounds=4, min_altitude=0.0):
     """Merges the endpoints of every edge shorter than ``min_edge`` (mesh units), then drops the triangles that degenerate.
 
@@ -99,7 +102,7 @@ def collapse_short_edges(mesh, min_edge, rounds=4, min_altitude=0.0):
 
         edges = short
         tried = {}  # cluster root -> how many merge positions failed (0 = midpoint, 1 = lowest vertex, 2 = highest vertex)
-        for _attempt in range(12):
+        for _attempt in range(40):
             parent = np.arange(len(cur.vertices))
 
             def find(a):
@@ -123,7 +126,8 @@ def collapse_short_edges(mesh, min_edge, rounds=4, min_altitude=0.0):
             faces = roots[cur.faces]
             ok = (faces[:, 0] != faces[:, 1]) & (faces[:, 1] != faces[:, 2]) & (faces[:, 0] != faces[:, 2])
             raw = trimesh.Trimesh(centres, faces[ok], process=False)
-            crossings = self_intersections(raw)
+            moved = counts[roots] > 1  # only triangles touching a merged vertex can have started to cross something
+            crossings = self_intersections(raw, only=moved[cur.faces][ok].any(axis=1))
             if not crossings:
                 break
             kept = np.nonzero(ok)[0]
@@ -134,13 +138,73 @@ def collapse_short_edges(mesh, min_edge, rounds=4, min_altitude=0.0):
             blocked = {root for root in involved if tried[root] >= 3}
             edges = np.array([e for e in edges if int(roots[e[0]]) not in blocked])
             if not len(edges):
+                if DEBUG: print("collapse: every cluster blocked")
                 return cur
         else:
-            return cur
+            if DEBUG: print("collapse: crossings persist after 40 attempts")
+            return cur  # still crossing after every retry: leave this round's merges out altogether
         out = raw.copy()
         out.remove_unreferenced_vertices()
         out = repair(out)
-        if not (out.is_watertight and out.body_count == mesh.body_count and abs(out.volume - mesh.volume) < 5e-3 * abs(mesh.volume)):
+        if not (out.is_watertight and out.body_count == mesh.body_count and abs(out.volume - mesh.volume) < 2e-2 * abs(mesh.volume)):
+            if DEBUG: print("collapse: result rejected", out.is_watertight, out.body_count, out.volume, mesh.volume)
             return cur
         cur = out
     return cur
+
+
+def _heights(mesh):
+    tri = mesh.triangles
+    longest = np.max([np.linalg.norm(tri[:, 1] - tri[:, 0], axis=1), np.linalg.norm(tri[:, 2] - tri[:, 1], axis=1),
+                      np.linalg.norm(tri[:, 0] - tri[:, 2], axis=1)], axis=0)
+    return 2 * mesh.area_faces / np.maximum(longest, 1e-30)
+
+
+def flip_slivers(mesh, min_altitude, max_dihedral_deg=3.0, passes=8):
+    """Flips the shared edge of sliver triangles with a (nearly) coplanar neighbour: the surface does not move, only its triangulation changes.
+
+    A flat sliver is three almost collinear points, so merging vertices is the wrong cure (it drags a corner through a neighbour); flipping the long edge
+    gives two well shaped triangles on the same plane. A flip is made only if the quad is convex and both new triangles are taller than the old ones.
+    """
+
+    for _ in range(passes):
+        height = _heights(mesh)
+        bad = height < min_altitude
+        if not bad.any():
+            break
+        faces = mesh.faces.copy()
+        vertices = mesh.vertices
+        used = set()
+        flipped = 0
+        angles = mesh.face_adjacency_angles
+        for (f1, f2), angle in zip(mesh.face_adjacency, angles):
+            if not (bad[f1] or bad[f2]) or f1 in used or f2 in used or angle > np.radians(max_dihedral_deg):
+                continue
+            shared = set(faces[f1]) & set(faces[f2])
+            if len(shared) != 2:
+                continue
+            cyc = list(faces[f1])
+            k = next(i for i in range(3) if {cyc[i], cyc[(i + 1) % 3]} == shared)
+            a, b, c = cyc[k], cyc[(k + 1) % 3], cyc[(k + 2) % 3]
+            others = [v for v in faces[f2] if v not in shared]
+            if len(others) != 1:
+                continue
+            d = others[0]
+            new = ((a, d, c), (d, b, c))
+            tri = vertices[np.array(new)]
+            normals = np.cross(tri[:, 1] - tri[:, 0], tri[:, 2] - tri[:, 0])
+            area = np.linalg.norm(normals, axis=1)
+            if (area < 1e-14).any():
+                continue
+            if (normals @ mesh.face_normals[f1] <= 0).any() or (normals @ mesh.face_normals[f2] <= 0).any():
+                continue  # not convex (the flip would fold the surface)
+            lengths = np.linalg.norm(tri - np.roll(tri, -1, axis=1), axis=2).max(axis=1)
+            if (area / lengths).min() <= 2.0 * min(height[f1], height[f2]):  # area / longest = height / 2 * 2: compare like with like
+                continue
+            faces[f1], faces[f2] = new
+            used.update((f1, f2))
+            flipped += 1
+        if not flipped:
+            break
+        mesh = trimesh.Trimesh(vertices, faces, process=False)
+    return mesh

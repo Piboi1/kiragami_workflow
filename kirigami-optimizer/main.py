@@ -137,7 +137,7 @@ def cmd_single(args):
             sys.exit(f"{args.from_design} is not in the ledger")
         params = dict(rec["params"])
     if args.clean_step:
-        params["EXTRUDE_METHOD"] = "clean"
+        params["EXTRUDE_METHOD"] = "lattice"
     if args.simplify_tol is not None:
         params["SIMPLIFY_TOLERANCE"] = args.simplify_tol
     if args.user_style or args.auto_flow:  # same canopy as `manual-step --user-style` (reference area / diameter come from it)
@@ -216,7 +216,7 @@ def cmd_mesh_test(args):
 
 
 def cmd_build_clean(args):
-    """Free: builds a design with the clean generator (own-normal ribbons, short end overlap, needle edges merged) and checks it.
+    """Free: builds a design with the lattice generator (own-normal ribbons, node pins, flat cap, needles merged) and checks it.
 
     Writes one watertight STL (and optionally the STEP air volume) and prints the checks: bodies, watertightness, crossing
     triangles, volume, shortest edge. Takes a ledger design or a JSON file of parameters.
@@ -237,8 +237,7 @@ def cmd_build_clean(args):
             return 1
         params, name = dict(record["params"]), args.design_id
     params["EXTRUDE_METHOD"] = args.method
-    params["CLEAN_SIMPLIFY_TOL"] = args.simplify
-    out = Path(args.out_dir or config.RUNS_DIR / "clean" / name)
+    out = Path(args.out_dir or config.RUNS_DIR / "lattice" / name)
     out.mkdir(parents=True, exist_ok=True)
     config.SIMSCALE["GEOMETRY_FORMAT"] = "STEP" if args.step else "MANUAL_FLOW_VOLUME"
     config.SIMSCALE["STEP_CHECK"] = False
@@ -335,14 +334,14 @@ def cmd_run_batch(args):
 def cmd_optimize(args):
     from optimizer.loop import run_optimization
 
-    if args.clean_step:  # clean canopy + local STEP air volume; only clean-geometry results train the optimizer
+    if args.clean_step:  # lattice canopy + local STEP air volume; only lattice-geometry results train the optimizer
         config.SIMSCALE["GEOMETRY_FORMAT"] = "STEP"
         config.SIMSCALE["STEP_CHECK"] = False
         config.SIMSCALE["IMPORT_IMPROVE"] = False
-        config.FIXED_PARAMS["EXTRUDE_METHOD"] = "clean"
+        config.FIXED_PARAMS["EXTRUDE_METHOD"] = "lattice"
     ctx = _live_context()
     if args.clean_step:
-        ctx.ledger.geometry_method = "clean"
+        ctx.ledger.geometry_method = "lattice"
     best = run_optimization(ctx, n_calls=args.n_calls, n_initial_points=args.n_initial)
     if best:
         print(f"Best design: {best['design_id']} Cd={best['cd']:.4f}")
@@ -813,10 +812,9 @@ def main(argv=None):
     p = sub.add_parser("build-clean")
     p.add_argument("--design-id", help="a design in the ledger, e.g. design_0026")
     p.add_argument("--params-json", help="a JSON file of design parameters instead of a ledger design")
-    p.add_argument("--out-dir", help="output folder (default runs/clean/<design>)")
+    p.add_argument("--out-dir", help="output folder (default runs/lattice/<design>)")
     p.add_argument("--step", action="store_true", help="also write the STEP air volume for SimScale")
-    p.add_argument("--method", choices=("dome", "clean", "legacy"), default="dome", help="canopy construction (default: the dome build)")
-    p.add_argument("--simplify", type=float, default=0.002, help="collapse features smaller than this (in) after the union; fewer faces")
+    p.add_argument("--method", choices=("lattice", "union", "legacy"), default="lattice", help="canopy construction (default: the lattice build)")
     p.set_defaults(fn=cmd_build_clean)
 
     p = sub.add_parser("export-print")
@@ -856,7 +854,7 @@ def main(argv=None):
     p.add_argument("--preset", default="baseline")
     p.add_argument("--from-design", metavar="DESIGN_ID", help="take the parameters of a ledger design")
     p.add_argument("--clean-step", action="store_true",
-                   help="clean canopy generator + locally built STEP air volume (no manual flow-volume step)")
+                   help="lattice canopy generator + locally built STEP air volume (no manual flow-volume step)")
     p.add_argument("--uz", type=float, help="force inlet speed (m/s), e.g. 6.148 to compare with Run 11")
     p.add_argument("--from-manual", metavar="DESIGN_ID",
                    help="use the flow volume made by `manual-step --design-id DESIGN_ID`")
@@ -885,7 +883,7 @@ def main(argv=None):
     p.add_argument("--n-calls", type=int, default=None)
     p.add_argument("--n-initial", type=int, default=None)
     p.add_argument("--clean-step", action="store_true",
-                   help="clean canopy generator + locally built STEP air volume (no manual flow-volume step)")
+                   help="lattice canopy generator + locally built STEP air volume (no manual flow-volume step)")
     p.set_defaults(fn=cmd_optimize)
 
     sub.add_parser("sync-sheet").set_defaults(fn=cmd_sync)

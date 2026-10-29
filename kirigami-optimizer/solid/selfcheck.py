@@ -36,7 +36,7 @@ def tri_tri(ta, tb):
     return False
 
 
-def self_intersections(mesh, limit=None):
+def self_intersections(mesh, limit=None, only=None):
     """List of (face_i, face_j) pairs that properly intersect and share no vertex."""
 
     import rtree
@@ -46,10 +46,13 @@ def self_intersections(mesh, limit=None):
     lo, hi = tris.min(axis=1), tris.max(axis=1)
     idx = rtree.index.Index(((i, (*lo[i], *hi[i]), None) for i in range(len(tris))), properties=rtree.index.Property(dimension=3))
     out = []
-    for i in range(len(tris)):
+    wanted = np.arange(len(tris)) if only is None else np.nonzero(only)[0]  # ``only``: face mask, test pairs that involve one of these faces
+    for i in wanted:
         vi = set(faces[i])
         for j in idx.intersection((*lo[i], *hi[i])):
-            if j <= i or vi & set(faces[j]):
+            if j == i or vi & set(faces[j]) or (only is None and j <= i):
+                continue
+            if only is not None and only[j] and j < i:
                 continue
             if tri_tri(tris[i], tris[j]):
                 out.append((i, int(j)))

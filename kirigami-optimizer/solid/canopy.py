@@ -57,9 +57,8 @@ DEFAULT_SOLID_PARAMS = {
     # shorter than this (inches). The union of thin overlapping slabs leaves
     # micron-scale slivers that CAD kernels reject as clashing faces.
     "SIMPLIFY_TOLERANCE": 1e-4,
-    "MIN_FEATURE_IN": 0.06,     # "dome" only: voids narrower than this fill in, every inside corner gets a fillet of half of it (solid/dome_canopy.py)
-    "DOME_MESH_H_IN": 0.09,     # "dome" only: target triangle edge of the sheet
-    "CLEAN_SIMPLIFY_TOL": 0.002,  # EXTRUDE_METHOD "clean" only: collapse features smaller than this after the union (fewer faces)
+    "PIN_RADIUS_T": 0.9,         # "lattice" only: radius of the pin laid along every node edge, in sheet thicknesses (solid/lattice_canopy.py)
+    "PIN_EXTENSION_T": 0.3,      # "lattice" only: how far each pin sticks out past the ribbon edges, in sheet thicknesses
     # "legacy" only: 1 builds the shell like the original Colab script (trimesh's default
     # process=True merges coincident vertices, so neighbouring strips share vertices and
     # the extrusion offsets use averaged normals). 0 keeps every strip separate.
@@ -301,7 +300,7 @@ def _legacy_extrude(strips, thickness, weld=False):
 def write_patch_stl(mesh, path, angle_deg=30.0):
     """Writes a one-body canopy as an ASCII STL with one ``solid pNNNN`` block per smooth patch.
 
-    The clean canopy is a single closed body, so SimScale's automatic facet split can give up and return it as ONE face. Cutting it
+    A lattice canopy is a single closed body, so SimScale's automatic facet split can give up and return it as ONE face. Cutting it
     along creases sharper than ``angle_deg`` and writing each patch as its own block gives the sewn import a face per patch
     (a few hundred), whatever the design. Returns the number of patches.
     """
@@ -392,27 +391,6 @@ def check_feasible(rings, kerf_factor, min_cap_radius):
         )
 
 
-CLEAN_JOINT_OVERLAP_IN = 0.01  # ribbon ends reach this far past each node so the slabs fuse into one body (0.7 sheet thicknesses)
-
-
-CLEAN_MIN_EDGES_IN = (1e-3, 7e-4, 5e-4)  # the union leaves edges down to 1e-7 in, which importers reject: merge the shortest ones
-
-
-CLEAN_MIN_ALTITUDE_IN = 1.5e-3  # no triangle thinner than this where it can be merged without a crossing (the legacy weld has down to 4e-5)
-
-
-def _clean_needles(mesh):
-    """Merges short edges, trying the largest threshold that leaves no crossing triangles (a merge can fold a sliver through a neighbour)."""
-
-    from solid.selfcheck import self_intersections
-
-    for eps in CLEAN_MIN_EDGES_IN:
-        cand = booleans.collapse_short_edges(mesh, eps, rounds=8, min_altitude=CLEAN_MIN_ALTITUDE_IN)
-        if not self_intersections(cand, limit=1):
-            return cand
-    return mesh
-
-
 def build_solid(ring_data, params=None):
     """Builds the watertight 3D canopy solid.
 
@@ -437,44 +415,28 @@ def build_solid(ring_data, params=None):
     rings = normalize_ring_data(ring_data)
     check_feasible(rings, float(p["KERF_FACTOR"]), float(p["MIN_CAP_RADIUS"]))
     method = p["EXTRUDE_METHOD"]
-    if method == "clean":
-        method = "union"
-        # Each ribbon is thickened along its OWN normals (not the node-averaged ones of the legacy build, which sit up to 87 degrees
-        # off the ribbon at hinge/diagonal junctions and thin or fold the slab); ribbons are fused by a short end overlap.
-        p["JOINT_OVERLAP"] = max(float(p["JOINT_OVERLAP"]), CLEAN_JOINT_OVERLAP_IN)
-        p["SIMPLIFY_TOLERANCE"] = float(p["CLEAN_SIMPLIFY_TOL"])
     joint_overlap = float(p["JOINT_OVERLAP"]) if method == "union" else 0.0
-    layout = []  # the centre cap's analytic description, for the dome build
+    layout = []  # the centre cap's analytic description, for the lattice build
     strips = build_open_strips(rings, cuts, float(p["VERTICAL_DROP"]), float(p["KERF_FACTOR"]), joint_overlap,
                                bridge_extra=float(p["BRIDGE_EXTRA"]), record=layout,
                                cap_overlap=None if p["CAP_OVERLAP"] is None else float(p["CAP_OVERLAP"]))
 
-    if method == "dome":
-        from solid.dome_canopy import build_dome_canopy
+    if method == "lattice":
+        from solid.lattice_canopy import build_lattice_canopy
 
         cap = next(item for item in layout if item["kind"] == "cap")
-        mesh = build_dome_canopy(strips, cap["r"], float(p["VERTICAL_DROP"]), rings[-1][0], thickness,
-                                 min_feature=float(p["MIN_FEATURE_IN"]), h=float(p["DOME_MESH_H_IN"]))
+        mesh = build_lattice_canopy(strips, cap, rings[0][0], thickness, extrude_surface,
+                                    pin_radius_t=float(p["PIN_RADIUS_T"]), pin_extension_t=float(p["PIN_EXTENSION_T"]))
     elif method == "union":
         slabs = [extrude_surface(v, f, thickness) for v, f in strips]
         mesh = booleans.union(slabs)
         if float(p["SIMPLIFY_TOLERANCE"]) > 0:
             mesh = booleans.simplify(mesh, float(p["SIMPLIFY_TOLERANCE"]))
         mesh = booleans.repair(mesh)
-        if p["EXTRUDE_METHOD"] == "clean":
-            mesh = _clean_needles(mesh)
     elif method == "legacy":
         mesh = _legacy_extrude(strips, thickness, weld=bool(round(float(p["WELD_STRIPS"]))))
     else:
         raise ValueError(f"unknown EXTRUDE_METHOD {method!r}")
-
-    if p["EXTRUDE_METHOD"] in ("clean", "dome"):
-        from solid.selfcheck import self_intersections
-
-        crossings = len(self_intersections(mesh))
-        if mesh.body_count != 1 or not mesh.is_watertight or crossings:
-            raise RuntimeError(f"{p['EXTRUDE_METHOD']} canopy not clean: {mesh.body_count} bodies, watertight {mesh.is_watertight}, "
-                                     f"{crossings} self-intersecting triangle pairs")
 
     radial = np.linalg.norm(mesh.vertices[:, :2], axis=1)
     projected_radius = float(radial.max())

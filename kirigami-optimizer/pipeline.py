@@ -80,7 +80,7 @@ def build_geometry(params, design_dir, design_id):
         if config.SIMSCALE.get("CANOPY_PRESPLIT") and solid_params.get("EXTRUDE_METHOD") == "legacy":
             domain_file = design_dir / f"{design_id}_canopy_presplit.stl"
             info["presplit_pieces"] = write_presplit_stl(canopy, domain_file)
-        elif config.SIMSCALE.get("CANOPY_PRESPLIT") and solid_params.get("EXTRUDE_METHOD") in ("clean", "dome"):
+        elif config.SIMSCALE.get("CANOPY_PRESPLIT") and solid_params.get("EXTRUDE_METHOD") == "lattice":
             domain_file = design_dir / f"{design_id}_canopy_presplit.stl"
             # one closed block at full precision: split into open patches, SimScale's importer crashes ("simgeo-crashed")
             info["presplit_pieces"] = write_patch_stl(canopy, domain_file, angle_deg=180.0)

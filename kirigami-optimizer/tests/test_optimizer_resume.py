@@ -43,7 +43,7 @@ def _ctx(sim):
 def fast_geometry(monkeypatch):
     # These tests are about resume/budget logic; skip the slower STEP export.
     monkeypatch.setitem(config.SIMSCALE, "GEOMETRY_FORMAT", "STL")
-    # The sting flow domain (experimental STL route) is built for the unioned slab canopy; the dome build is not used there.
+    # The sting flow domain (experimental STL route) is built for the unioned slab canopy; the lattice build is not used there.
     monkeypatch.setitem(config.FIXED_PARAMS, "EXTRUDE_METHOD", "union")
     monkeypatch.setitem(config.FIXED_PARAMS, "JOINT_OVERLAP", 0.03)
     monkeypatch.setitem(config.FIXED_PARAMS, "BRIDGE_EXTRA", 1.0)

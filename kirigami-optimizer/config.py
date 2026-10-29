@@ -58,7 +58,7 @@ FIXED_PARAMS = {
     "SHEET_THICKNESS": 0.015,
     # The user's own script output (welded legacy strips, flush hinges): the canopy of Run 11, which
     # SimScale imports as a 948-face solid. The old "union" canopy fails SimScale's import/meshing.
-    "EXTRUDE_METHOD": "dome",  # one thickened sheet (solid/dome_canopy.py); "clean" = fused slabs, "legacy" = the original build (fails the mesher for about 1 in 4 designs); see HANDOFF.md
+    "EXTRUDE_METHOD": "lattice",  # the legacy hexagon web rebuilt with pinned joints (solid/lattice_canopy.py); "legacy" = the original build (fails the mesher for about 1 in 4 designs); see HANDOFF.md
     "WELD_STRIPS": 1,
     "BRIDGE_EXTRA": 0.0,
     "JOINT_OVERLAP": 0.0,
@@ -278,5 +278,5 @@ ONSHAPE = {
     "ALLOW_FAULTY_PARTS": True,               # Onshape STL import option (the web UI default may differ)
     "REQUEST_CAP": 2000,                     # soft stop, counted in state/onshape_usage.json
     # Canopy as the manual workflow feeds Onshape: overlapping slabs, flush hinges, no boolean union.
-    "CANOPY_OVERRIDES": {"EXTRUDE_METHOD": "dome", "BRIDGE_EXTRA": 0.0, "JOINT_OVERLAP": 0.0, "WELD_STRIPS": 1},
+    "CANOPY_OVERRIDES": {"EXTRUDE_METHOD": "lattice", "BRIDGE_EXTRA": 0.0, "JOINT_OVERLAP": 0.0, "WELD_STRIPS": 1},
 }
