@@ -412,3 +412,11 @@ SimScale keeps results of failed runs (`FORCE_COEFFICIENTS_PLOT`, `RESIDUALS_PLO
 - Total billed this round about 1.25 CPU h (cap was 5 each). Both records are failed, so they do not train the optimizer.
 - Reading: the clean generator removes the MESHER failures (0022/0026/0027 now import and mesh) but the steady-solver divergence (about half of all designs) is a separate, still open mesh-quality problem; here it hits the apex cap region of a design that had no apex problem before.
 - Ideas (need approval + caps): finer mesh or boundary layers off for the cap region; re-run 0030/0031 with `--mesh-fineness 6`; or unify both builds' apex (e.g. coarser cap fan / cap_overlap) since both failures are within 1 in of the apex.
+
+## Update: step B (sliver-free clean canopy) done; batch_20261029_192800 prepared; step A (finer mesh) follows
+- Hypothesis from the data: the clean build left a few sliver triangles (height 3.5e-4..1.4e-3 in) where a merge would have pushed a triangle through a neighbour; for design_0026 they sat at r 0.80 in and
+  r 1.04 in, and the solver blew up at r 1.02 in. `collapse_short_edges` now retries a blocked merge at the cluster's end vertices instead of the midpoint before giving up: design_0026 clean has 3 slivers
+  left (was 21), design_0027 and design_0023 none. Not yet proven to affect divergence (design_0030 = 0023 clean ran away with no slivers left to blame).
+- batch_20261029_192800: design_0023 shape (`_01`) and design_0026 shape (`_02`) on the sliver-free canopy, inlet speeds as before (5.187 / 5.1808 m/s). Waiting for the flow-volume clicks; then
+  `run-batch --batch batch_20261029_192800 --max-core-hours 5 --batch-core-hours 10 --skip-estimate-check`. Step A (user approved option C): any design of it that still diverges is re-run with `--redo ... --mesh-fineness 6`
+  on the same flow volumes (no new clicks), 5 CPU h cap.

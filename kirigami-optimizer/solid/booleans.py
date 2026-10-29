@@ -98,7 +98,8 @@ def collapse_short_edges(mesh, min_edge, rounds=4, min_altitude=0.0):
             break
 
         edges = short
-        for _attempt in range(8):
+        tried = {}  # cluster root -> how many merge positions failed (0 = midpoint, 1 = lowest vertex, 2 = highest vertex)
+        for _attempt in range(12):
             parent = np.arange(len(cur.vertices))
 
             def find(a):
@@ -115,6 +116,10 @@ def collapse_short_edges(mesh, min_edge, rounds=4, min_altitude=0.0):
             counts = np.bincount(roots, minlength=len(parent))
             centres = np.column_stack([np.bincount(roots, weights=cur.vertices[:, k], minlength=len(parent)) for k in range(3)])
             centres /= np.maximum(counts, 1)[:, None]
+            for root, n_failed in tried.items():  # a merge that crossed another triangle: try an end vertex instead of the midpoint
+                members = np.nonzero(roots == root)[0]
+                if len(members) > 1 and n_failed in (1, 2):
+                    centres[root] = cur.vertices[members[0] if n_failed == 1 else members[-1]]
             faces = roots[cur.faces]
             ok = (faces[:, 0] != faces[:, 1]) & (faces[:, 1] != faces[:, 2]) & (faces[:, 0] != faces[:, 2])
             raw = trimesh.Trimesh(centres, faces[ok], process=False)
@@ -123,7 +128,10 @@ def collapse_short_edges(mesh, min_edge, rounds=4, min_altitude=0.0):
                 break
             kept = np.nonzero(ok)[0]
             bad_faces = kept[np.unique(np.array(crossings).ravel())]
-            blocked = {int(r) for r in roots[cur.faces[bad_faces].ravel()] if counts[r] > 1}
+            involved = {int(r) for r in roots[cur.faces[bad_faces].ravel()] if counts[r] > 1}
+            for root in involved:
+                tried[root] = tried.get(root, 0) + 1
+            blocked = {root for root in involved if tried[root] >= 3}
             edges = np.array([e for e in edges if int(roots[e[0]]) not in blocked])
             if not len(edges):
                 return cur
