@@ -404,3 +404,11 @@ SimScale keeps results of failed runs (`FORCE_COEFFICIENTS_PLOT`, `RESIDUALS_PLO
   (5.187 and 5.1808 m/s, stored as `uz_override` in batch.json, honoured by run-batch), so only the geometry differs from the legacy runs (legacy Cd of 0023: 0.7863; 0026 never ran).
 - Canopies imported (one solid, one face each): `batch_20261029_013921_01_canopy` (design_0023 shape) and `_02_canopy` (design_0026 shape). Checklist: `runs/batch/batch_20261029_013921/MANUAL_STEPS.txt`.
 - Approved (user): 5 CPU h cap per design. After the clicks: `python main.py run-batch --batch batch_20261029_013921 --max-core-hours 5 --batch-core-hours 10 --skip-estimate-check`.
+
+## Update: clean-geometry batch (batch_20261029_013921): both solver runs DIVERGED; the mesh was cheap, the clean canopy does not cure solver divergence
+- Mesh on the semi-manual route: design_0030 (= design_0023 shape, clean, Uz 5.187): **0.096 CPU h** (legacy 0.12), meshing finished. design_0031 (= design_0026 shape, clean, Uz 5.181): also meshed cheaply. So the manual route handles the clean one-face canopy.
+- design_0030: runaway guard cancelled the steady solve at Cd -254 (1.05 CPU h solver + 0.10 mesh). The LEGACY build of this very design converged to Cd 0.7863, so the clean build changes the mesh enough to land on a different weak spot.
+- design_0031: solver FAILED right at the start (9%): "velocity field started diverging to 1.2e7 m/s near [0.01945, -0.01721, -0.01102] m" = about 1 in from the apex, in the cap region. 0.1 CPU h mesh, ~0 solver.
+- Total billed this round about 1.25 CPU h (cap was 5 each). Both records are failed, so they do not train the optimizer.
+- Reading: the clean generator removes the MESHER failures (0022/0026/0027 now import and mesh) but the steady-solver divergence (about half of all designs) is a separate, still open mesh-quality problem; here it hits the apex cap region of a design that had no apex problem before.
+- Ideas (need approval + caps): finer mesh or boundary layers off for the cap region; re-run 0030/0031 with `--mesh-fineness 6`; or unify both builds' apex (e.g. coarser cap fan / cap_overlap) since both failures are within 1 in of the apex.
