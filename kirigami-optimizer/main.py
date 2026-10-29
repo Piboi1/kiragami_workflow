@@ -295,7 +295,7 @@ def cmd_prepare_batch(args):
     from optimizer.batch import prepare_batch
 
     ctx = _live_context()
-    batch_id, designs, texts = prepare_batch(ctx, args.n)
+    batch_id, designs, texts = prepare_batch(ctx, args.n, from_designs=args.from_design)
     out = config.RUNS_DIR / "batch" / batch_id
     print(f"\n{batch_id}: {len(designs)} design(s) ready. Checklist for all of them: {out / 'MANUAL_STEPS.txt'}\n")
     print(("\n" + "=" * 70 + "\n\n").join(texts))
@@ -829,6 +829,8 @@ def main(argv=None):
 
     p = sub.add_parser("prepare-batch")
     p.add_argument("--n", type=int, default=4, help="number of designs in the batch")
+    p.add_argument("--from-design", nargs="+", metavar="DESIGN_ID",
+                   help="prepare these ledger designs again (built with the current canopy method, same inlet speed) instead of new proposals")
     p.set_defaults(fn=cmd_prepare_batch)
 
     p = sub.add_parser("run-batch")

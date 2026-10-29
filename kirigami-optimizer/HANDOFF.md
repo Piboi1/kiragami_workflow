@@ -398,3 +398,9 @@ SimScale keeps results of failed runs (`FORCE_COEFFICIENTS_PLOT`, `RESIDUALS_PLO
   is not used. `mesh-test --route manual --import-only` (free) imports it the way prepare-batch does: **design_0026, 0027, 0022 and 0023 all IMPORT OK** (one solid, one face; 0026/0027/0022 failed before).
   The sliver screen is skipped for clean canopies (no slab overlaps). Unknown until a flow volume is made and meshed: how much the meshed one-face canopy costs (legacy semi-manual mesh about 0.12 CPU h).
 - Needs `rtree` (added to requirements.txt) for the local crossing check; `fast-simplification` was tried and dropped (it breaks watertightness).
+
+## Update: batch_20261029_013921 = design_0023 and design_0026 on the clean canopy (prepared, waiting for the flow-volume clicks)
+- `python main.py prepare-batch --from-design design_0023 design_0026` (new option): re-prepares ledger designs with the current canopy method and the inlet speed they first ran at
+  (5.187 and 5.1808 m/s, stored as `uz_override` in batch.json, honoured by run-batch), so only the geometry differs from the legacy runs (legacy Cd of 0023: 0.7863; 0026 never ran).
+- Canopies imported (one solid, one face each): `batch_20261029_013921_01_canopy` (design_0023 shape) and `_02_canopy` (design_0026 shape). Checklist: `runs/batch/batch_20261029_013921/MANUAL_STEPS.txt`.
+- Approved (user): 5 CPU h cap per design. After the clicks: `python main.py run-batch --batch batch_20261029_013921 --max-core-hours 5 --batch-core-hours 10 --skip-estimate-check`.

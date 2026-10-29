@@ -58,18 +58,27 @@ def _all_prepared(prefix=BATCH_DIR):
     return xs
 
 
-def prepare_batch(ctx, k, log=print):
+def prepare_batch(ctx, k, log=print, from_designs=None):
     space = ctx.search_space
     batch_id = "batch_" + datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
     out = BATCH_DIR / batch_id
     out.mkdir(parents=True, exist_ok=True)
     designs, texts = [], []
-    for x in propose_points(ctx.ledger, space, k, _all_prepared()):
+    if from_designs:  # re-run known designs (e.g. on the clean canopy), at the speed they were first run with
+        records = {r["design_id"]: r for r in ctx.ledger.records}
+        proposals = []
+        for design_id in from_designs:
+            rec = records[design_id]
+            proposals.append((rec["x"], dict(rec["params"], EXTRUDE_METHOD=config.FIXED_PARAMS["EXTRUDE_METHOD"]),
+                              abs(rec["velocity"]["uz_mps"]) if rec.get("velocity") else None, design_id))
+        k = len(proposals)
+    else:
+        proposals = [(x, design_params(to_params(space, x)), None, None) for x in propose_points(ctx.ledger, space, k, _all_prepared())]
+    for x, params, uz, source in proposals:
         if len(designs) >= k:
             break
         i = len(designs) + 1
         name = f"{batch_id}_{i:02d}"
-        params = design_params(to_params(space, x))
         try:
             _, info, _, paths = build_geometry(params, out / name, name)
         except InfeasibleGeometry as exc:
@@ -102,7 +111,7 @@ def prepare_batch(ctx, k, log=print):
             continue
         d = ctx.simscale.describe_geometry(ctx.project_id, geometry_id)
         n_faces = sum(len(v) for v in d["groups"].values()) + len(d["unlabeled_faces"])
-        entry = {"name": name, "canopy_name": canopy_name, "x": x, "params": params,
+        entry = {"name": name, "canopy_name": canopy_name, "x": x, "params": params, "uz_override": uz, "source_design": source,
                  "canopy_geometry_id": geometry_id, "canopy_faces": n_faces,
                  "bounds_in": info["domain_bounds_in"], "volume_in3": info["volume_in3"],
                  "projected_diameter_in": info["projected_diameter_in"]}
@@ -147,7 +156,7 @@ def run_batch(ctx, batch_id, per_design_cap, batch_cap, skip_estimate_check=Fals
             continue
         log(f"{entry['name']}: running on flow-volume geometry {geometry_id}")
         resume = start_with_geometry(ctx, entry["params"], geometry_id)
-        record = evaluate_design(ctx, entry["params"], mode="optimize", resume=resume)
+        record = evaluate_design(ctx, entry["params"], mode="optimize", resume=resume, uz_override=entry.get("uz_override"))
         entry.update(design_id=record["design_id"], status=record["status"], cd=record.get("cd"),
                      flow_volume_geometry_id=geometry_id)
         path.write_text(json.dumps(batch, indent=2, default=str) + "\n")
