@@ -1,3 +1,2 @@
-usage: main.py [-h]
-               {dry-run,check,inspect-simscale,mesh-test,build-clean,export-print,prepare-batch,run-batch,single,optimize,sync-sheet,sync-results,status,depth-model,manual-step,reference-check,onshape-roundtrip,canopy-gate,mesh-probe,probe-import} ...
-main.py: error: unrecognized arguments: --from-design design_0026 --clean-step
+CPU-hour cap for this design (mesh + run, checked against SimScale's estimate and enforced live): 5
+[design_0030] generating pattern + solid
