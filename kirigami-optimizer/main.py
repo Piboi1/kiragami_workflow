@@ -236,7 +236,7 @@ def cmd_build_clean(args):
             print(f"{args.design_id} is not in the ledger")
             return 1
         params, name = dict(record["params"]), args.design_id
-    params["EXTRUDE_METHOD"] = "clean"
+    params["EXTRUDE_METHOD"] = args.method
     params["CLEAN_SIMPLIFY_TOL"] = args.simplify
     out = Path(args.out_dir or config.RUNS_DIR / "clean" / name)
     out.mkdir(parents=True, exist_ok=True)
@@ -815,6 +815,7 @@ def main(argv=None):
     p.add_argument("--params-json", help="a JSON file of design parameters instead of a ledger design")
     p.add_argument("--out-dir", help="output folder (default runs/clean/<design>)")
     p.add_argument("--step", action="store_true", help="also write the STEP air volume for SimScale")
+    p.add_argument("--method", choices=("dome", "clean", "legacy"), default="dome", help="canopy construction (default: the dome build)")
     p.add_argument("--simplify", type=float, default=0.002, help="collapse features smaller than this (in) after the union; fewer faces")
     p.set_defaults(fn=cmd_build_clean)
 

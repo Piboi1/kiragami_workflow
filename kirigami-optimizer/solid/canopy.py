@@ -57,6 +57,8 @@ DEFAULT_SOLID_PARAMS = {
     # shorter than this (inches). The union of thin overlapping slabs leaves
     # micron-scale slivers that CAD kernels reject as clashing faces.
     "SIMPLIFY_TOLERANCE": 1e-4,
+    "MIN_FEATURE_IN": 0.06,     # "dome" only: voids narrower than this fill in, every inside corner gets a fillet of half of it (solid/dome_canopy.py)
+    "DOME_MESH_H_IN": 0.09,     # "dome" only: target triangle edge of the sheet
     "CLEAN_SIMPLIFY_TOL": 0.002,  # EXTRUDE_METHOD "clean" only: collapse features smaller than this after the union (fewer faces)
     # "legacy" only: 1 builds the shell like the original Colab script (trimesh's default
     # process=True merges coincident vertices, so neighbouring strips share vertices and
@@ -442,11 +444,18 @@ def build_solid(ring_data, params=None):
         p["JOINT_OVERLAP"] = max(float(p["JOINT_OVERLAP"]), CLEAN_JOINT_OVERLAP_IN)
         p["SIMPLIFY_TOLERANCE"] = float(p["CLEAN_SIMPLIFY_TOL"])
     joint_overlap = float(p["JOINT_OVERLAP"]) if method == "union" else 0.0
+    layout = []  # the centre cap's analytic description, for the dome build
     strips = build_open_strips(rings, cuts, float(p["VERTICAL_DROP"]), float(p["KERF_FACTOR"]), joint_overlap,
-                               bridge_extra=float(p["BRIDGE_EXTRA"]),
+                               bridge_extra=float(p["BRIDGE_EXTRA"]), record=layout,
                                cap_overlap=None if p["CAP_OVERLAP"] is None else float(p["CAP_OVERLAP"]))
 
-    if method == "union":
+    if method == "dome":
+        from solid.dome_canopy import build_dome_canopy
+
+        cap = next(item for item in layout if item["kind"] == "cap")
+        mesh = build_dome_canopy(strips, cap["r"], float(p["VERTICAL_DROP"]), rings[-1][0], thickness,
+                                 min_feature=float(p["MIN_FEATURE_IN"]), h=float(p["DOME_MESH_H_IN"]))
+    elif method == "union":
         slabs = [extrude_surface(v, f, thickness) for v, f in strips]
         mesh = booleans.union(slabs)
         if float(p["SIMPLIFY_TOLERANCE"]) > 0:
@@ -459,12 +468,12 @@ def build_solid(ring_data, params=None):
     else:
         raise ValueError(f"unknown EXTRUDE_METHOD {method!r}")
 
-    if p["EXTRUDE_METHOD"] == "clean":
+    if p["EXTRUDE_METHOD"] in ("clean", "dome"):
         from solid.selfcheck import self_intersections
 
         crossings = len(self_intersections(mesh))
         if mesh.body_count != 1 or not mesh.is_watertight or crossings:
-            raise RuntimeError(f"clean canopy not clean: {mesh.body_count} bodies, watertight {mesh.is_watertight}, "
+            raise RuntimeError(f"{p['EXTRUDE_METHOD']} canopy not clean: {mesh.body_count} bodies, watertight {mesh.is_watertight}, "
                                      f"{crossings} self-intersecting triangle pairs")
 
     radial = np.linalg.norm(mesh.vertices[:, :2], axis=1)

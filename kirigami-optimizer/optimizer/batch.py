@@ -84,7 +84,7 @@ def prepare_batch(ctx, k, log=print, from_designs=None):
         except InfeasibleGeometry as exc:
             log(f"  skipped {x}: infeasible ({exc})")
             continue
-        if config.OPTIMIZER.get("SCREEN_SLIVERS", True) and params.get("EXTRUDE_METHOD") != "clean":  # the clean canopy has no slab overlaps
+        if config.OPTIMIZER.get("SCREEN_SLIVERS", True) and params.get("EXTRUDE_METHOD") not in ("clean", "dome"):  # only the legacy canopy has slab overlaps
             import trimesh
 
             try:
