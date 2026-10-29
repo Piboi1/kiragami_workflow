@@ -165,3 +165,31 @@ def test_self_intersection_finder_sees_a_crossing():
     assert self_intersections(trimesh.util.concatenate([a, b]))
     b.apply_translation((3.0, 0, 0))
     assert not self_intersections(trimesh.util.concatenate([a, b]))
+
+
+def test_collapse_short_edges_merges_a_needle_edge_without_changing_the_body():
+    import trimesh
+
+    from solid import booleans
+
+    ball = trimesh.creation.icosphere(subdivisions=2)
+    a, b = ball.edges_unique[0]
+    moved = ball.copy()
+    moved.vertices[b] = moved.vertices[a] + (moved.vertices[b] - moved.vertices[a]) * 1e-4  # one needle edge
+    assert moved.edges_unique_length.min() < 1e-3
+    out = booleans.collapse_short_edges(moved, 1e-3)
+    assert out.edges_unique_length.min() >= 1e-3
+    assert out.is_watertight and abs(out.volume - ball.volume) < 5e-3 * ball.volume
+
+
+def test_single_block_stl_has_one_closed_solid(tmp_path):
+    import trimesh
+
+    from solid import write_patch_stl
+
+    mesh, _ = build_solid(LEGACY_3D_RING_DATA, {"EXTRUDE_METHOD": "clean", "BRIDGE_EXTRA": 0.0})
+    path = tmp_path / "c.stl"
+    assert write_patch_stl(mesh, path, angle_deg=180.0) == 1
+    assert path.read_text().count("solid p") == 2  # solid + endsolid
+    back = trimesh.load(path, process=True)
+    assert back.is_watertight and abs(back.volume - mesh.volume) < 1e-4

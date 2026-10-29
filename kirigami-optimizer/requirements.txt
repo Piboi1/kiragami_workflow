@@ -14,3 +14,4 @@ urllib3>=1.26
 pytest>=7.0
 # SimScale SDK is not on PyPI; install it separately (see README):
 #   pip install git+https://github.com/SimScaleGmbH/simscale-python-sdk.git
+rtree

@@ -77,8 +77,11 @@ def collapse_short_edges(mesh, min_edge, rounds=4, min_altitude=0.0):
     A boolean of near-coincident faces leaves needle triangles with edges of 1e-7 in; STEP importers reject those edges
     ("fault-edge-invalid"). With ``min_altitude`` the shortest edge of every sliver (a triangle whose smallest height is below
     it, however long its edges) is merged too; the mesher refuses faces thinner than its CAD tolerance.
-    Returns the cleaned mesh, or ``mesh`` unchanged if the result is not one watertight body.
+    A merge that would push a triangle through another is undone for that cluster only (the rest still merges), so the result has
+    no new crossing triangles. Returns the cleaned mesh, or ``mesh`` unchanged if the result is not one watertight body.
     """
+
+    from solid.selfcheck import self_intersections
 
     cur = mesh
     for _ in range(rounds):
@@ -93,25 +96,40 @@ def collapse_short_edges(mesh, min_edge, rounds=4, min_altitude=0.0):
             short = np.vstack([short, extra]) if len(short) else extra
         if not len(short):
             break
-        parent = np.arange(len(cur.vertices))
 
-        def find(a):
-            while parent[a] != a:
-                parent[a] = parent[parent[a]]
-                a = parent[a]
-            return a
+        edges = short
+        for _attempt in range(8):
+            parent = np.arange(len(cur.vertices))
 
-        for a, b in short:
-            ra, rb = find(a), find(b)
-            if ra != rb:
-                parent[rb] = ra
-        roots = np.array([find(i) for i in range(len(parent))])
-        counts = np.bincount(roots, minlength=len(parent))
-        centres = np.column_stack([np.bincount(roots, weights=cur.vertices[:, k], minlength=len(parent)) for k in range(3)])
-        centres /= np.maximum(counts, 1)[:, None]
-        faces = roots[cur.faces]
-        ok = (faces[:, 0] != faces[:, 1]) & (faces[:, 1] != faces[:, 2]) & (faces[:, 0] != faces[:, 2])
-        out = trimesh.Trimesh(centres, faces[ok], process=False)
+            def find(a):
+                while parent[a] != a:
+                    parent[a] = parent[parent[a]]
+                    a = parent[a]
+                return a
+
+            for a, b in edges:
+                ra, rb = find(a), find(b)
+                if ra != rb:
+                    parent[rb] = ra
+            roots = np.array([find(i) for i in range(len(parent))])
+            counts = np.bincount(roots, minlength=len(parent))
+            centres = np.column_stack([np.bincount(roots, weights=cur.vertices[:, k], minlength=len(parent)) for k in range(3)])
+            centres /= np.maximum(counts, 1)[:, None]
+            faces = roots[cur.faces]
+            ok = (faces[:, 0] != faces[:, 1]) & (faces[:, 1] != faces[:, 2]) & (faces[:, 0] != faces[:, 2])
+            raw = trimesh.Trimesh(centres, faces[ok], process=False)
+            crossings = self_intersections(raw)
+            if not crossings:
+                break
+            kept = np.nonzero(ok)[0]
+            bad_faces = kept[np.unique(np.array(crossings).ravel())]
+            blocked = {int(r) for r in roots[cur.faces[bad_faces].ravel()] if counts[r] > 1}
+            edges = np.array([e for e in edges if int(roots[e[0]]) not in blocked])
+            if not len(edges):
+                return cur
+        else:
+            return cur
+        out = raw.copy()
         out.remove_unreferenced_vertices()
         out = repair(out)
         if not (out.is_watertight and out.body_count == mesh.body_count and abs(out.volume - mesh.volume) < 5e-3 * abs(mesh.volume)):

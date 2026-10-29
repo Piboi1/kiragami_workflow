@@ -1,0 +1,16 @@
+  uploading design_0026_manual_man_canopy_presplit.stl (8 MB, STL, sewing=True, improve=True)
+  geometry import: RUNNING
+  geometry import: FAILED
+design_0026: IMPORT FAIL cpu 0.0 h, 127 s  geometry import FAILED: {'code': 'model-has-invalid-geometry',  'details': {'faults': [{'code': 'fault-face-self_int',                          'entityIds': ['B4285_TE1'],                          'en
+  uploading design_0027_manual_man_canopy_presplit.stl (9 MB, STL, sewing=True, improve=True)
+  geometry import: RUNNING
+  geometry import: FAILED
+design_0027: IMPORT FAIL cpu 0.0 h, 150 s  geometry import FAILED: {'code': 'model-has-invalid-geometry',  'details': {'faults': [{'code': 'fault-face-slit',                          'entityIds': ['B643_TE1'],                          'entityT
+  uploading design_0022_manual_man_canopy_presplit.stl (9 MB, STL, sewing=True, improve=True)
+  geometry import: RUNNING
+  geometry import: FAILED
+design_0022: IMPORT FAIL cpu 0.0 h, 188 s  geometry import FAILED: {'code': 'model-has-invalid-geometry',  'details': {'faults': [{'code': 'fault-face-bad_face_face',                          'entityIds': ['B66_TE259'],                        
+  uploading design_0023_manual_man_canopy_presplit.stl (8 MB, STL, sewing=True, improve=True)
+  geometry import: RUNNING
+  geometry import: FAILED
+design_0023: IMPORT FAIL cpu 0.0 h, 156 s  geometry import FAILED: {'code': 'model-has-invalid-geometry',  'details': {'faults': [{'code': 'fault-face-slit',                          'entityIds': ['B1092_TE1'],                          'entity

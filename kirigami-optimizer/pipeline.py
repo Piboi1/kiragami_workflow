@@ -13,7 +13,7 @@ from pathlib import Path
 import config
 from generator import generate_pattern
 from optimizer.space import from_params, normalize
-from solid import InfeasibleGeometry, build_flow_domain, build_solid, export_stl, weld_union, write_named_stl, write_presplit_stl
+from solid import InfeasibleGeometry, build_flow_domain, build_solid, export_stl, weld_union, write_named_stl, write_patch_stl, write_presplit_stl
 from solid.canopy import DEFAULT_SOLID_PARAMS
 from simscale.results import core_hours_used
 from sheets.results import outcome_of, refresh_results_tab
@@ -80,6 +80,10 @@ def build_geometry(params, design_dir, design_id):
         if config.SIMSCALE.get("CANOPY_PRESPLIT") and solid_params.get("EXTRUDE_METHOD") == "legacy":
             domain_file = design_dir / f"{design_id}_canopy_presplit.stl"
             info["presplit_pieces"] = write_presplit_stl(canopy, domain_file)
+        elif config.SIMSCALE.get("CANOPY_PRESPLIT") and solid_params.get("EXTRUDE_METHOD") == "clean":
+            domain_file = design_dir / f"{design_id}_canopy_presplit.stl"
+            # one closed block at full precision: split into open patches, SimScale's importer crashes ("simgeo-crashed")
+            info["presplit_pieces"] = write_patch_stl(canopy, domain_file, angle_deg=180.0)
     elif fmt == "STEP":
         # One solid with the canopy as an internal void: no sting, no sewing.
         domain_params["STING_RADIUS"] = 0.0

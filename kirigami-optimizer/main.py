@@ -62,8 +62,9 @@ def _live_context():
     if logger.sheet is None:
         print(f"WARNING: Google Sheet not available ({logger.sheet_error}). "
               f"Rows go to {config.LOCAL_RESULTS_CSV}; run `python main.py sync-sheet` later.")
-    return Context(ledger=Ledger(config.LEDGER_PATH), logger=logger, estimator=_estimator(),
-                   simscale=client, project_id=project_id)
+    ledger = Ledger(config.LEDGER_PATH)
+    ledger.geometry_method = config.FIXED_PARAMS["EXTRUDE_METHOD"]  # results of another canopy construction do not train this one
+    return Context(ledger=ledger, logger=logger, estimator=_estimator(), simscale=client, project_id=project_id)
 
 
 def cmd_dry_run(args):
@@ -207,7 +208,8 @@ def cmd_mesh_test(args):
                 params[key] = value
         res = mesh_test(params, f"{design_id}_{args.route}{args.tag}", route=args.route, cap=args.cap,
                         pass_progress=args.pass_progress, timeout=args.timeout, import_only=args.import_only,
-                        improve=False if args.no_improve else None)
+                        improve=False if args.no_improve else None,
+                        presplit=False if args.no_presplit else None)
         results.append(res)
         print(f"{design_id}: {res['result']:6s} cpu {res['cpu_hours']} h, {res['seconds']} s  {res.get('reason', '')[:200]}")
     return 0
@@ -797,12 +799,13 @@ def main(argv=None):
 
     p = sub.add_parser("mesh-test")
     p.add_argument("--design-id", nargs="+", required=True, help="ledger design(s) to test, e.g. design_0026")
-    p.add_argument("--route", choices=("step", "stl"), default="step", help="how the air volume is built and imported (default: B-rep STEP)")
+    p.add_argument("--route", choices=("step", "stl", "manual"), default="step", help="how the air volume is built and imported (default: B-rep STEP)")
     p.add_argument("--cap", type=float, default=3.0, help="CPU-hour cap per design")
     p.add_argument("--pass-progress", type=float, default=0.3, help="cancel and report PASS when the mesh reaches this progress")
     p.add_argument("--timeout", type=int, default=1500, help="seconds of meshing before giving up")
     p.add_argument("--set", nargs="+", metavar="KEY=VALUE", help="numeric parameter overrides for the design")
     p.add_argument("--tag", default="", help="suffix for the test name")
+    p.add_argument("--no-presplit", action="store_true", help="manual route: import the whole canopy as one STL block with SimScale's automatic facet split")
     p.add_argument("--no-improve", action="store_true", help="import without SimScale's geometry improvement/healing")
     p.add_argument("--import-only", action="store_true", help="only check that SimScale accepts the geometry (free, no meshing)")
     p.set_defaults(fn=cmd_mesh_test)

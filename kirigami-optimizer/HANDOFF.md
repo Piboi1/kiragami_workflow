@@ -389,3 +389,12 @@ SimScale keeps results of failed runs (`FORCE_COEFFICIENTS_PLOT`, `RESIDUALS_PLO
 - STL auto route (clean 0026, `mesh-test --route stl`): rejected by the mesh setup check (`missing-material-assignment`, canopy and sting arrive as extra bodies), same as in the earlier auto-flow probes.
 - New commands (free to build, billed to run): `single --from-design D --clean-step`, `optimize --clean-step` (the optimizer is trained only on clean-geometry designs; `Ledger.geometry_method`).
 - Open decision: (A) raise `MESH_MAX_CORE_HOURS` (about 6+ CPU h per mesh estimated, 10 CPU h per design) and run clean designs fully automatically, or (B) use the clean canopy with the semi-manual flow volume (mesh about 0.1-0.3 CPU h, needs the web-app clicks; untested for clean canopies).
+
+## Update: the clean generator is now the default canopy build
+- `config.FIXED_PARAMS["EXTRUDE_METHOD"] = "clean"` (and the user-style CANOPY_OVERRIDES): every new design (prepare-batch, single, optimize) is built with own-normal ribbons, 0.01 in end overlap,
+  `CLEAN_SIMPLIFY_TOL` 0.002 in, then needle edges (< 1e-3 in) and slivers (height < 1.5e-3 in) are merged cluster by cluster, undoing any merge that would create a crossing triangle. The legacy build is still
+  available (`EXTRUDE_METHOD=legacy`). `Ledger.geometry_method` is set from the config, so only results built the same way train the optimizer (the 28 legacy records stay in the ledger and sheet but no longer count).
+- Manual flow-volume route: the clean canopy is written as ONE closed STL block (full precision). Splitting it into open smooth patches crashes SimScale's importer (`simgeo-crashed`) and the float32 binary STL
+  is not used. `mesh-test --route manual --import-only` (free) imports it the way prepare-batch does: **design_0026, 0027, 0022 and 0023 all IMPORT OK** (one solid, one face; 0026/0027/0022 failed before).
+  The sliver screen is skipped for clean canopies (no slab overlaps). Unknown until a flow volume is made and meshed: how much the meshed one-face canopy costs (legacy semi-manual mesh about 0.12 CPU h).
+- Needs `rtree` (added to requirements.txt) for the local crossing check; `fast-simplification` was tried and dropped (it breaks watertightness).

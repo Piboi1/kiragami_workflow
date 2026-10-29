@@ -296,6 +296,37 @@ def _legacy_extrude(strips, thickness, weld=False):
     return solid
 
 
+def write_patch_stl(mesh, path, angle_deg=30.0):
+    """Writes a one-body canopy as an ASCII STL with one ``solid pNNNN`` block per smooth patch.
+
+    The clean canopy is a single closed body, so SimScale's automatic facet split can give up and return it as ONE face. Cutting it
+    along creases sharper than ``angle_deg`` and writing each patch as its own block gives the sewn import a face per patch
+    (a few hundred), whatever the design. Returns the number of patches.
+    """
+
+    from scipy.sparse import coo_matrix
+    from scipy.sparse.csgraph import connected_components
+
+    mesh = mesh.copy()
+    trimesh.repair.fix_normals(mesh)
+    adjacency = mesh.face_adjacency[mesh.face_adjacency_angles < math.radians(angle_deg)]
+    n = len(mesh.faces)
+    graph = coo_matrix((np.ones(len(adjacency)), (adjacency[:, 0], adjacency[:, 1])), shape=(n, n))
+    _, label = connected_components(graph, directed=False)
+    patches = [np.nonzero(label == k)[0] for k in range(label.max() + 1)]
+    with open(path, "w", encoding="ascii") as fh:
+        for i, faces in enumerate(patches):
+            fh.write(f"solid p{i:04d}\n")
+            for f in faces:
+                n = mesh.face_normals[f]
+                fh.write(f"  facet normal {n[0]:.7e} {n[1]:.7e} {n[2]:.7e}\n    outer loop\n")
+                for v in mesh.triangles[f]:
+                    fh.write(f"      vertex {v[0]:.9e} {v[1]:.9e} {v[2]:.9e}\n")
+                fh.write("    endloop\n  endfacet\n")
+            fh.write(f"endsolid p{i:04d}\n")
+    return len(patches)
+
+
 def write_presplit_stl(mesh, path):
     """Writes the welded canopy as an ASCII STL with one ``solid pNNNN`` block per piece.
 
@@ -362,10 +393,10 @@ def check_feasible(rings, kerf_factor, min_cap_radius):
 CLEAN_JOINT_OVERLAP_IN = 0.01  # ribbon ends reach this far past each node so the slabs fuse into one body (0.7 sheet thicknesses)
 
 
-CLEAN_MIN_EDGES_IN = (1e-3, 7e-4, 5e-4, 3e-4)  # the union leaves edges down to 1e-7 in, which STEP importers reject: merge the shortest ones
+CLEAN_MIN_EDGES_IN = (1e-3, 7e-4, 5e-4)  # the union leaves edges down to 1e-7 in, which importers reject: merge the shortest ones
 
 
-CLEAN_MIN_ALTITUDE_IN = 5e-4  # no triangle thinner than this (the legacy weld has down to 4e-5 and meshes)
+CLEAN_MIN_ALTITUDE_IN = 1.5e-3  # no triangle thinner than this where it can be merged without a crossing (the legacy weld has down to 4e-5)
 
 
 def _clean_needles(mesh):

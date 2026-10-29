@@ -15,13 +15,15 @@ from pipeline import build_geometry
 from simscale.runner import SimScaleClient
 
 
-def mesh_test(params, name, route="step", cap=3.0, pass_progress=0.3, timeout=1500, log=print, import_only=False, improve=None):
+def mesh_test(params, name, route="step", cap=3.0, pass_progress=0.3, timeout=1500, log=print, import_only=False, improve=None, presplit=None):
     """Returns {"result": PASS|FAIL|ERROR, "reason", "cpu_hours", "seconds", ...}."""
 
     saved = config.SIMSCALE["GEOMETRY_FORMAT"]
-    config.SIMSCALE["GEOMETRY_FORMAT"] = {"step": "STEP", "stl": "STL"}[route]
+    config.SIMSCALE["GEOMETRY_FORMAT"] = {"step": "STEP", "stl": "STL", "manual": "MANUAL_FLOW_VOLUME"}[route]
     if improve is not None:
         config.SIMSCALE["IMPORT_IMPROVE"] = improve
+    if presplit is not None:
+        config.SIMSCALE["CANOPY_PRESPLIT"] = presplit
     config.SIMSCALE["STEP_CHECK"] = False  # the mesher is the judge; BRepCheck does not separate working from failing designs
     t0 = time.time()
     out = config.RUNS_DIR / "mesh_tests" / name
@@ -36,7 +38,11 @@ def mesh_test(params, name, route="step", cap=3.0, pass_progress=0.3, timeout=15
         if import_only:  # free: SimScale's geometry validity check only, no mesher
             result = {"name": name, "route": route, "volume_in3": round(info["volume_in3"], 4), "triangles": info.get("triangle_count")}
             try:
-                _, import_id = client.start_import(pid, name, paths["domain_file"], False, config.SIMSCALE["IMPORT_IMPROVE"], fmt=config.SIMSCALE["GEOMETRY_FORMAT"])
+                if route == "manual":  # the canopy alone, as prepare-batch imports it before the web-app flow-volume step
+                    _, import_id = client.start_import(pid, name, paths["domain_file"], True, config.SIMSCALE["IMPORT_IMPROVE"], "STL",
+                                                       facet_split=not config.SIMSCALE.get("CANOPY_PRESPLIT"))
+                else:
+                    _, import_id = client.start_import(pid, name, paths["domain_file"], False, config.SIMSCALE["IMPORT_IMPROVE"], fmt=config.SIMSCALE["GEOMETRY_FORMAT"])
                 gid = client.wait_for_import(pid, import_id)
                 geo = client.describe_geometry(pid, gid, out / "simscale_entities.json")
                 named = {g: len(n) for g, n in geo["groups"].items()}
