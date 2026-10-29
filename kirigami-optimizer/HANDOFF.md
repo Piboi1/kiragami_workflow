@@ -420,3 +420,12 @@ SimScale keeps results of failed runs (`FORCE_COEFFICIENTS_PLOT`, `RESIDUALS_PLO
 - batch_20261029_192800: design_0023 shape (`_01`) and design_0026 shape (`_02`) on the sliver-free canopy, inlet speeds as before (5.187 / 5.1808 m/s). Waiting for the flow-volume clicks; then
   `run-batch --batch batch_20261029_192800 --max-core-hours 5 --batch-core-hours 10 --skip-estimate-check`. Step A (user approved option C): any design of it that still diverges is re-run with `--redo ... --mesh-fineness 6`
   on the same flow volumes (no new clicks), 5 CPU h cap.
+
+## Update: sliver-free clean canopy and fineness 6 BOTH still diverge (options B and C of the clean-geometry plan failed)
+- batch_20261029_192800 (sliver-free clean canopy, fineness 4.5): design_0032 (0023 shape) solver FAILED after 1.02 CPU h, velocity 1.2e8 m/s near r 1.59 in, z -1.26 in; design_0033 (0026 shape) runaway guard
+  cancelled at Cd 3927 (0.83 CPU h). Fineness 6 re-runs on the same flow volumes: design_0034 (0023 shape) cancelled at Cd 92123 (2.75 CPU h of solver, 0.12 mesh); design_0035 (0026 shape) FAILED at the start,
+  velocity 1.1e7 m/s near r 2.30 in, z -2.38 in (0.12 CPU h). Total this round about 5.0 CPU h; clean-geometry attempts so far about 6.3 CPU h; none produced a Cd.
+- Where it diverges (exports/divergence_clean_runs.png, made by `tools_divergence_plot.py`): always in the open ribbon web of rings 1-2.5 in from the axis, on a different ribbon each run
+  (r 1.02 / 1.59 / 1.85 / 2.30 in), never on the apex cap. Finer mesh and slivers removed: it just moves. So it is neither the apex nor a specific bad triangle.
+- Reading: the clean generator fixes the MESHER failures only. The steady-state solver diverges for the thin-ribbon web whatever we do to the surface; legacy designs that converged did so by luck of the mesh.
+  Remaining ideas: transient (pseudo-time) or lower-CFL solver settings, a coarser/steadier physics (laminar-ish / lower Re), a lower inlet speed, or SimScale support.

@@ -1,0 +1,41 @@
+Mesh fineness 6 (default 6): more cells, more CPU hours
+batch_20261029_192800_01: running on flow-volume geometry 94b28fc2-289d-46a2-a911-bede5dfcb5a6
+Resuming design_0034 (SimScale state: ['geometry_id'])
+[design_0034] generating pattern + solid
+[design_0034] rings=29 Aref=73.31 in^2 Uz=-5.187 m/s (Cd for Uz 0.307)
+  meshing: QUEUED 0%
+  meshing: RUNNING 10%
+  meshing: RUNNING 30%
+  meshing: RUNNING 95%
+  meshing: FINISHED
+  simulation estimate 45.23 core hours exceeds cap 5; estimate gate skipped on request, the run is cancelled live at the cap
+  simulation run: QUEUED 0%
+  simulation run: RUNNING 0%
+  simulation run: RUNNING 1%
+  simulation run: RUNNING 9%
+  simulation run: RUNNING 16%
+  simulation run: RUNNING 27%
+  simulation run: RUNNING 34%
+  simulation run: diverging: Cd = 92122.95 is outside any physical range -- cancelling it on SimScale
+[design_0034] FAILED: SimScaleError: simulation run cancelled: diverging: Cd = 92122.95 is outside any physical range (2.75 CPU h billed)
+batch_20261029_192800_01: failed Cd=None
+batch_20261029_192800_02: running on flow-volume geometry c665de20-6701-45c3-a6ee-2f67815c009b
+Resuming design_0035 (SimScale state: ['geometry_id'])
+[design_0035] generating pattern + solid
+[design_0035] rings=30 Aref=73.04 in^2 Uz=-5.181 m/s (Cd for Uz 0.307)
+  meshing: QUEUED 0%
+  meshing: RUNNING 10%
+  meshing: RUNNING 30%
+  meshing: RUNNING 95%
+  meshing: FINISHED
+  simulation estimate 45.23 core hours exceeds cap 5; estimate gate skipped on request, the run is cancelled live at the cap
+  simulation run: QUEUED 0%
+  simulation run: RUNNING 0%
+  simulation run: RUNNING 3%
+  simulation run: RUNNING 10%
+  simulation run: RUNNING 16%
+  simulation run: FAILED
+[design_0035] FAILED: SimScaleError: simulation run FAILED
+batch_20261029_192800_02: failed Cd=None
+batch_20261029_192800_01: failed Cd=None
+batch_20261029_192800_02: failed Cd=None
