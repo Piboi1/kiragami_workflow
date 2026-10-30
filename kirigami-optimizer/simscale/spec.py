@@ -92,7 +92,9 @@ def build_model(sim_cfg, entities, uz_mps, reference_area_in2, reference_length_
         numerics=FluidNumerics(
             relaxation_factor=RelaxationFactor(**{k: v for k, v in (
                 ("pressure_field", sim_cfg.get("RELAX_PRESSURE")),
-                ("velocity_equation", sim_cfg.get("RELAX_VELOCITY"))) if v is not None}),
+                ("velocity_equation", sim_cfg.get("RELAX_VELOCITY")),
+                ("turbulent_kinetic_energy_equation", sim_cfg.get("RELAX_TURBULENCE")),
+                ("omega_dissipation_rate_equation", sim_cfg.get("RELAX_TURBULENCE"))) if v is not None}),
             num_non_orthogonal_correctors=sim_cfg["NON_ORTHOGONAL_CORRECTORS"],
             pressure_reference_cell=0,
             pressure_reference_value=DimensionalPressure(value=0, unit="Pa"),
@@ -214,6 +216,8 @@ def describe_settings(sim_cfg):
         numerics.append("potential-flow init")
     if sim_cfg.get("RELAX_PRESSURE") is not None or sim_cfg.get("RELAX_VELOCITY") is not None:
         numerics.append(f"relax p {sim_cfg.get('RELAX_PRESSURE')} U {sim_cfg.get('RELAX_VELOCITY')}")
+    if sim_cfg.get("RELAX_TURBULENCE") is not None:
+        numerics.append(f"relax k/omega {sim_cfg['RELAX_TURBULENCE']}")
     if sim_cfg.get("UPWIND_TURBULENCE_SCHEME"):
         numerics.append("upwind k/omega")
     parts.extend(numerics or ["default numerics"])

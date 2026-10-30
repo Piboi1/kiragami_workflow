@@ -210,6 +210,7 @@ SIMSCALE = {
     "POTENTIAL_FOAM_INIT": False,
     "RELAX_PRESSURE": None,
     "RELAX_VELOCITY": None,
+    "RELAX_TURBULENCE": None,   # relaxation of the k and omega equations (None = SimScale default)
     "MESH_FINENESS": 4.5,           # Simmetrix automatic sizing, 0-10
     "MESH_BOUNDARY_LAYERS": True,
     "MESH_PHYSICS_BASED": True,

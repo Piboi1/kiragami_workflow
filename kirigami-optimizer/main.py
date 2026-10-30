@@ -184,6 +184,8 @@ def cmd_single(args):
 
 ROBUST_NUMERICS = {"POTENTIAL_FOAM_INIT": True, "RELAX_PRESSURE": 0.2, "RELAX_VELOCITY": 0.5}
 STABLE_SCHEME = {"UPWIND_TURBULENCE_SCHEME": True}
+# Everything gentle at once: potential-flow start, low relaxation of p, U, k and omega, first-order upwind for k and omega (shifts Cd; a diagnostic, not a production setting).
+GENTLE_NUMERICS = {**ROBUST_NUMERICS, **STABLE_SCHEME, "RELAX_TURBULENCE": 0.5}
 
 
 def cmd_mesh_test(args):
@@ -315,6 +317,9 @@ def cmd_run_batch(args):
     if args.stable_scheme:
         ctx.simscale.cfg.update(STABLE_SCHEME)
         print("First-order upwind for the turbulence transport (k, omega): on")
+    if args.gentle:
+        ctx.simscale.cfg.update(GENTLE_NUMERICS)
+        print(f"Gentle solver numerics on: {GENTLE_NUMERICS}")
     if args.mesh_fineness is not None:  # Simmetrix automatic sizing 0-10 (default config.SIMSCALE["MESH_FINENESS"])
         ctx.simscale.cfg["MESH_FINENESS"] = args.mesh_fineness
         print(f"Mesh fineness {args.mesh_fineness:g} (default {config.SIMSCALE['MESH_FINENESS']:g}): more cells, more CPU hours")
@@ -844,6 +849,8 @@ def main(argv=None):
                    help="first-order upwind for the turbulence transport (k, omega); more diffusive, shifts Cd")
     p.add_argument("--robust-numerics", action="store_true",
                    help="potential-flow initialisation and lower relaxation factors (for designs whose solver diverged)")
+    p.add_argument("--gentle", action="store_true",
+                   help="every stabiliser at once: potential-flow start, relaxation p 0.2 / U 0.5 / k,omega 0.5, upwind k/omega (diagnostic; shifts Cd)")
     p.add_argument("--redo", nargs="+", metavar="NAME", help="design names (e.g. batch_..._02) to run again even though they have a result")
     p.add_argument("--batch-core-hours", type=float, required=True, help="stop starting new designs once the batch has used this many")
     p.add_argument("--skip-estimate-check", action="store_true",
