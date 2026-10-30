@@ -85,6 +85,20 @@ class SheetsLogger:
         values = [_cell(row.get(col)) for col in header]
         self.ws.append_row(values, value_input_option="USER_ENTERED", table_range="A1")
 
+    def update_row(self, design_id, row):
+        """Rewrites the cells of the existing row of ``design_id`` (same columns as append). Returns False if the design has no row."""
+
+        header = self._header()
+        if "design_id" not in header:
+            return False
+        ids = self.ws.col_values(header.index("design_id") + 1)
+        if design_id not in ids:
+            return False
+        number = ids.index(design_id) + 1
+        values = [_cell(row.get(col)) for col in header]
+        self.ws.update(range_name=f"A{number}", values=[values], value_input_option="USER_ENTERED")
+        return True
+
     def describe(self):
         return f"{self.spreadsheet.title} / {self.ws.title}"
 

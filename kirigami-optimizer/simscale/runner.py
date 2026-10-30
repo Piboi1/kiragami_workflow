@@ -281,6 +281,29 @@ class SimScaleClient:
         self.log(f"  {what}: {obj.status}")
         return obj
 
+    def partial_result(self, project_id, simulation_id, run_id, cfg, work_dir=None):
+        """Coefficients of a run that was stopped before it finished, if its drag history is long enough and as settled as a finished run's
+        (same plausibility and noise/drift limits); otherwise None. ``partial_iterations`` says how far it got."""
+
+        try:
+            res = self.runs.get_simulation_run_results(project_id, simulation_id, run_id, page=1, limit=100,
+                                                       category="FORCE_COEFFICIENTS_PLOT").embedded or []
+            if not res:
+                return None
+            text = maybe_unzip(self._download(res[0].download.url))
+            if work_dir is not None:
+                (Path(work_dir) / "force_coefficients_partial.csv").write_text(text)
+            coeffs = parse_force_coefficients(text, cfg["AVERAGING_FRACTION"])
+        except Exception:
+            return None
+        cd, noise, drift = coeffs.get("cd"), coeffs.get("cd_noise_rel"), coeffs.get("cd_drift_rel")
+        n = coeffs.get("n_iterations") or 0
+        if (cd is None or not math.isfinite(cd) or not (MIN_PLAUSIBLE_CD <= cd <= MAX_PLAUSIBLE_CD) or noise is None or noise > MAX_CD_NOISE
+                or abs(drift) > MAX_CD_DRIFT or n < cfg.get("MIN_PARTIAL_ITERATIONS", 300)):
+            return None
+        coeffs["partial_iterations"] = n
+        return coeffs
+
     def runaway_check(self, project_id, simulation_id, run_id):
         """Reason to cancel a runaway solve (from the drag history available while it runs), or None.
 
@@ -642,7 +665,7 @@ class SimScaleClient:
         run_get = lambda: self.runs.get_simulation_run(project_id, sim_id, state["run_id"])  # noqa: E731
         run_cap = None
         if cfg.get("MAX_CORE_HOURS_PER_RUN") is not None:
-            run_cap = max(0.0, cfg["MAX_CORE_HOURS_PER_RUN"] - float(state.get("mesh_core_hours") or 0.0))
+            run_cap = max(0.0, cfg["MAX_CORE_HOURS_PER_RUN"] - float(state.get("mesh_core_hours") or 0.0)) * cfg.get("RUN_CAP_SAFETY", 0.85)  # SimScale keeps billing while a cancel propagates (design_0043: 17.5 CPU h billed against a 15 cap)
         def runaway_watch():
             return self.runaway_check(project_id, sim_id, state["run_id"]) if cfg.get("RUNAWAY_GUARD", True) else None
 
@@ -651,6 +674,17 @@ class SimScaleClient:
                              state.get("run_max_runtime_s", cfg["MAX_RUN_TIME_S"]) + 3600,
                              cancel=lambda: self.runs.cancel_simulation_run(project_id, sim_id, state["run_id"]),
                              cpu_cap=run_cap, stall_seconds=cfg["STALL_TIMEOUT_S"], watch=runaway_watch)
+        except SimScaleError as exc:
+            if "CPU h cap" not in str(exc):
+                raise
+            remember(run_core_hours=_core_hours(run_get()))
+            partial = self.partial_result(project_id, sim_id, state["run_id"], cfg, work_dir)  # stopped by the cap: keep it if the drag had settled
+            if partial is None:
+                raise
+            partial["core_hours_used"] = core_hours_used(state)
+            self.log(f"  stopped by the CPU cap at iteration {partial['partial_iterations']}, but Cd had settled: {partial['cd']:.4f} "
+                     f"(noise {partial['cd_noise_rel']:.2%}, drift {partial['cd_drift_rel']:+.2%}); accepted as a partial run")
+            return partial
         finally:
             remember(run_core_hours=_core_hours(run_get()))
         if run.status != "FINISHED":

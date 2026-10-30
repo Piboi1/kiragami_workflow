@@ -357,6 +357,42 @@ def cmd_optimize(args):
     return 0
 
 
+def cmd_salvage_run(args):
+    """Free: keeps the result of a run that the CPU cap stopped, if its drag history was long enough and as settled as a finished run's.
+
+    Re-reads the partial Cd history from SimScale, applies the same plausibility and noise/drift limits, and (only if they pass) turns the
+    failed ledger record into an ok one that says how far the run got; the sheet row and the results tab are updated."""
+
+    from pipeline import _row
+    from sheets.results import refresh_results_tab
+
+    ledger = Ledger(config.LEDGER_PATH)
+    rec = next((r for r in ledger.records if r["design_id"] == args.design_id), None)
+    if rec is None or rec.get("status") != "failed" or "CPU h cap" not in (rec.get("error") or ""):
+        sys.exit(f"{args.design_id} is not a run that was cancelled by the CPU cap")
+    client, project_id = _simscale_client()
+    sim = rec["simscale"]
+    work = config.RUNS_DIR / args.design_id
+    coeffs = client.partial_result(project_id, sim["simulation_id"], sim["run_id"], config.SIMSCALE, work)
+    if coeffs is None:
+        sys.exit("the partial drag history is too short or had not settled; nothing changed")
+    coeffs["core_hours_used"] = ledger.core_hours_used_for(rec) if hasattr(ledger, "core_hours_used_for") else None
+    rec.update(status="ok", cd=coeffs["cd"], coefficients=coeffs, y=-coeffs["cd"] if rec.get("x") is not None else None,
+               note=f"partial run: stopped by the CPU cap at iteration {coeffs['partial_iterations']}; Cd settled "
+                    f"(noise {coeffs['cd_noise_rel']:.2%}, drift {coeffs['cd_drift_rel']:+.2%}); the earlier error was: {rec.get('error')}")
+    rec["error"] = None
+    rec["settings"] = (rec.get("settings") or "") + f"; partial run, {coeffs['partial_iterations']} it"
+    ledger.save()
+    (work / "record.json").write_text(json.dumps(rec, indent=2, default=str) + "\n")
+    rec["row"] = _row(rec)
+    logger = RunLogger(config.LOCAL_RESULTS_CSV, config.SHEETS)
+    updated = logger.sheet.update_row(args.design_id, rec["row"]) if logger.sheet else False
+    print(f"{args.design_id}: Cd {coeffs['cd']:.4f} accepted (partial, {coeffs['partial_iterations']} iterations); sheet row updated: {updated}")
+    if logger.sheet:
+        print(f"results tab: {refresh_results_tab(logger.sheet.spreadsheet, ledger.records, config.VELOCITY['AIR_DENSITY'])} designs ranked")
+    return 0
+
+
 def cmd_sync_results(args):
     """Rebuilds the ranked `results` tab of the Google Sheet from the ledger (the raw `runs` tab is not touched)."""
 
@@ -901,6 +937,10 @@ def main(argv=None):
 
     sub.add_parser("sync-sheet").set_defaults(fn=cmd_sync)
     sub.add_parser("sync-results").set_defaults(fn=cmd_sync_results)
+
+    p = sub.add_parser("salvage-run")
+    p.add_argument("--design-id", required=True, help="a design whose run was cancelled by the CPU cap, e.g. design_0043")
+    p.set_defaults(fn=cmd_salvage_run)
     sub.add_parser("status").set_defaults(fn=cmd_status)
     sub.add_parser("depth-model").set_defaults(fn=cmd_depth_model)
 

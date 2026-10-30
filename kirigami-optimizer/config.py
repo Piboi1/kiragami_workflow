@@ -224,6 +224,7 @@ SIMSCALE = {
     # any of these trips. Your manual meshes took 3-5 min / 0.2-0.7 CPU h;
     # run 4's mesh sat at 10% for 35 min and billed 9.42 CPU h.
     "MESH_TIMEOUT_S": 1800,
+    "MIN_PARTIAL_ITERATIONS": 300,   # a run stopped by the CPU cap is kept if it got this far and its Cd had settled like a finished run's
     "MESH_MAX_BAD_TETS": 250,        # refuse to start the solver on a mesh with more tetrahedra above 88 deg non-orthogonality (converged runs had <= 81, diverged clean/lattice runs 190-1100)
     "MESH_MAX_CORE_HOURS": 2.0,
     "STALL_TIMEOUT_S": 900,         # progress unchanged this long while RUNNING

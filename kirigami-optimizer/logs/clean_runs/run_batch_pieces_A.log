@@ -1,0 +1,37 @@
+Mesh quality gate: at most 1000 tetrahedra above 88 degrees non-orthogonality (default 250)
+batch_20261030_021503_01: running on flow-volume geometry d593ffc9-3ec8-428e-acd2-b22f9b6a12b9
+Resuming design_0043 (SimScale state: ['geometry_id'])
+[design_0043] generating pattern + solid
+[design_0043] rings=29 Aref=73.39 in^2 Uz=-5.187 m/s (Cd for Uz 0.307)
+  meshing: QUEUED 0%
+  meshing: RUNNING 10%
+  meshing: RUNNING 30%
+  meshing: RUNNING 80%
+  meshing: RUNNING 95%
+  meshing: FINISHED
+  mesh quality: 583 tetrahedra with non-orthogonality > 88 degrees (limit 1000)
+  simulation run: QUEUED 0%
+  simulation run: RUNNING 0%
+  simulation run: RUNNING 2%
+  simulation run: RUNNING 6%
+  simulation run: RUNNING 10%
+  simulation run: RUNNING 14%
+  simulation run: RUNNING 18%
+  simulation run: RUNNING 23%
+  simulation run: RUNNING 28%
+  simulation run: RUNNING 32%
+  simulation run: RUNNING 36%
+  simulation run: RUNNING 41%
+  simulation run: RUNNING 47%
+  simulation run: RUNNING 52%
+  simulation run: RUNNING 57%
+  simulation run: RUNNING 60%
+  simulation run: RUNNING 65%
+  simulation run: RUNNING 69%
+  simulation run: RUNNING 73%
+  simulation run: RUNNING 77%
+  simulation run: used 14.37 CPU h, over the 14.07 CPU h cap -- cancelling it on SimScale
+[design_0043] FAILED: SimScaleError: simulation run cancelled: used 14.37 CPU h, over the 14.07 CPU h cap (17.46 CPU h billed)
+batch_20261030_021503_01: failed Cd=None
+batch_20261030_021503_01: failed Cd=None
+batch_20261030_021503_02: failed Cd=None
