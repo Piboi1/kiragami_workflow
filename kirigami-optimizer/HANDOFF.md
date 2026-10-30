@@ -465,3 +465,10 @@ SimScale keeps results of failed runs (`FORCE_COEFFICIENTS_PLOT`, `RESIDUALS_PLO
 - Prepared (free): batch_20261030_021503 = design_0023 shape (`_01`, 872 faces) and design_0026 shape (`_02`, 902 faces) with the piece-block import. Waiting for the flow-volume clicks. The run starts with the mesh and stops there
   if the bad-cell gate trips (about 0.1 CPU h), otherwise it solves (cap 5 CPU h each, user-approved style).
 - Atlas: exports/geometry_error_atlas.pdf (tools_error_map.py -> tools_error_atlas.py): every run, shape, build, outcome and failure position.
+
+## Update: piece-block import fixes the divergence-prone mesh only partly, and makes the mesh 4x bigger (batch_20261030_021503)
+- design_0040 (0023 shape) and design_0041 (0026 shape): mesh quality gate tripped (583 and 376 nearly-flat tetrahedra, limit 250; one-face import had 1082 / 955; legacy converged runs <= 81), solver not started, 0.1 CPU h each.
+- Gate lifted (`--max-bad-tets 1000`): design_0042 (0023 shape) did NOT diverge, but the 5 CPU h cap cut it (4.61 CPU h solver billed + 0.87 mesh, progress still reported 0%). The piece-block mesh is 7.3 M cells
+  (5.95 M tets, 0.59 M pyramids, 415 k prism layers, 0.31 M hexes) against 1.7 M for the legacy runs, so SimScale's solver estimate is 13.65 CPU h. Design_0043 (0026) was stopped before any SimScale call (0 billed) and its pending entry cleared.
+- Reading: with face structure the mesher refines around every feature edge, pin and merged sliver (about 900 faces plus 1.5e-3 in features), giving a 4x larger mesh; the solver did not blow up in 4.6 CPU h, which is the first time a clean-geometry run survived that long, but it cannot finish inside 5 CPU h.
+- Options: (1) raise the cap to about 15 CPU h and re-run design_0042's geometry (`run-batch --redo ... --max-bad-tets 1000 --max-core-hours 15`); (2) coarser mesh (`--mesh-fineness 3`) so cells drop towards the legacy 1.7 M; (3) both together on one design first.
