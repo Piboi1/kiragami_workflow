@@ -1,0 +1,15 @@
+Mesh quality gate: at most 1000 tetrahedra above 88 degrees non-orthogonality (default 250)
+Mesh fineness 3 (default 3): more cells, more CPU hours
+batch_20261030_021503_02: running on flow-volume geometry f10bc30c-7986-40f8-bfa2-d318b3b58058
+Resuming design_0044 (SimScale state: ['geometry_id'])
+[design_0044] generating pattern + solid
+[design_0044] rings=30 Aref=73.12 in^2 Uz=-5.181 m/s (Cd for Uz 0.307)
+  meshing: QUEUED 0%
+  meshing: RUNNING 10%
+  meshing: RUNNING 30%
+  meshing: RUNNING 80%
+  meshing: RUNNING 95%
+  meshing: FINISHED
+  mesh quality: 361 tetrahedra with non-orthogonality > 88 degrees (limit 1000)
+  simulation estimate 13.65 core hours exceeds cap 5; estimate gate skipped on request, the run is cancelled live at the cap
+  simulation run: QUEUED 0%
