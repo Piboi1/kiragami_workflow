@@ -1,0 +1,29 @@
+batch_20261030_021503_01: running on flow-volume geometry d593ffc9-3ec8-428e-acd2-b22f9b6a12b9
+Resuming design_0040 (SimScale state: ['geometry_id'])
+[design_0040] generating pattern + solid
+[design_0040] rings=29 Aref=73.39 in^2 Uz=-5.187 m/s (Cd for Uz 0.307)
+  meshing: QUEUED 0%
+  meshing: RUNNING 0%
+  meshing: RUNNING 10%
+  meshing: RUNNING 30%
+  meshing: RUNNING 80%
+  meshing: RUNNING 95%
+  meshing: FINISHED
+  mesh quality: 583 tetrahedra with non-orthogonality > 88 degrees (limit 250)
+[design_0040] FAILED: SimScaleError: mesh quality gate: 583 tetrahedra with non-orthogonality > 88 degrees (limit 250); solver not started
+batch_20261030_021503_01: failed Cd=None
+batch_20261030_021503_02: running on flow-volume geometry f10bc30c-7986-40f8-bfa2-d318b3b58058
+Resuming design_0041 (SimScale state: ['geometry_id'])
+[design_0041] generating pattern + solid
+[design_0041] rings=30 Aref=73.12 in^2 Uz=-5.181 m/s (Cd for Uz 0.307)
+  meshing: QUEUED 0%
+  meshing: RUNNING 10%
+  meshing: RUNNING 30%
+  meshing: RUNNING 80%
+  meshing: RUNNING 95%
+  meshing: FINISHED
+  mesh quality: 376 tetrahedra with non-orthogonality > 88 degrees (limit 250)
+[design_0041] FAILED: SimScaleError: mesh quality gate: 376 tetrahedra with non-orthogonality > 88 degrees (limit 250); solver not started
+batch_20261030_021503_02: failed Cd=None
+batch_20261030_021503_01: failed Cd=None
+batch_20261030_021503_02: failed Cd=None

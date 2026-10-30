@@ -317,6 +317,9 @@ def cmd_run_batch(args):
     if args.stable_scheme:
         ctx.simscale.cfg.update(STABLE_SCHEME)
         print("First-order upwind for the turbulence transport (k, omega): on")
+    if args.max_bad_tets is not None:
+        ctx.simscale.cfg["MESH_MAX_BAD_TETS"] = args.max_bad_tets
+        print(f"Mesh quality gate: at most {args.max_bad_tets} tetrahedra above 88 degrees non-orthogonality (default {config.FIXED_PARAMS and 250})")
     if args.gentle:
         ctx.simscale.cfg.update(GENTLE_NUMERICS)
         print(f"Gentle solver numerics on: {GENTLE_NUMERICS}")
@@ -851,6 +854,7 @@ def main(argv=None):
     p.add_argument("--robust-numerics", action="store_true",
                    help="potential-flow initialisation and lower relaxation factors (for designs whose solver diverged)")
     p.add_argument("--uz", type=float, default=None, help="force the inlet speed (m/s) of every design of this run instead of the stored/estimated one (diagnostic)")
+    p.add_argument("--max-bad-tets", type=int, default=None, help="override the mesh quality gate (default 250); a mesh with more flat cells than this does not get a solver run")
     p.add_argument("--gentle", action="store_true",
                    help="every stabiliser at once: potential-flow start, relaxation p 0.2 / U 0.5 / k,omega 0.5, upwind k/omega (diagnostic; shifts Cd)")
     p.add_argument("--redo", nargs="+", metavar="NAME", help="design names (e.g. batch_..._02) to run again even though they have a result")
