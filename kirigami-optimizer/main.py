@@ -211,7 +211,7 @@ def cmd_mesh_test(args):
         res = mesh_test(params, f"{design_id}_{args.route}{args.tag}", route=args.route, cap=args.cap,
                         pass_progress=args.pass_progress, timeout=args.timeout, import_only=args.import_only,
                         improve=False if args.no_improve else None,
-                        presplit=False if args.no_presplit else None)
+                        presplit=False if args.no_presplit else None, pieces=True if args.pieces else None)
         results.append(res)
         print(f"{design_id}: {res['result']:6s} cpu {res['cpu_hours']} h, {res['seconds']} s  {res.get('reason', '')[:200]}")
     return 0
@@ -809,6 +809,7 @@ def main(argv=None):
     p.add_argument("--timeout", type=int, default=1500, help="seconds of meshing before giving up")
     p.add_argument("--set", nargs="+", metavar="KEY=VALUE", help="numeric parameter overrides for the design")
     p.add_argument("--tag", default="", help="suffix for the test name")
+    p.add_argument("--pieces", action="store_true", help="lattice canopy: import the closed ribbons/pins/cap as separate STL blocks")
     p.add_argument("--no-presplit", action="store_true", help="manual route: import the whole canopy as one STL block with SimScale's automatic facet split")
     p.add_argument("--no-improve", action="store_true", help="import without SimScale's geometry improvement/healing")
     p.add_argument("--import-only", action="store_true", help="only check that SimScale accepts the geometry (free, no meshing)")

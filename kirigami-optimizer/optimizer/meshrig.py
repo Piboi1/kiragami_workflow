@@ -15,13 +15,15 @@ from pipeline import build_geometry
 from simscale.runner import SimScaleClient
 
 
-def mesh_test(params, name, route="step", cap=3.0, pass_progress=0.3, timeout=1500, log=print, import_only=False, improve=None, presplit=None):
+def mesh_test(params, name, route="step", cap=3.0, pass_progress=0.3, timeout=1500, log=print, import_only=False, improve=None, presplit=None, pieces=None):
     """Returns {"result": PASS|FAIL|ERROR, "reason", "cpu_hours", "seconds", ...}."""
 
     saved = config.SIMSCALE["GEOMETRY_FORMAT"]
     config.SIMSCALE["GEOMETRY_FORMAT"] = {"step": "STEP", "stl": "STL", "manual": "MANUAL_FLOW_VOLUME"}[route]
     if improve is not None:
         config.SIMSCALE["IMPORT_IMPROVE"] = improve
+    if pieces is not None:
+        config.SIMSCALE["LATTICE_PIECES"] = pieces
     if presplit is not None:
         config.SIMSCALE["CANOPY_PRESPLIT"] = presplit
     config.SIMSCALE["STEP_CHECK"] = False  # the mesher is the judge; BRepCheck does not separate working from failing designs

@@ -88,6 +88,7 @@ def _attempt(ribbons, cap, ring0_radius, thickness, extrude_surface, pin_radius_
         if part.volume < 0:
             part.invert()
     mesh = merge_needles(booleans.repair(booleans.union(parts)))
+    mesh.metadata["pieces"] = parts  # the closed ribbons, pins and cap before fusing (for the pre-split STL import)
     tri = mesh.triangles
     longest = np.max([np.linalg.norm(tri[:, 1] - tri[:, 0], axis=1), np.linalg.norm(tri[:, 2] - tri[:, 1], axis=1),
                       np.linalg.norm(tri[:, 0] - tri[:, 2], axis=1)], axis=0)

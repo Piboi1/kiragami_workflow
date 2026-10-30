@@ -454,3 +454,14 @@ SimScale keeps results of failed runs (`FORCE_COEFFICIENTS_PLOT`, `RESIDUALS_PLO
 - Total this round about 3.1 CPU h. Neither produced a Cd; both records are failed (they do not train the optimizer).
 - Reading: seven geometry variants of the same two designs (legacy, clean, sliver-free clean, fineness 6, lattice) now all diverge in the steady solve although the old legacy build of design_0023 converged once (Cd 0.7863).
   The mesher problem is fixed; the steady-solver divergence is NOT a geometry-cleanliness problem. Next ideas are solver-side (transient / pseudo-transient start, lower CFL or relaxation, bounded schemes, lower inlet speed) or SimScale support.
+
+## Update: options A (gentle solver) and B (low inlet speed) both diverged; the mesh-quality data points at the canopy IMPORT, not the geometry or the solver
+- A: design_0038 (0023 lattice, flow volume of batch_20261029_224604, `run-batch --gentle`: potential-flow start, relax p 0.2 / U 0.5 / k,omega 0.5, upwind k/omega): ran away at Cd 625 after 1.29 CPU h (+0.11 mesh).
+- B: design_0039 (same geometry, default numerics, `run-batch --uz 2.5`): velocity blow-up 2e7 m/s near r 3.99 in, z -7.1 in, Cd 620, 1.25 CPU h (+0.11 mesh). Divergence does NOT follow numerics or inlet speed.
+- Mesh log data (tools_mesh_quality.py -> runs/mesh_quality.json, plotted in the atlas): tetrahedra with non-orthogonality > 88 deg: converged legacy runs 1-81 (prisms 45k-109k); diverged legacy 32-80; every clean/lattice run 190-1082
+  with only 22-47k prisms (boundary-layer cells). Those meshes were built from the canopy imported as ONE face (38k triangles, no feature edges); legacy meshes came from ~700-950 faces (pre-split pieces).
+- New: `MESH_MAX_BAD_TETS` 250 (config.SIMSCALE): the runner reads the mesher log and refuses to start the solver on a worse mesh (saves 1-3 CPU h per doomed run). `LATTICE_PIECES` True: the lattice canopy is written as its
+  closed ribbons/pins/cap blocks (`write_pieces_stl`) so SimScale gets ~900 faces again (design_0026 import: 1 solid, 902 faces). Free import check: `mesh-test --route manual --import-only --pieces`.
+- Prepared (free): batch_20261030_021503 = design_0023 shape (`_01`, 872 faces) and design_0026 shape (`_02`, 902 faces) with the piece-block import. Waiting for the flow-volume clicks. The run starts with the mesh and stops there
+  if the bad-cell gate trips (about 0.1 CPU h), otherwise it solves (cap 5 CPU h each, user-approved style).
+- Atlas: exports/geometry_error_atlas.pdf (tools_error_map.py -> tools_error_atlas.py): every run, shape, build, outcome and failure position.

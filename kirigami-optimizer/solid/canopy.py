@@ -297,6 +297,28 @@ def _legacy_extrude(strips, thickness, weld=False):
     return solid
 
 
+def write_pieces_stl(pieces, path):
+    """Writes closed pieces (ribbons, pins, cap) as an ASCII STL with one ``solid pNNNN`` block each, oriented outwards.
+
+    The pre-split layout the legacy runs used: SimScale sews the blocks into one solid whose faces keep the pieces' boundaries as feature edges,
+    instead of one 38k-triangle face. Returns the number of blocks.
+    """
+
+    with open(path, "w", encoding="ascii") as fh:
+        for i, piece in enumerate(pieces):
+            piece = piece.copy()
+            if piece.volume < 0:
+                piece.invert()
+            fh.write(f"solid p{i:04d}\n")
+            for tri, n in zip(piece.triangles, piece.face_normals):
+                fh.write(f"  facet normal {n[0]:.7e} {n[1]:.7e} {n[2]:.7e}\n    outer loop\n")
+                for v in tri:
+                    fh.write(f"      vertex {v[0]:.9e} {v[1]:.9e} {v[2]:.9e}\n")
+                fh.write("    endloop\n  endfacet\n")
+            fh.write(f"endsolid p{i:04d}\n")
+    return len(pieces)
+
+
 def write_patch_stl(mesh, path, angle_deg=30.0):
     """Writes a one-body canopy as an ASCII STL with one ``solid pNNNN`` block per smooth patch.
 

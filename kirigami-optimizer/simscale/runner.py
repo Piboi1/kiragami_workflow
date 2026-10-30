@@ -307,6 +307,22 @@ class SimScaleClient:
             obj = getter()
         return obj
 
+    def _mesh_quality_gate(self, project_id, operation_id, limit):
+        """Counts the tetrahedra with non-orthogonality above 88 degrees in the mesher's log; refuses to start the solver above ``limit``.
+
+        Every converged run so far had at most 81 of them; every run with 190-1100 diverged (see tools_mesh_quality.py), so a mesh like that
+        only wastes the 1-3 CPU h the solver needs to blow up."""
+
+        import re
+
+        entries = self.meshes.get_mesh_operation_event_log(project_id, operation_id).entries or []
+        m = re.search(r"Number of Tetrahedra with Non-orthogonality > 88:\s*(\d+)", "\n".join(e.message for e in entries))
+        bad = int(m.group(1)) if m else 0
+        self.log(f"  mesh quality: {bad} tetrahedra with non-orthogonality > 88 degrees (limit {limit})")
+        if limit is not None and bad > limit:
+            raise SimScaleError(f"mesh quality gate: {bad} tetrahedra with non-orthogonality > 88 degrees (limit {limit}); solver not started")
+        return bad
+
     def _all_mappings(self, project_id, geometry_id, entity_class):
         out, page = [], 1
         while True:
@@ -607,6 +623,7 @@ class SimScaleClient:
             spec.mesh_id = op.mesh_id
             self.simulations.update_simulation(project_id, sim_id, spec)
             remember(mesh_id=op.mesh_id, mesh_core_hours=_core_hours(op))
+            remember(mesh_bad_tets=self._mesh_quality_gate(project_id, state["mesh_operation_id"], cfg.get("MESH_MAX_BAD_TETS")))
 
         if mesh_only:
             mesh = MeshesApi(self.api_client).get_mesh(project_id, state["mesh_id"])

@@ -120,7 +120,8 @@ def main(out):
                  "- Mesher failures (red X) all sit within 1.5 in of the apex: the centre cap and the first rings (the old builds' crossing triangles and slivers).",
                  "- Solver blow-ups (orange / blue) are spread over r 1.0 - 4.6 in, on a different ribbon in each run; they follow the same designs across builds, not one spot.",
                  "- Runs 0001, 0010, 0014-0016 and 0019 were pipeline / settings problems, not geometry; 0029 hit the mesh CPU cap.",
-                 "- Valid Cds (8 runs) all came from the legacy build; no clean- or lattice-build run has converged yet."]
+                 "- Valid Cds (8 runs) all came from the legacy build; no clean- or lattice-build run has converged yet.",
+                 "- Mesh quality is the common factor: converged runs had at most 81 nearly-flat tetrahedra (non-orthogonality > 88 deg); clean/lattice meshes had 190-1100 and half the boundary-layer cells (page 4)."]
         y = 0.20
         for k, line in enumerate(notes):
             fig.text(0.05, y, line, fontsize=10 if k == 0 else 8.5, weight="bold" if k == 0 else "normal")
@@ -149,6 +150,25 @@ def main(out):
         a2.legend()
         pdf.savefig(fig)
         plt.close(fig)
+        mq_path = Path(config.RUNS_DIR) / "mesh_quality.json"
+        if mq_path.exists():
+            mq = json.loads(mq_path.read_text())
+            fig, ax = plt.subplots(figsize=(11, 8.5))
+            colours = {"legacy": "#1f77b4", "clean": "#ff7f0e", "lattice": "#d62728"}
+            for did, r in mq.items():
+                if "error" in r or not r.get("prisms"):
+                    continue
+                good = r["outcome"] == "ok"
+                ax.scatter(r["prisms"], max(r["tets_over_88"], 0.7), s=120 if good else 70, marker="o" if good else "x", c=colours.get(r["method"], "k"),
+                           linewidths=2, facecolors=colours.get(r["method"]) if good else None)
+                ax.annotate(did[-4:], (r["prisms"], max(r["tets_over_88"], 0.7)), xytext=(4, 4), textcoords="offset points", fontsize=6)
+            ax.set_yscale("log")
+            ax.set_xlabel("boundary-layer prism cells in the mesh")
+            ax.set_ylabel("tetrahedra with non-orthogonality > 88 degrees (log)")
+            ax.set_title("Mesh quality vs outcome: filled circle = converged, cross = solver diverged\n(blue legacy, orange clean, red lattice): the clean/lattice meshes have 5-1000x more nearly flat cells")
+            ax.grid(alpha=0.3)
+            pdf.savefig(fig)
+            plt.close(fig)
         for i, (key, runs) in enumerate(groups.items(), 1):
             page_for(pdf, i, runs, ledger[runs[0]["design_id"]])
     print("wrote", out, f"({len(groups)} shapes)")

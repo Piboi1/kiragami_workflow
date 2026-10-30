@@ -190,6 +190,7 @@ SIMSCALE = {
     # Import the canopy as one named STL block per welded piece (705 faces for the baseline). SimScale's
     # automatic 30-degree facet split fails on many designs (whole canopy = 1 face); this never does.
     "CANOPY_PRESPLIT": True,
+    "LATTICE_PIECES": True,         # lattice canopy: import the closed pieces as separate STL blocks instead of one fused block
     "AUTO_FLOW_SIMPLIFY_TOL": 2e-3,   # inches; union canopy cleanup for the sting-STL route (smaller values fail to import)
     "IMPORT_SEWING": True,   # STL only; needs FIXED_PARAMS["STING_RADIUS"] > 0
     "IMPORT_IMPROVE": True,
@@ -223,6 +224,7 @@ SIMSCALE = {
     # any of these trips. Your manual meshes took 3-5 min / 0.2-0.7 CPU h;
     # run 4's mesh sat at 10% for 35 min and billed 9.42 CPU h.
     "MESH_TIMEOUT_S": 1800,
+    "MESH_MAX_BAD_TETS": 250,        # refuse to start the solver on a mesh with more tetrahedra above 88 deg non-orthogonality (converged runs had <= 81, diverged clean/lattice runs 190-1100)
     "MESH_MAX_CORE_HOURS": 2.0,
     "STALL_TIMEOUT_S": 900,         # progress unchanged this long while RUNNING
     # Per-design CPU-hour cap (mesh + simulation). Checked against SimScale's

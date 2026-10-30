@@ -3,3 +3,20 @@ Resuming design_0039 (SimScale state: ['geometry_id'])
 [design_0039] generating pattern + solid
 [design_0039] rings=29 Aref=73.39 in^2 Uz=-2.500 m/s (Cd for Uz 0.307)
   meshing: QUEUED 0%
+  meshing: RUNNING 30%
+  meshing: RUNNING 95%
+  meshing: FINISHED
+  simulation estimate 13.05 core hours exceeds cap 5; estimate gate skipped on request, the run is cancelled live at the cap
+  simulation run: QUEUED 0%
+  simulation run: RUNNING 0%
+  simulation run: RUNNING 1%
+  simulation run: RUNNING 8%
+  simulation run: RUNNING 13%
+  simulation run: RUNNING 20%
+  simulation run: RUNNING 24%
+  simulation run: RUNNING 29%
+  simulation run: diverging: Cd = 619.89 is outside any physical range -- cancelling it on SimScale
+[design_0039] FAILED: SimScaleError: simulation run cancelled: diverging: Cd = 619.89 is outside any physical range (1.25 CPU h billed)
+batch_20261029_224604_01: failed Cd=None
+batch_20261029_224604_01: failed Cd=None
+batch_20261029_224604_02: failed Cd=None
