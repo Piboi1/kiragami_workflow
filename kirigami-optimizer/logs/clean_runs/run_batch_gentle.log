@@ -7,3 +7,20 @@ Resuming design_0038 (SimScale state: ['geometry_id'])
   meshing: QUEUED 0%
   meshing: RUNNING 10%
   meshing: RUNNING 30%
+  meshing: RUNNING 80%
+  meshing: FINISHED
+  simulation check warning: The sum of (U) Velocity equation and (P) Pressure field relaxation factors is either greater than 1.1 or smaller than 0.9. This can lead to instabilities. Please consider keeping this sum between 0.9 and 1.1
+  simulation estimate 13.05 core hours exceeds cap 5; estimate gate skipped on request, the run is cancelled live at the cap
+  simulation run: QUEUED 0%
+  simulation run: RUNNING 0%
+  simulation run: RUNNING 1%
+  simulation run: RUNNING 6%
+  simulation run: RUNNING 10%
+  simulation run: RUNNING 12%
+  simulation run: RUNNING 15%
+  simulation run: RUNNING 17%
+  simulation run: diverging: Cd = 625.09 is outside any physical range -- cancelling it on SimScale
+[design_0038] FAILED: SimScaleError: simulation run cancelled: diverging: Cd = 625.09 is outside any physical range (1.29 CPU h billed)
+batch_20261029_224604_01: failed Cd=None
+batch_20261029_224604_01: failed Cd=None
+batch_20261029_224604_02: failed Cd=None

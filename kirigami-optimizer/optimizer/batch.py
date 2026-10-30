@@ -134,7 +134,7 @@ def _find_flow_volume(simscale, project_id, entry):
     return None
 
 
-def run_batch(ctx, batch_id, per_design_cap, batch_cap, skip_estimate_check=False, redo=(), log=print):
+def run_batch(ctx, batch_id, per_design_cap, batch_cap, skip_estimate_check=False, redo=(), log=print, uz=None):
     path = BATCH_DIR / batch_id / "batch.json"
     batch = json.loads(path.read_text())
     ctx.simscale.cfg["MAX_CORE_HOURS_PER_RUN"] = per_design_cap
@@ -156,7 +156,7 @@ def run_batch(ctx, batch_id, per_design_cap, batch_cap, skip_estimate_check=Fals
             continue
         log(f"{entry['name']}: running on flow-volume geometry {geometry_id}")
         resume = start_with_geometry(ctx, entry["params"], geometry_id)
-        record = evaluate_design(ctx, entry["params"], mode="optimize", resume=resume, uz_override=entry.get("uz_override"))
+        record = evaluate_design(ctx, entry["params"], mode="optimize", resume=resume, uz_override=uz if uz is not None else entry.get("uz_override"))
         entry.update(design_id=record["design_id"], status=record["status"], cd=record.get("cd"),
                      flow_volume_geometry_id=geometry_id)
         path.write_text(json.dumps(batch, indent=2, default=str) + "\n")

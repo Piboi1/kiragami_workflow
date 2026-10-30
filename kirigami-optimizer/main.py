@@ -330,7 +330,7 @@ def cmd_run_batch(args):
         ctx.simscale.cfg["END_TIME_S"] = args.iterations
         print(f"Solver iterations: {args.iterations} (default 500)")
     batch = run_batch(ctx, args.batch, args.max_core_hours, args.batch_core_hours,
-                      skip_estimate_check=args.skip_estimate_check, redo=tuple(args.redo or ()))
+                      skip_estimate_check=args.skip_estimate_check, redo=tuple(args.redo or ()), uz=args.uz)
     for e in batch["designs"]:
         print(f"{e['name']}: {e.get('status', 'not run')} Cd={e.get('cd')}")
     return 0
@@ -849,6 +849,7 @@ def main(argv=None):
                    help="first-order upwind for the turbulence transport (k, omega); more diffusive, shifts Cd")
     p.add_argument("--robust-numerics", action="store_true",
                    help="potential-flow initialisation and lower relaxation factors (for designs whose solver diverged)")
+    p.add_argument("--uz", type=float, default=None, help="force the inlet speed (m/s) of every design of this run instead of the stored/estimated one (diagnostic)")
     p.add_argument("--gentle", action="store_true",
                    help="every stabiliser at once: potential-flow start, relaxation p 0.2 / U 0.5 / k,omega 0.5, upwind k/omega (diagnostic; shifts Cd)")
     p.add_argument("--redo", nargs="+", metavar="NAME", help="design names (e.g. batch_..._02) to run again even though they have a result")
