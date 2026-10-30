@@ -447,3 +447,10 @@ SimScale keeps results of failed runs (`FORCE_COEFFICIENTS_PLOT`, `RESIDUALS_PLO
 - Cds from the lattice build are NOT comparable with legacy results (different thickness/joints); only lattice results train the optimizer (`Ledger.geometry_method`, set from config). The 28 legacy records stay in the ledger and sheet.
 - Prepared (free): batch_20261029_224604 = design_0023 shape (`_01`) and design_0026 shape (`_02`), inlet speeds as before; waiting for the flow-volume clicks and an approved CPU cap. Earlier batches 013921, 192800, 211430, 220106 are obsolete.
 - Not yet shown: that the lattice build converges in the solver (earlier solver runs on the "clean" build diverged for both designs; divergence is also common with legacy). That is the test.
+
+## Update: lattice build, first solver runs (batch_20261029_224604): BOTH diverged and were cancelled by the runaway guard
+- design_0036 (0023 shape, Uz 5.187): cancelled at Cd 8e14 after 1.52 CPU h solver + 0.12 mesh; SimScale reported the blow-up near r 2.97 in, z -3.98 in (a ribbon in the web, not the apex).
+- design_0037 (0026 shape, Uz 5.181): cancelled at Cd 824 after 1.30 CPU h solver + 0.13 mesh; no position reported. SimScale's solver estimate for these meshes was 13 core hours (cap 5, gate skipped on request).
+- Total this round about 3.1 CPU h. Neither produced a Cd; both records are failed (they do not train the optimizer).
+- Reading: seven geometry variants of the same two designs (legacy, clean, sliver-free clean, fineness 6, lattice) now all diverge in the steady solve although the old legacy build of design_0023 converged once (Cd 0.7863).
+  The mesher problem is fixed; the steady-solver divergence is NOT a geometry-cleanliness problem. Next ideas are solver-side (transient / pseudo-transient start, lower CFL or relaxation, bounded schemes, lower inlet speed) or SimScale support.
