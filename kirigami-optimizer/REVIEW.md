@@ -127,3 +127,27 @@ Free checks that should have come first:
 4. One change at a time on the same saved flow volume, with the change size checked against the feature size.
 5. A mesh-independence check before building a 150-sample optimizer on top of the first working run.
 6. Comparing the first CFD force against your drop-test weight balance (0.53-0.60 N vs 0.233 N), which needs no CPU at all.
+
+## 7. Addendum: the approved test ran (design_0044 = design_0023 at fineness 6)
+
+Run `batch_20261028_032516_03` redone on its saved legacy flow volume. Same shape, same inlet speed (5.187 m/s), same 500 iterations; only the mesh fineness changed (4.5 -> 6). Record: `review/design_0044_fineness6_record.json`.
+
+| | fineness 4.5 (design_0023) | fineness 6 (design_0044) | lattice, 7.3 M cells (design_0043) |
+|---|---|---|---|
+| Cd | 0.7863 | **0.7111** | 0.6907 |
+| cells | ~1.4 M | ~2.35 M (1.73 M tets, 0.53 M hexes, 83 k prisms) | 7.3 M |
+| flat tets (> 88 deg) | 1 | 0 | 583 |
+| CPU h | 2.9 | 6.4 (0.17 mesh + 6.25 solve) | 17.5 |
+| settling | drift 0.12% | noise 0.03%, drift 0.08% | drift 0.07% |
+
+What it means:
+- **The legacy Cds are mesh-dependent by about 10%.** A 1.7x finer mesh moved Cd by -9.6%, with no divergence and a cleaner mesh (0 flat tets). The solver was well settled in both, so "settled" does not mean "mesh-converged".
+- **That explains most of the 12% legacy-vs-lattice gap** (finding 2). On a finer mesh the legacy build lands within 2.9% of the lattice value (0.711 vs 0.691), which is about the numerics noise. The "builds differ in thickness/pins" explanation is not needed; I now think the lattice and legacy builds give nearly the same physics and the legacy 4.5 mesh was too coarse. (Medium confidence: one design, one refinement step.)
+- **0.711 is probably not mesh-converged either**: going 4.5 -> 6 changed Cd by 10%. A third level (fineness 7.5, roughly 3.5 M cells, estimate 10-12 CPU h) would show whether it levels off near 0.70.
+- **The ranking of the eight legacy designs is now unproven.** If the mesh error is a similar +10% for every design, the order holds; if it depends on shape (denser or finer-ribbon designs lose more), it may not. This was the open risk in Option A.
+- **Cost:** a legacy design at fineness 6 is ~6.4 CPU h versus ~17 for the lattice, so it is still ~2.7x cheaper per design, but about twice the 3 CPU h assumed in Option A. Total ledger now ~103 CPU h.
+
+Updated recommendation (replaces section 4):
+> "Run design_0028 (the lowest legacy Cd, 0.7316) at fineness 6, same settings, cap 8 CPU h."
+
+If 0028 drops by about the same ~10% (to ~0.66), the legacy ordering survives mesh refinement and Option A should be done at fineness 6 (about 6.4 CPU h per design: roughly 25 shapes for ~200 CPU h). If it drops by a clearly different amount, the Cd values are not rankable at this mesh, and the better plan is Option B (fix the lattice cost) or Option C (physical drops). Do not run the 4.5-fineness screening of Option A as written.
