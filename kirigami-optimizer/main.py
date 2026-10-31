@@ -357,6 +357,47 @@ def cmd_optimize(args):
     return 0
 
 
+def cmd_mesh_check(args):
+    """Billed (about 1 CPU h): meshes the SAVED flow volume of a batch design with the given mesh settings and reports the cell counts and the flat-cell count.
+
+    No solver run, no new web-app clicks: use it to see what a mesh setting or a geometry variant does to the mesh cost before paying for a solve."""
+
+    import json as _json
+
+    from optimizer.batch import BATCH_DIR, _find_flow_volume
+
+    ctx = _live_context()
+    batch = _json.loads((BATCH_DIR / args.batch / "batch.json").read_text())
+    entry = next(e for e in batch["designs"] if e["name"] == args.name)
+    geometry_id = _find_flow_volume(ctx.simscale, ctx.project_id, entry)
+    if geometry_id is None:
+        sys.exit(f"{args.name}: no flow volume saved")
+    cfg = ctx.simscale.cfg
+    cfg["MESH_MAX_BAD_TETS"] = None
+    cfg["MESH_MAX_CORE_HOURS"] = args.cap
+    cfg["MESH_TIMEOUT_S"] = 3600
+    if args.fineness is not None:
+        cfg["MESH_FINENESS"] = args.fineness
+    if args.small_feature_mm is not None:
+        cfg["MESH_SMALL_FEATURE_TOLERANCE_MM"] = args.small_feature_mm
+    if args.no_boundary_layers:
+        cfg["MESH_BOUNDARY_LAYERS"] = False
+    if args.no_physics:
+        cfg["MESH_PHYSICS_BASED"] = False
+    if args.no_hex_core:
+        cfg["MESH_HEX_CORE"] = False
+    print(f"meshing {args.name} on {geometry_id}: fineness {cfg['MESH_FINENESS']}, small-feature tolerance {cfg['MESH_SMALL_FEATURE_TOLERANCE_MM']} mm")
+    state = {"geometry_id": geometry_id}
+    out = config.RUNS_DIR / "mesh_checks" / f"{args.name}_{args.tag}"
+    out.mkdir(parents=True, exist_ok=True)
+    res = ctx.simscale.run_design(ctx.project_id, f"{args.name}_{args.tag}", None, -5.0, 70.0, 9.6, out, state, lambda s: None, mesh_only=True,
+                                  manual={"bounds_in": entry["bounds_in"]})
+    res.update(mesh_bad_tets=state.get("mesh_bad_tets"), tag=args.tag, fineness=cfg["MESH_FINENESS"], small_feature_mm=cfg["MESH_SMALL_FEATURE_TOLERANCE_MM"])
+    (out / "mesh_check.json").write_text(_json.dumps(res, indent=2, default=str) + "\n")
+    print(_json.dumps(res, indent=2, default=str))
+    return 0
+
+
 def cmd_salvage_run(args):
     """Free: keeps the result of a run that the CPU cap stopped, if its drag history was long enough and as settled as a finished run's.
 
@@ -937,6 +978,18 @@ def main(argv=None):
 
     sub.add_parser("sync-sheet").set_defaults(fn=cmd_sync)
     sub.add_parser("sync-results").set_defaults(fn=cmd_sync_results)
+
+    p = sub.add_parser("mesh-check")
+    p.add_argument("--batch", required=True)
+    p.add_argument("--name", required=True, help="batch design name, e.g. batch_20261030_021503_01")
+    p.add_argument("--tag", default="check", help="label for this variant")
+    p.add_argument("--fineness", type=float, default=None)
+    p.add_argument("--small-feature-mm", type=float, default=None, help="Simmetrix small-feature tolerance in mm (default 0.0164)")
+    p.add_argument("--cap", type=float, default=3.0, help="CPU-hour cap for the mesh")
+    p.add_argument("--no-physics", action="store_true", help="switch off physics-based meshing (diagnostic)")
+    p.add_argument("--no-boundary-layers", action="store_true", help="switch off the automatic boundary layers (diagnostic)")
+    p.add_argument("--no-hex-core", action="store_true", help="switch off the hex-dominant core (diagnostic)")
+    p.set_defaults(fn=cmd_mesh_check)
 
     p = sub.add_parser("salvage-run")
     p.add_argument("--design-id", required=True, help="a design whose run was cancelled by the CPU cap, e.g. design_0043")

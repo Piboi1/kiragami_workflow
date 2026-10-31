@@ -102,10 +102,10 @@ def _attempt(ribbons, cap, ring0_radius, thickness, extrude_surface, pin_radius_
     return mesh
 
 
-def build_lattice_canopy(strips, cap, ring0_radius, thickness, extrude_surface, pin_radius_t=0.9, pin_extension_t=0.3):
+def build_lattice_canopy(strips, cap, ring0_radius, thickness, extrude_surface, pin_radius_t=0.6, pin_extension_t=0.2):
     """Returns the fused canopy (trimesh, inches). ``strips`` end with the legacy centre-cap fan, which is replaced by a bell-shaped cap.
 
-    The requested pin size is tried first (almost flush: pins stick out 0.4 sheet thicknesses at most); if a sliver survives the clean-up, the pins are
+    The requested pin size is tried first (almost flush: at 0.6 / 0.2 the pins stick out 0.1 sheet thicknesses = 0.0015 in, below the mesher's small-feature tolerance); if a sliver survives the clean-up, the pins are
     made slightly larger (still under 1.5 thicknesses) and the build is repeated. A canopy that no variant makes clean raises RuntimeError.
     """
 
@@ -113,7 +113,7 @@ def build_lattice_canopy(strips, cap, ring0_radius, thickness, extrude_surface, 
         raise RuntimeError("expected the centre cap fan as the last strip")
     ribbons = strips[:-1]
     last = None
-    for radius_t, extension_t in ((pin_radius_t, pin_extension_t), (1.0, 0.5), (1.2, 1.0)):
+    for radius_t, extension_t in ((pin_radius_t, pin_extension_t), (0.75, 0.3), (0.9, 0.3), (1.0, 0.5), (1.2, 1.0)):
         try:
             return _attempt(ribbons, cap, ring0_radius, thickness, extrude_surface, radius_t, extension_t)
         except RuntimeError as exc:

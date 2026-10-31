@@ -1,0 +1,18 @@
+meshing batch_20261030_021503_01 on d593ffc9-3ec8-428e-acd2-b22f9b6a12b9: fineness 4.5, small-feature tolerance 0.1 mm
+  meshing: QUEUED 0%
+  meshing: RUNNING 10%
+  meshing: RUNNING 30%
+  meshing: RUNNING 80%
+  meshing: RUNNING 100%
+  meshing: FINISHED
+  mesh quality: 583 tetrahedra with non-orthogonality > 88 degrees (limit None)
+{
+  "mesh_id": "3f928750-45b2-49d9-a2ee-9d7930a18ca2",
+  "cells": 7264429,
+  "nodes": 1754849,
+  "mesh_core_hours": 0.8736111111111111,
+  "mesh_bad_tets": 583,
+  "tag": "tol0p1",
+  "fineness": 4.5,
+  "small_feature_mm": 0.1
+}

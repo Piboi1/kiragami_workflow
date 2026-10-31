@@ -57,8 +57,8 @@ DEFAULT_SOLID_PARAMS = {
     # shorter than this (inches). The union of thin overlapping slabs leaves
     # micron-scale slivers that CAD kernels reject as clashing faces.
     "SIMPLIFY_TOLERANCE": 1e-4,
-    "PIN_RADIUS_T": 0.9,         # "lattice" only: radius of the pin laid along every node edge, in sheet thicknesses (solid/lattice_canopy.py)
-    "PIN_EXTENSION_T": 0.3,      # "lattice" only: how far each pin sticks out past the ribbon edges, in sheet thicknesses
+    "PIN_RADIUS_T": 0.6,         # "lattice" only: radius of the pin laid along every node edge, in sheet thicknesses (solid/lattice_canopy.py)
+    "PIN_EXTENSION_T": 0.2,      # "lattice" only: how far each pin sticks out past the ribbon edges, in sheet thicknesses
     # "legacy" only: 1 builds the shell like the original Colab script (trimesh's default
     # process=True merges coincident vertices, so neighbouring strips share vertices and
     # the extrusion offsets use averaged normals). 0 keeps every strip separate.

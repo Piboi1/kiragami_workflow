@@ -482,3 +482,13 @@ SimScale keeps results of failed runs (`FORCE_COEFFICIENTS_PLOT`, `RESIDUALS_PLO
 - design_0044 (0026 shape, fineness 3, cap 5): the fineness change barely shrank the mesh (6.5 M cells vs 7.3 M; mesh size is driven by the ~900 face boundaries and features, not the fineness slider), SimScale's estimate was again 13.65 CPU h, so the run was
   cancelled right after it started (solver 0.00 CPU h, mesh 0.86 CPU h); no ledger record.
 - Cost note: each lattice design needs about 15-17 CPU h with the piece-block import. At 800 CPU h that is about 40 designs. Options to cut it: a coarser canopy (bigger MIN edge / fewer pins), or a one-face import (cheaper but its mesh diverged).
+
+## Update: option B (cut the mesh cost): mesh settings do not help; the cost sits in the canopy geometry as SimScale imports it
+- New command `main.py mesh-check --batch B --name N [--fineness --small-feature-mm --no-physics --no-boundary-layers --no-hex-core]`: meshes a SAVED flow volume only (about 0.8-0.9 CPU h for the lattice canopy), no solver, no clicks.
+- design_0023 shape, lattice piece-block canopy (batch_20261030_021503_01, 884-ish faces), identical numbers every time unless noted:
+  default 7,264,429 cells (583 flat tets, 0.87 CPU h); small-feature tolerance 0.1 mm (default 0.0164): 7,264,429 (no effect); physics-based off: 7,264,429 (no effect);
+  boundary layers off: 5,149,469 cells (281 flat tets, 0.78 CPU h); fineness 3 on the 0026 shape: 6.5 M. Reference: the LEGACY flow volume of the same design (batch_20261028_032516_03) at the same settings: 1,444,408 cells, 1 flat tet, 0.12 CPU h.
+- So the lattice geometry itself makes a 5x bigger mesh at equal surface area (111 in^2 both) and equal thickness: the likely cause is the small facets/faces around the joint pins and the cap (pin octagons have 0.007-0.010 in edges; the lattice STL median edge 0.033 in vs 0.14 in for the legacy weld).
+- Changes made: pins are now nearly flush (PIN_RADIUS_T 0.6, extension 0.2: stick out 0.0015 in instead of 0.006; with the sliver flips this builds for designs 0023/0026/0027/0022/0028/0005; falls back to bigger pins if a design needs them).
+- Prepared (free): batch_20261031_164247 = design_0023 shape with the nearly-flush pins (884 faces). To see whether flush pins cut the mesh: flow volume clicks, then `mesh-check --batch batch_20261031_164247 --name batch_20261031_164247_01` (about 1 CPU h).
+- Other ways to cut cost: END_TIME_S 350 (the Cd had settled by iteration 350: drift 0.05% at 400) saves about 30% of the solve; `--no-boundary-layers` saves about 30% of the cells but changes the physics.
