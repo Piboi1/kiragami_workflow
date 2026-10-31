@@ -151,3 +151,24 @@ Updated recommendation (replaces section 4):
 > "Run design_0028 (the lowest legacy Cd, 0.7316) at fineness 6, same settings, cap 8 CPU h."
 
 If 0028 drops by about the same ~10% (to ~0.66), the legacy ordering survives mesh refinement and Option A should be done at fineness 6 (about 6.4 CPU h per design: roughly 25 shapes for ~200 CPU h). If it drops by a clearly different amount, the Cd values are not rankable at this mesh, and the better plan is Option B (fix the lattice cost) or Option C (physical drops). Do not run the 4.5-fineness screening of Option A as written.
+
+## 8. Addendum: design_0028 at fineness 6 (design_0045) - the ranking does not survive
+
+Same procedure as section 7 (saved legacy flow volume, inlet 5.186 m/s, 500 iterations, cap 8 CPU h). It ran all 500 iterations and billed 7.79 CPU h (0.44 mesh + 7.35 solve). Record: `review/design_0045_fineness6_record.json`.
+
+| design | Cd at fineness 4.5 | Cd at fineness 6 | change | cells 4.5 -> 6 |
+|---|---|---|---|---|
+| 0023 (29 rings, 6 cuts) | 0.7863 | 0.7111 | **-9.6%** | 1.40 M -> 2.35 M |
+| 0028 (32 rings, 8 cuts) | 0.7316 | 0.7021 | **-4.0%** | 1.69 M -> 2.69 M |
+| gap between them | 0.055 (7.5%) | **0.009 (1.3%)** | | |
+
+- Both runs settled cleanly (drift 0.06-0.08%), 0-5 flat tets, no divergence.
+- The mesh error is **shape dependent** (10% for one design, 4% for the other). So the pre-agreed test came out the "different amount" way: the legacy fineness-4.5 Cds cannot be ranked.
+- On the finer mesh the two designs, which were the best and the worst legacy results, differ by 1.3%, below the ~3% numerics noise. The 7.5% design-to-design spread that the whole search rests on is mostly a coarse-mesh effect. After refinement, differences between designs may be 1-2% or less. This is two designs only, so I'd call it likely, not proven.
+- The lattice value for 0023 (0.691, 7.3 M cells) sits close to the legacy fineness-6 value (0.711), which fits the picture of Cds drifting down toward a common level near 0.69-0.70 as the mesh gets finer.
+
+Updated recommendation (replaces sections 4 and 7's):
+1. **Stop spending CPU hours on screening.** At the mesh sizes affordable (6-7 CPU h per design) CFD does not separate these designs, and the finer meshes that might cost 15+ CPU h each, so Option A is dead and Option B only helps if differences are bigger than the mesh noise.
+2. **Go to Option C**: print designs 0023 and 0028 (the old best and worst) plus one or two very different shapes, and drop-test them. That tests, for free, whether the design space matters at all, and it addresses the 2.5x CFD-vs-drop-test gap (finding 1).
+3. If you still want one more CFD data point: design_0023 at fineness 7.5 (my estimate 10-12 CPU h, cap 14) to see whether Cd levels off near 0.70. I would not run it before the drop tests.
+Ledger total is now about 111 CPU h of the 800.
