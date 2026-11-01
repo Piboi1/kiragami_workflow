@@ -255,7 +255,7 @@ SHEETS = {
 # ------------------------------------------------------------------
 OPTIMIZER = {
     "N_CALLS": 150,                 # total designs, including ones already in the ledger
-    "N_INITIAL_POINTS": 20,         # space-filling designs before the GP takes over
+    "N_INITIAL_POINTS": 9,          # space-filling designs before the GP takes over (9 fineness-6 results existed after the first screening batch)
     "INITIAL_POINT_GENERATOR": "lhs",
     "ACQ_FUNC": "gp_hedge",
     "RANDOM_STATE": 42,

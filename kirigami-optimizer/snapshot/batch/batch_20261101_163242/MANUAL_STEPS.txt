@@ -1,0 +1,170 @@
+
+
+MANUAL STEP for batch_20261101_163242_01  (about 2 minutes)
+
+1. Open https://www.simscale.com/workbench/?pid=7871279013725148382 -> project Kiragami_Optimizer -> Geometries.
+2. Open the geometry named "batch_20261101_163242_01_canopy" in CAD mode.
+3. Add an "External flow volume" with a CUSTOM box:
+       X: -25.830 .. +25.830 in    (-0.6561 .. +0.6561 m)
+       Y: -25.830 .. +25.830 in    (-0.6561 .. +0.6561 m)
+       Z: -70.000 .. +31.130 in    (-1.7780 .. +0.7907 m)
+   (same orientation as the Kiragami_CFD runs: Max Z is the inlet.)
+4. Use "Delete bodies" to remove the canopy solid, leaving only the Flow region.
+5. Save/exit the CAD mode so the new geometry is created in the project.
+   Do not start a mesh or simulation; the pipeline does that.
+
+The pipeline polls the project, finds the new geometry by its
+"Max Z@Flow region" ... "Min Y@Flow region" faces, and carries on.
+======================================================================
+
+MANUAL STEP for batch_20261101_163242_02  (about 2 minutes)
+
+1. Open https://www.simscale.com/workbench/?pid=7871279013725148382 -> project Kiragami_Optimizer -> Geometries.
+2. Open the geometry named "batch_20261101_163242_02_canopy" in CAD mode.
+3. Add an "External flow volume" with a CUSTOM box:
+       X: -25.830 .. +25.830 in    (-0.6561 .. +0.6561 m)
+       Y: -25.830 .. +25.830 in    (-0.6561 .. +0.6561 m)
+       Z: -70.000 .. +31.130 in    (-1.7780 .. +0.7907 m)
+   (same orientation as the Kiragami_CFD runs: Max Z is the inlet.)
+4. Use "Delete bodies" to remove the canopy solid, leaving only the Flow region.
+5. Save/exit the CAD mode so the new geometry is created in the project.
+   Do not start a mesh or simulation; the pipeline does that.
+
+The pipeline polls the project, finds the new geometry by its
+"Max Z@Flow region" ... "Min Y@Flow region" faces, and carries on.
+======================================================================
+
+MANUAL STEP for batch_20261101_163242_03  (about 2 minutes)
+
+1. Open https://www.simscale.com/workbench/?pid=7871279013725148382 -> project Kiragami_Optimizer -> Geometries.
+2. Open the geometry named "batch_20261101_163242_03_canopy" in CAD mode.
+3. Add an "External flow volume" with a CUSTOM box:
+       X: -25.830 .. +25.830 in    (-0.6561 .. +0.6561 m)
+       Y: -25.830 .. +25.830 in    (-0.6561 .. +0.6561 m)
+       Z: -70.000 .. +31.130 in    (-1.7780 .. +0.7907 m)
+   (same orientation as the Kiragami_CFD runs: Max Z is the inlet.)
+4. Use "Delete bodies" to remove the canopy solid, leaving only the Flow region.
+5. Save/exit the CAD mode so the new geometry is created in the project.
+   Do not start a mesh or simulation; the pipeline does that.
+
+The pipeline polls the project, finds the new geometry by its
+"Max Z@Flow region" ... "Min Y@Flow region" faces, and carries on.
+======================================================================
+
+MANUAL STEP for batch_20261101_163242_04  (about 2 minutes)
+
+1. Open https://www.simscale.com/workbench/?pid=7871279013725148382 -> project Kiragami_Optimizer -> Geometries.
+2. Open the geometry named "batch_20261101_163242_04_canopy" in CAD mode.
+3. Add an "External flow volume" with a CUSTOM box:
+       X: -25.830 .. +25.830 in    (-0.6561 .. +0.6561 m)
+       Y: -25.830 .. +25.830 in    (-0.6561 .. +0.6561 m)
+       Z: -70.000 .. +31.130 in    (-1.7780 .. +0.7907 m)
+   (same orientation as the Kiragami_CFD runs: Max Z is the inlet.)
+4. Use "Delete bodies" to remove the canopy solid, leaving only the Flow region.
+5. Save/exit the CAD mode so the new geometry is created in the project.
+   Do not start a mesh or simulation; the pipeline does that.
+
+The pipeline polls the project, finds the new geometry by its
+"Max Z@Flow region" ... "Min Y@Flow region" faces, and carries on.
+======================================================================
+
+MANUAL STEP for batch_20261101_163242_05  (about 2 minutes)
+
+1. Open https://www.simscale.com/workbench/?pid=7871279013725148382 -> project Kiragami_Optimizer -> Geometries.
+2. Open the geometry named "batch_20261101_163242_05_canopy" in CAD mode.
+3. Add an "External flow volume" with a CUSTOM box:
+       X: -25.830 .. +25.830 in    (-0.6561 .. +0.6561 m)
+       Y: -25.830 .. +25.830 in    (-0.6561 .. +0.6561 m)
+       Z: -70.000 .. +31.130 in    (-1.7780 .. +0.7907 m)
+   (same orientation as the Kiragami_CFD runs: Max Z is the inlet.)
+4. Use "Delete bodies" to remove the canopy solid, leaving only the Flow region.
+5. Save/exit the CAD mode so the new geometry is created in the project.
+   Do not start a mesh or simulation; the pipeline does that.
+
+The pipeline polls the project, finds the new geometry by its
+"Max Z@Flow region" ... "Min Y@Flow region" faces, and carries on.
+======================================================================
+
+MANUAL STEP for batch_20261101_163242_06  (about 2 minutes)
+
+1. Open https://www.simscale.com/workbench/?pid=7871279013725148382 -> project Kiragami_Optimizer -> Geometries.
+2. Open the geometry named "batch_20261101_163242_06_canopy" in CAD mode.
+3. Add an "External flow volume" with a CUSTOM box:
+       X: -25.830 .. +25.830 in    (-0.6561 .. +0.6561 m)
+       Y: -25.830 .. +25.830 in    (-0.6561 .. +0.6561 m)
+       Z: -70.000 .. +31.130 in    (-1.7780 .. +0.7907 m)
+   (same orientation as the Kiragami_CFD runs: Max Z is the inlet.)
+4. Use "Delete bodies" to remove the canopy solid, leaving only the Flow region.
+5. Save/exit the CAD mode so the new geometry is created in the project.
+   Do not start a mesh or simulation; the pipeline does that.
+
+The pipeline polls the project, finds the new geometry by its
+"Max Z@Flow region" ... "Min Y@Flow region" faces, and carries on.
+======================================================================
+
+MANUAL STEP for batch_20261101_163242_07  (about 2 minutes)
+
+1. Open https://www.simscale.com/workbench/?pid=7871279013725148382 -> project Kiragami_Optimizer -> Geometries.
+2. Open the geometry named "batch_20261101_163242_07_canopy" in CAD mode.
+3. Add an "External flow volume" with a CUSTOM box:
+       X: -25.830 .. +25.830 in    (-0.6561 .. +0.6561 m)
+       Y: -25.830 .. +25.830 in    (-0.6561 .. +0.6561 m)
+       Z: -70.000 .. +31.130 in    (-1.7780 .. +0.7907 m)
+   (same orientation as the Kiragami_CFD runs: Max Z is the inlet.)
+4. Use "Delete bodies" to remove the canopy solid, leaving only the Flow region.
+5. Save/exit the CAD mode so the new geometry is created in the project.
+   Do not start a mesh or simulation; the pipeline does that.
+
+The pipeline polls the project, finds the new geometry by its
+"Max Z@Flow region" ... "Min Y@Flow region" faces, and carries on.
+======================================================================
+
+MANUAL STEP for batch_20261101_163242_08  (about 2 minutes)
+
+1. Open https://www.simscale.com/workbench/?pid=7871279013725148382 -> project Kiragami_Optimizer -> Geometries.
+2. Open the geometry named "batch_20261101_163242_08_canopy" in CAD mode.
+3. Add an "External flow volume" with a CUSTOM box:
+       X: -25.830 .. +25.830 in    (-0.6561 .. +0.6561 m)
+       Y: -25.830 .. +25.830 in    (-0.6561 .. +0.6561 m)
+       Z: -70.000 .. +31.130 in    (-1.7780 .. +0.7907 m)
+   (same orientation as the Kiragami_CFD runs: Max Z is the inlet.)
+4. Use "Delete bodies" to remove the canopy solid, leaving only the Flow region.
+5. Save/exit the CAD mode so the new geometry is created in the project.
+   Do not start a mesh or simulation; the pipeline does that.
+
+The pipeline polls the project, finds the new geometry by its
+"Max Z@Flow region" ... "Min Y@Flow region" faces, and carries on.
+======================================================================
+
+MANUAL STEP for batch_20261101_163242_09  (about 2 minutes)
+
+1. Open https://www.simscale.com/workbench/?pid=7871279013725148382 -> project Kiragami_Optimizer -> Geometries.
+2. Open the geometry named "batch_20261101_163242_09_canopy" in CAD mode.
+3. Add an "External flow volume" with a CUSTOM box:
+       X: -25.830 .. +25.830 in    (-0.6561 .. +0.6561 m)
+       Y: -25.830 .. +25.830 in    (-0.6561 .. +0.6561 m)
+       Z: -70.000 .. +31.130 in    (-1.7780 .. +0.7907 m)
+   (same orientation as the Kiragami_CFD runs: Max Z is the inlet.)
+4. Use "Delete bodies" to remove the canopy solid, leaving only the Flow region.
+5. Save/exit the CAD mode so the new geometry is created in the project.
+   Do not start a mesh or simulation; the pipeline does that.
+
+The pipeline polls the project, finds the new geometry by its
+"Max Z@Flow region" ... "Min Y@Flow region" faces, and carries on.
+======================================================================
+
+MANUAL STEP for batch_20261101_163242_10  (about 2 minutes)
+
+1. Open https://www.simscale.com/workbench/?pid=7871279013725148382 -> project Kiragami_Optimizer -> Geometries.
+2. Open the geometry named "batch_20261101_163242_10_canopy" in CAD mode.
+3. Add an "External flow volume" with a CUSTOM box:
+       X: -25.830 .. +25.830 in    (-0.6561 .. +0.6561 m)
+       Y: -25.830 .. +25.830 in    (-0.6561 .. +0.6561 m)
+       Z: -70.000 .. +31.130 in    (-1.7780 .. +0.7907 m)
+   (same orientation as the Kiragami_CFD runs: Max Z is the inlet.)
+4. Use "Delete bodies" to remove the canopy solid, leaving only the Flow region.
+5. Save/exit the CAD mode so the new geometry is created in the project.
+   Do not start a mesh or simulation; the pipeline does that.
+
+The pipeline polls the project, finds the new geometry by its
+"Max Z@Flow region" ... "Min Y@Flow region" faces, and carries on.

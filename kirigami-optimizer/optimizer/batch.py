@@ -35,8 +35,10 @@ def propose_points(ledger, space, k, prepared=()):
     opt = config.OPTIMIZER
     x0, y0 = restrict(space, *ledger.xy())  # results outside the (narrowed) space cannot teach skopt anything
     seen = {tuple(x) for x in x0} | {tuple(x) for x in prepared}
+    # Space-filling until N_INITIAL_POINTS results exist (the whole batch counts as initial points); model-driven afterwards.
+    n_init = opt["N_INITIAL_POINTS"] if len(x0) >= opt["N_INITIAL_POINTS"] else max(opt["N_INITIAL_POINTS"], k + len(x0))
     o = Optimizer(dimensions(space), base_estimator="GP", acq_func=opt["ACQ_FUNC"],
-                  n_initial_points=max(opt["N_INITIAL_POINTS"], k + len(x0)),
+                  n_initial_points=n_init,
                   initial_point_generator=opt["INITIAL_POINT_GENERATOR"],
                   random_state=opt["RANDOM_STATE"] + len(x0) + len(prepared))
     if x0:
