@@ -172,3 +172,29 @@ Updated recommendation (replaces sections 4 and 7's):
 2. **Go to Option C**: print designs 0023 and 0028 (the old best and worst) plus one or two very different shapes, and drop-test them. That tests, for free, whether the design space matters at all, and it addresses the 2.5x CFD-vs-drop-test gap (finding 1).
 3. If you still want one more CFD data point: design_0023 at fineness 7.5 (my estimate 10-12 CPU h, cap 14) to see whether Cd levels off near 0.70. I would not run it before the drop tests.
 Ledger total is now about 111 CPU h of the 800.
+
+## 9. Addendum: the 10-design screening batch at fineness 6 (batch_20261101_012513)
+
+Legacy build, fineness 6, 500 iterations, cap 8 CPU h per design. Data: `review/fineness6_results.csv`. The batch itself used about 52 CPU h; the ledger total is now about 164 CPU h of 800.
+
+| design | rings | cuts | exp | overlap | r_in | Cd | CPU h |
+|---|---|---|---|---|---|---|---|
+| 0049 | 29 | 5 | 1.30 | 0.38 | 0.74 | **0.7312** | 6.6 |
+| 0044 (= 0023) | 29 | 6 | 1.30 | 0.38 | 0.74 | 0.7111 | 6.4 |
+| 0052 | 28 | 5 | 1.21 | 0.62 | 0.95 | 0.7053 | 7.5 |
+| 0050 | 30 | 7 | 1.43 | 0.56 | 0.72 | 0.7040 | 6.9 |
+| 0045 (= 0028) | 32 | 8 | 1.42 | 0.84 | 0.60 | 0.7021 | 7.8 |
+| 0053 | 28 | 5 | 1.00 | 0.80 | 0.51 | 0.6961 | 6.2 |
+| 0047 | 32 | 6 | 1.49 | 0.92 | 1.09 | 0.6895 | 7.2 |
+| 0046 | 29 | 4 | 1.41 | 0.72 | 0.67 | 0.6878 | 6.2 |
+| 0055 | 32 | 7 | 1.16 | 0.37 | 1.25 | 0.6837 | 6.8 |
+| 0048, 0051 | | | | | | mesher failed | 0 |
+| 0054 | 30 | 5 | 1.09 | 0.99 | 0.55 | solver diverged | 5.5 |
+
+- **Yield:** 9 of 12 attempts gave a Cd (75%), at 6.2-7.8 CPU h each. The sliver screen removes most mesher failures before they cost anything; the two that got through cost 0, the one divergence cost 5.5 CPU h.
+- **Spread:** 0.684-0.731 (6.8% from lowest to highest, standard deviation 2.1%). This passes the pre-agreed test only narrowly: it is driven by one pair. Seven of the nine sit in a 0.684-0.711 band that is inside the ~3% numerics noise, so those seven cannot be ranked.
+- **The one signal:** the two highest results (0049: 0.731 and 0044: 0.711) are neighbours. They share rings 29, exponent 1.30, overlap 0.38, inner radius 0.74 and differ only in cuts (5 vs 6). A neighbouring pair both coming out on top is more convincing than one lucky run. Low overlap (0.37-0.38) is the common feature of the top pair, but design 0055 also has 0.37 overlap and is the lowest, so overlap alone does not explain it.
+- **Parameter trends** (n = 9, weak): fewer rings, lower overlap and smaller inner radius each correlate with higher Cd (r about -0.4); cuts and spacing exponent show nothing. Nine points cannot support more than hints.
+- **Caveats unchanged:** the CFD level is still about 2.5x the drop-test drag (finding 1), and one run per design means the 3% numerics noise is not averaged out. 0049's Cd drift was 0.3% (the others 0.02-0.09%), still acceptable.
+
+Conclusion: a search is justified but should be local and cautious. The GP now has 9 same-fineness training points. Note that `propose_points` still uses `N_INITIAL_POINTS = 20`, so it would keep proposing space-filling points until 20 results exist; lower it to about 9 to get model-driven proposals.
