@@ -64,6 +64,7 @@ def _live_context():
               f"Rows go to {config.LOCAL_RESULTS_CSV}; run `python main.py sync-sheet` later.")
     ledger = Ledger(config.LEDGER_PATH)
     ledger.geometry_method = config.FIXED_PARAMS["EXTRUDE_METHOD"]  # results of another canopy construction do not train this one
+    ledger.mesh_fineness = config.SIMSCALE["MESH_FINENESS"]  # nor do results from another mesh fineness
     return Context(ledger=ledger, logger=logger, estimator=_estimator(), simscale=client, project_id=project_id)
 
 

@@ -28,7 +28,7 @@ def test_spec_serializes_like_manual_setup():
     assert fc["dragDirection"]["value"] == {"x": 0, "y": 0, "z": -1}
     assert fc["topologicalReference"]["entities"] == ["B1_TE6"]
     mesh = ApiClient().sanitize_for_serialization(build_mesh_model(config.SIMSCALE))
-    assert mesh["sizing"]["fineness"] == 4.5 and mesh["hexCore"] and mesh["physicsBasedMeshing"]
+    assert mesh["sizing"]["fineness"] == config.SIMSCALE["MESH_FINENESS"] and mesh["hexCore"] and mesh["physicsBasedMeshing"]
 
 
 def test_parse_force_coefficients():

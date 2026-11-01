@@ -58,7 +58,7 @@ FIXED_PARAMS = {
     "SHEET_THICKNESS": 0.015,
     # The user's own script output (welded legacy strips, flush hinges): the canopy of Run 11, which
     # SimScale imports as a 948-face solid. The old "union" canopy fails SimScale's import/meshing.
-    "EXTRUDE_METHOD": "lattice",  # the legacy hexagon web rebuilt with pinned joints (solid/lattice_canopy.py); "legacy" = the original build (fails the mesher for about 1 in 4 designs); see HANDOFF.md
+    "EXTRUDE_METHOD": "legacy",  # REVIEW.md: switched back to legacy (7 CPU h/design at fineness 6 vs 17 for lattice); "lattice" = the legacy hexagon web rebuilt with pinned joints (solid/lattice_canopy.py); "legacy" = the original build (fails the mesher for about 1 in 4 designs); see HANDOFF.md
     "WELD_STRIPS": 1,
     "BRIDGE_EXTRA": 0.0,
     "JOINT_OVERLAP": 0.0,
@@ -212,7 +212,7 @@ SIMSCALE = {
     "RELAX_PRESSURE": None,
     "RELAX_VELOCITY": None,
     "RELAX_TURBULENCE": None,   # relaxation of the k and omega equations (None = SimScale default)
-    "MESH_FINENESS": 4.5,           # Simmetrix automatic sizing, 0-10
+    "MESH_FINENESS": 6,             # Simmetrix automatic sizing, 0-10. 4.5 over-predicted Cd by 4-10% (REVIEW.md sec. 7-8); only runs at the same fineness train the optimizer
     "MESH_BOUNDARY_LAYERS": True,
     "MESH_PHYSICS_BASED": True,
     "MESH_HEX_CORE": True,

@@ -14,7 +14,7 @@ def test_propose_points_are_distinct_and_inside_the_space(tmp_path):
 
 
 def test_default_canopy_is_the_lattice_build_with_the_user_style_ribbons():
-    assert config.FIXED_PARAMS["EXTRUDE_METHOD"] == "lattice" and config.FIXED_PARAMS["WELD_STRIPS"] == 1
+    assert config.FIXED_PARAMS["EXTRUDE_METHOD"] == "legacy" and config.FIXED_PARAMS["WELD_STRIPS"] == 1
     assert config.FIXED_PARAMS["BRIDGE_EXTRA"] == 0.0 and config.FIXED_PARAMS["JOINT_OVERLAP"] == 0.0
 
 
@@ -98,10 +98,10 @@ def test_settings_description_names_every_non_default_setting():
     from simscale.spec import describe_settings
 
     base = dict(config.SIMSCALE)
-    assert describe_settings(base) == "fineness 4.5; 500 it; default numerics"
-    odd = dict(base, MESH_FINENESS=6, END_TIME_S=1400, POTENTIAL_FOAM_INIT=True, RELAX_PRESSURE=0.2, RELAX_VELOCITY=0.5)
+    assert describe_settings(base) == f"fineness {config.SIMSCALE['MESH_FINENESS']:g}; 500 it; default numerics"
+    odd = dict(base, MESH_FINENESS=7.5, END_TIME_S=1400, POTENTIAL_FOAM_INIT=True, RELAX_PRESSURE=0.2, RELAX_VELOCITY=0.5)
     text = describe_settings(odd)
-    assert "fineness 6" in text and "1400 it" in text and "potential-flow init" in text and "relax p 0.2 U 0.5" in text
+    assert "fineness 7.5" in text and "1400 it" in text and "potential-flow init" in text and "relax p 0.2 U 0.5" in text
 
 
 def test_search_space_is_the_simulable_region():

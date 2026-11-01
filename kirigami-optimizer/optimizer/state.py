@@ -35,8 +35,12 @@ class Ledger:
         # When set (e.g. "clean"), the optimizer's views only count designs built with that canopy construction: legacy and
         # clean geometries have different thickness, so their Cds must not train the same model.
         self.geometry_method = None
+        # When set (e.g. 6), only runs made at this mesh fineness count: Cd moved 4-10% between fineness 4.5 and 6 (REVIEW.md), so mixed meshes must not train one model.
+        self.mesh_fineness = None
 
     def _same_geometry(self, record):
+        if self.mesh_fineness is not None and f"fineness {self.mesh_fineness:g};" not in (record.get("settings") or ""):
+            return False
         return self.geometry_method is None or (record.get("solid_params") or {}).get("EXTRUDE_METHOD") == self.geometry_method
 
     # -- persistence --------------------------------------------------------
