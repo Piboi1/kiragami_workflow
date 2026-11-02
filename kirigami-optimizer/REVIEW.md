@@ -198,3 +198,29 @@ Legacy build, fineness 6, 500 iterations, cap 8 CPU h per design. Data: `review/
 - **Caveats unchanged:** the CFD level is still about 2.5x the drop-test drag (finding 1), and one run per design means the 3% numerics noise is not averaged out. 0049's Cd drift was 0.3% (the others 0.02-0.09%), still acceptable.
 
 Conclusion: a search is justified but should be local and cautious. The GP now has 9 same-fineness training points. Note that `propose_points` still uses `N_INITIAL_POINTS = 20`, so it would keep proposing space-filling points until 20 results exist; lower it to about 9 to get model-driven proposals.
+
+## 10. Addendum: second screening batch (model-driven) and the combined fineness-6 picture
+
+Batch `batch_20261101_163242`: 10 designs proposed by the GP from the first nine results (`N_INITIAL_POINTS` 9, so proposals were model-driven). Seven gave a Cd, three failed (two mesher failures and one solver crash: 0058, 3.8 CPU h). Batch cost 45.1 CPU h. Ledger total about 209 CPU h of 800. Data: `review/fineness6_results.csv`.
+
+| design | rings | cuts | exp | overlap | r_in | Cd |
+|---|---|---|---|---|---|---|
+| 0057 | 28 | 4 | 1.19 | 0.20 | 0.69 | 0.7154 |
+| 0064 | 29 | 8 | 1.27 | 1.00 | 0.53 | 0.7096 |
+| 0061 | 27 | 5 | 1.14 | 0.48 | 0.69 | 0.7081 |
+| 0060 | 27 | 4 | 0.87 | 0.51 | 0.50 | 0.7003 |
+| 0062 | 28 | 4 | 0.93 | 1.00 | 0.72 | 0.6999 |
+| 0063 | 27 | 4 | 1.08 | 0.27 | 1.18 | 0.6958 |
+| 0065 | 28 | 4 | 1.12 | 0.94 | 1.11 | 0.6867 |
+
+All 16 valid fineness-6 results together: mean 0.7017, standard deviation 1.7%, range 0.684-0.731.
+
+- **The search found nothing better.** No model-proposed design beat design_0049 (0.7312). The best new one is 0.7154. The model-driven batch landed in the same 0.69-0.71 band as the space-filling one.
+- **The design space is nearly flat in this model.** 15 of 16 results lie within 0.684-0.715, a 4.5% range, and the run-to-run numerics noise measured earlier is ~3%. Parameter correlations with Cd are weak (inner radius r = -0.47, overlap r = -0.36, rings r = -0.25, cuts and exponent about 0). The overlap-0.20 and overlap-1.00 designs score alike (0.715 and 0.710), which contradicts a simple "less overlap is better" story.
+- **Only 0049 stands out** (+4.2% above the mean, about 2.4 standard deviations), and it has the largest Cd drift of the set (0.3% vs 0.02-0.11%). Its neighbour 0044 (same shape with 6 cuts) is only +1.3% above the mean, so the "neighbouring pair on top" signal from section 9 was weaker than I said. 0049 is a candidate, not a result, until it is repeated.
+- **Cost of finding this out:** 112 CPU h at fineness 6 for 16 valid Cds. More batches of the same kind would most likely return more numbers in the same band.
+
+Recommended next steps (cheapest first):
+1. **Repeat 0049** with a different numerics path (e.g. potential-flow init, `--robust-numerics`, cap 8 CPU h). If it lands near 0.70 it was noise; if it stays near 0.73 it is a real outlier. About 7 CPU h.
+2. **Drop-test three printed designs** (0049, 0057, and a typical one such as 0065). 0 CPU h; this is the only check that says whether the CFD differences mean anything on the real canopy, and it addresses the 2.5x drag gap from finding 1.
+3. Only if 1 and 2 show real differences: another model-driven batch (about 55 CPU h per 10 designs).
