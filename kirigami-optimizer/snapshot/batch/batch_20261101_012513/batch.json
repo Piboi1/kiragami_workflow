@@ -264,10 +264,13 @@
       ],
       "volume_in3": 0.6362389002845218,
       "projected_diameter_in": 9.657514651644,
-      "design_id": "design_0049",
       "status": "ok",
-      "cd": 0.7311946151479221,
-      "flow_volume_geometry_id": "9b00a7b8-8135-40e0-bfbd-f9d336ff176a"
+      "cd": 0.739150491760464,
+      "flow_volume_geometry_id": "9b00a7b8-8135-40e0-bfbd-f9d336ff176a",
+      "previous_design_ids": [
+        "design_0049"
+      ],
+      "design_id": "design_0066"
     },
     {
       "name": "batch_20261101_012513_05",

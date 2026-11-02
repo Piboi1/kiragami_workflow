@@ -224,3 +224,20 @@ Recommended next steps (cheapest first):
 1. **Repeat 0049** with a different numerics path (e.g. potential-flow init, `--robust-numerics`, cap 8 CPU h). If it lands near 0.70 it was noise; if it stays near 0.73 it is a real outlier. About 7 CPU h.
 2. **Drop-test three printed designs** (0049, 0057, and a typical one such as 0065). 0 CPU h; this is the only check that says whether the CFD differences mean anything on the real canopy, and it addresses the 2.5x drag gap from finding 1.
 3. Only if 1 and 2 show real differences: another model-driven batch (about 55 CPU h per 10 designs).
+
+## 11. Addendum: repeat of design_0049 with robust numerics (design_0066)
+
+Same shape, same saved flow volume, same mesh fineness (6) and inlet speed (5.171 m/s); only the solver start changed (potential-flow initialisation, relaxation p 0.2 / U 0.5). 6.4 CPU h; ledger total about 215 CPU h.
+
+| run | numerics | Cd | last-10% noise | drift |
+|---|---|---|---|---|
+| design_0049 | default | 0.7312 | 0.08% | +0.30% |
+| design_0066 | robust | **0.7392** | 0.16% | -0.16% |
+
+- **0049 is a real outlier in this CFD model.** The repeat agrees within 1.1% and is slightly higher. Both values are 4-5% above the mean of the other 15 designs (0.700), while those 15 have a standard deviation of about 1.4%. The large drift in the first run did not mean it was unconverged.
+- **The robust numerics push Cd up.** The same switch raised design_0013 vs design_0002 by 2.9% on an identical mesh (section 2) and 0049 by 1.1% here. So robust-numerics Cds must not be compared with default-numerics ones; compare 0049 default (0.7312) with the population, which still puts it on top. Bookkeeping note: the ledger filter only checks fineness, so design_0066 now also trains the optimizer as a second point at the same x; it is harmless for a proposal batch but should be excluded from any quoted statistics.
+- **What it still does not tell us:** whether the real canopy behaves like this (finding 1: the CFD drag is ~2.5x the drop-test drag), and what in the shape makes it better. Its closest neighbour (0044, same shape with 6 cuts) is only +1.3% above the mean, so the effect may be tied to 5 cuts with this ring/overlap/inner-radius combination, or may be a narrow sweet spot.
+
+Next step options:
+1. **Drop-test 0049 against 0057 and 0065** (0 CPU h). Tells whether the CFD ranking means anything physically.
+2. **A small local batch around 0049** (about 6 designs, ~40 CPU h): vary overlap, exponent and inner radius by modest steps at 5 cuts, to see if the high Cd is a sweet spot or a plateau.
