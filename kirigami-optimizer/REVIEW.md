@@ -259,3 +259,22 @@ Source: the "geo testing" tab of the team spreadsheet (5 trials each, 4.937 m dr
 - The strongest physical signal in the sheet is 24-10 (1.322 s) against 24-14 (1.150 s): same rings and spacing, overlap 10 vs 14 degrees, 0.172 s apart = about 7 standard errors. The CFD screening never covered 24 rings, and its overlap parameter is a fraction rather than degrees.
 - Measured Cds (0.14-0.31) are 2.3-5x below the CFD's 0.70.
 - Short drops resolve Cd poorly (about 7% Cd per 0.01 s near 1.15 s, because the canopy never reaches terminal speed in 1.0-1.3 s).
+
+## 13. Correction to sections 1 and 12: the drop times are timed at terminal speed
+
+The team clarified that the sheet's times start after about 2 s of falling, so the canopy is already at terminal speed. Sections 1 and 12 assumed a fall from rest over the whole 4.937 m, which wrongly inflated the speed and made the measured Cd look 2.5-5x too low. Assuming the timed distance is 4.937 m (not yet confirmed), speed = 4.937 / time and Cd = 2 m g / (rho v^2 A):
+
+| design | time | speed | Cd |
+|---|---|---|---|
+| 24-10 | 1.322 s | 3.73 m/s | 0.58 |
+| 24-14 | 1.150 s | 4.29 m/s | 0.44 |
+| 4cpr 31 r | 1.154 s | 4.28 m/s | 0.44 |
+| 6 cpr 24 r | 1.144 s | 4.32 m/s | 0.43 |
+| many rings (30 r) | 1.258 s | 3.92 m/s | 0.52 |
+| CFD (Cd 0.70-0.74) would give | 1.45-1.50 s | | 0.70-0.74 |
+
+- The CFD overshoots the drag by about 20-60% (equivalent drop time 1.45-1.50 s vs measured 1.14-1.32 s), not 2.5x. Finding 1 is therefore much milder than written; the remaining gap is plausibly the canopy not opening exactly like the model.
+- Resolution is better than I said: about 1.7% in Cd per 0.01 s. The new pair (1.154 vs 1.144 s) is still not distinguishable (difference of the means 0.010 s, standard error of the difference 0.06 s), so "similar" is the only conclusion; it is consistent with, but too coarse to confirm, a 1-4% CFD difference.
+- 24-10 vs 24-14 (0.172 s, about 7 standard errors, 26% in Cd) is real.
+- Consequence for the code: `DROP_TEST_CORRECT_FOR_ACCELERATION` should be False for these tests. The seed Cd would become about 0.58 and the inlet speeds about 3.7 m/s instead of 5.19 m/s. Left unchanged for now so the 20+ existing CFD results stay comparable.
+- Open caveat: the depth model ignores overlap, but measured depths show it matters (two 30-ring chutes hang 9.19 in and 10.62 in with different overlaps). The CFD pair is prepared with the model's depth for 24 rings (about 8.2 in, identical for both), so any depth difference between the real 24-10 and 24-14 chutes is not represented.
