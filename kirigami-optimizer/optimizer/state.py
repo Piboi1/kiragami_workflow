@@ -39,8 +39,11 @@ class Ledger:
         self.mesh_fineness = None
 
     def _same_geometry(self, record):
-        if self.mesh_fineness is not None and f"fineness {self.mesh_fineness:g};" not in (record.get("settings") or ""):
-            return False
+        if self.mesh_fineness is not None:
+            settings = record.get("settings") or ""
+            # same mesh AND default solver numerics: robust/gentle numerics shift Cd by 1-3% (REVIEW.md sec. 11)
+            if f"fineness {self.mesh_fineness:g};" not in settings or "default numerics" not in settings:
+                return False
         return self.geometry_method is None or (record.get("solid_params") or {}).get("EXTRUDE_METHOD") == self.geometry_method
 
     # -- persistence --------------------------------------------------------
