@@ -1,0 +1,38 @@
+[
+ {
+  "label": "24-10 (sheet row 28)",
+  "params": {
+   "NUM_RINGS": 24,
+   "CUTS_PER_RING": 8,
+   "RING_SPACING_EXPONENT": 1.15,
+   "INNER_RADIUS": 0.75,
+   "INNER_RING_COUNT": 5,
+   "MIN_GAP_DEGREES": 6.0,
+   "INNER_GAP_DEGREES": 6.0,
+   "INNER_GAP_RING_COUNT": 5,
+   "RING_OVERLAP_FRACTION": null,
+   "INNER_OVERLAP_RATIO": null,
+   "VERTICAL_DROP": null,
+   "RING_OVERLAP_DEGREES": 10.0,
+   "INNER_RING_OVERLAP_DEGREES": 10.0
+  }
+ },
+ {
+  "label": "24-14 (sheet row 29)",
+  "params": {
+   "NUM_RINGS": 24,
+   "CUTS_PER_RING": 8,
+   "RING_SPACING_EXPONENT": 1.15,
+   "INNER_RADIUS": 0.75,
+   "INNER_RING_COUNT": 5,
+   "MIN_GAP_DEGREES": 6.0,
+   "INNER_GAP_DEGREES": 6.0,
+   "INNER_GAP_RING_COUNT": 5,
+   "RING_OVERLAP_FRACTION": null,
+   "INNER_OVERLAP_RATIO": null,
+   "VERTICAL_DROP": null,
+   "RING_OVERLAP_DEGREES": 14.0,
+   "INNER_RING_OVERLAP_DEGREES": 14.0
+  }
+ }
+]

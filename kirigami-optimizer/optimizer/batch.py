@@ -56,17 +56,20 @@ def _all_prepared(prefix=BATCH_DIR):
     xs = []
     if Path(prefix).exists():
         for f in Path(prefix).glob("*/batch.json"):
-            xs += [tuple(e["x"]) for e in json.loads(f.read_text())["designs"]]
+            xs += [tuple(e["x"]) for e in json.loads(f.read_text())["designs"] if e.get("x") is not None]
     return xs
 
 
-def prepare_batch(ctx, k, log=print, from_designs=None):
+def prepare_batch(ctx, k, log=print, from_designs=None, custom=None):
     space = ctx.search_space
     batch_id = "batch_" + datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
     out = BATCH_DIR / batch_id
     out.mkdir(parents=True, exist_ok=True)
     designs, texts = [], []
-    if from_designs:  # re-run known designs (e.g. on the clean canopy), at the speed they were first run with
+    if custom:  # hand-specified designs (x is None: they are outside the search vector, so they never train the optimizer)
+        proposals = [(None, design_params(c["params"]), c.get("uz"), c.get("label")) for c in custom]
+        k = len(proposals)
+    elif from_designs:  # re-run known designs (e.g. on the clean canopy), at the speed they were first run with
         records = {r["design_id"]: r for r in ctx.ledger.records}
         proposals = []
         for design_id in from_designs:
@@ -84,7 +87,7 @@ def prepare_batch(ctx, k, log=print, from_designs=None):
         try:
             _, info, _, paths = build_geometry(params, out / name, name)
         except InfeasibleGeometry as exc:
-            log(f"  skipped {x}: infeasible ({exc})")
+            log(f"  skipped {x if x is not None else source}: infeasible ({exc})")
             continue
         if config.OPTIMIZER.get("SCREEN_SLIVERS", True) and params.get("EXTRUDE_METHOD") != "lattice":  # only the legacy canopy has slab overlaps
             import trimesh
@@ -96,7 +99,7 @@ def prepare_batch(ctx, k, log=print, from_designs=None):
                 ok, stats = True, None
                 log("  (sliver screen skipped: manifold3d is not installed)")
             if not ok:
-                log(f"  skipped {x}: sliver overlaps ({stats['slivers']} pairs, smallest {stats['min_overlap_in3']:.1e} in^3) "
+                log(f"  skipped {x if x is not None else source}: sliver overlaps ({stats['slivers']} pairs, smallest {stats['min_overlap_in3']:.1e} in^3) "
                     "would fail SimScale's mesher")
                 continue
         canopy_name = f"{name}_canopy"
@@ -106,10 +109,10 @@ def prepare_batch(ctx, k, log=print, from_designs=None):
         try:
             geometry_id = ctx.simscale.wait_for_import(ctx.project_id, import_id)
         except Exception as exc:  # a design SimScale cannot import is simply not run
-            log(f"  skipped {x}: SimScale import failed ({type(exc).__name__})")
+            log(f"  skipped {x if x is not None else source}: SimScale import failed ({type(exc).__name__})")
             continue
         if not ctx.simscale._all_mappings(ctx.project_id, geometry_id, "region"):
-            log(f"  skipped {x}: SimScale imported a sheet body, not a solid")
+            log(f"  skipped {x if x is not None else source}: SimScale imported a sheet body, not a solid")
             continue
         d = ctx.simscale.describe_geometry(ctx.project_id, geometry_id)
         n_faces = sum(len(v) for v in d["groups"].values()) + len(d["unlabeled_faces"])
@@ -119,7 +122,7 @@ def prepare_batch(ctx, k, log=print, from_designs=None):
                  "projected_diameter_in": info["projected_diameter_in"]}
         designs.append(entry)
         texts.append(manual_flow.instructions(name, canopy_name, info["domain_bounds_in"], ctx.project_id))
-        log(f"  prepared {name}: {dict(zip([s['name'] for s in space], x))}, {n_faces} faces")
+        log(f"  prepared {name}: {dict(zip([s['name'] for s in space], x)) if x is not None else source}, {n_faces} faces")
     (out / "batch.json").write_text(json.dumps({"batch_id": batch_id, "designs": designs}, indent=2, default=str) + "\n")
     (out / "MANUAL_STEPS.txt").write_text("\n\n" + ("=" * 70 + "\n\n").join(texts))
     return batch_id, designs, texts
