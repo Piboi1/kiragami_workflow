@@ -241,3 +241,21 @@ Same shape, same saved flow volume, same mesh fineness (6) and inlet speed (5.17
 Next step options:
 1. **Drop-test 0049 against 0057 and 0065** (0 CPU h). Tells whether the CFD ranking means anything physically.
 2. **A small local batch around 0049** (about 6 designs, ~40 CPU h): vary overlap, exponent and inner radius by modest steps at 5 cuts, to see if the high Cd is a sweet spot or a plateau.
+
+## 12. Addendum: first physical drop tests of the bottom two sheet rows (2026-11-03)
+
+Source: the "geo testing" tab of the team spreadsheet (5 trials each, 4.937 m drop). Equivalent Cd comes from the pipeline's own fall-from-rest model (23.8 g, 75 in^2 reference).
+
+| design | avg time | std | equivalent Cd |
+|---|---|---|---|
+| 24-10 (24 rings, overlap 10) | 1.322 s | 0.049 | 0.31 |
+| 4cpr 31 r (new) | 1.154 s | 0.101 | 0.15 |
+| 6 cpr 24 r (new) | 1.144 s | 0.090 | 0.14 |
+| 24-14 (24 rings, overlap 14) | 1.150 s | 0.023 | 0.14 |
+| CFD (Cd 0.70-0.74) would give | 1.69-1.73 s | | 0.70-0.74 |
+
+- The new pair differ by **0.010 s** (not 0.001 s). With 5 trials each the standard error of the difference is 0.060 s, which is about +-40% in Cd. The test can only say "similar"; it could not have detected a difference of the size the CFD predicts (1-4%). It neither confirms nor refutes the CFD.
+- The two rows are not designs from the CFD batches (one is 24 rings, outside the 27-32 band), so this is not a check of the CFD predictions.
+- The strongest physical signal in the sheet is 24-10 (1.322 s) against 24-14 (1.150 s): same rings and spacing, overlap 10 vs 14 degrees, 0.172 s apart = about 7 standard errors. The CFD screening never covered 24 rings, and its overlap parameter is a fraction rather than degrees.
+- Measured Cds (0.14-0.31) are 2.3-5x below the CFD's 0.70.
+- Short drops resolve Cd poorly (about 7% Cd per 0.01 s near 1.15 s, because the canopy never reaches terminal speed in 1.0-1.3 s).
