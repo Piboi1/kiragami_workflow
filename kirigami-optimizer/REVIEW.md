@@ -278,3 +278,22 @@ The team clarified that the sheet's times start after about 2 s of falling, so t
 - 24-10 vs 24-14 (0.172 s, about 7 standard errors, 26% in Cd) is real.
 - Consequence for the code: `DROP_TEST_CORRECT_FOR_ACCELERATION` should be False for these tests. The seed Cd would become about 0.58 and the inlet speeds about 3.7 m/s instead of 5.19 m/s. Left unchanged for now so the 20+ existing CFD results stay comparable.
 - Open caveat: the depth model ignores overlap, but measured depths show it matters (two 30-ring chutes hang 9.19 in and 10.62 in with different overlaps). The CFD pair is prepared with the model's depth for 24 rings (about 8.2 in, identical for both), so any depth difference between the real 24-10 and 24-14 chutes is not represented.
+
+## 14. Addendum: third batch (batch_20261103_221441) and what the model predicts
+
+Ten more model-proposed designs at fineness 6, default numerics. Six gave a Cd, four failed in the mesher (cost 0). Batch cost 42.0 CPU h; ledger total about 257 CPU h of 800. Data: `review/fineness6_results.csv`.
+
+| design | rings | cuts | exp | overlap | r_in | Cd |
+|---|---|---|---|---|---|---|
+| 0071 | 27 | 7 | 0.88 | 1.00 | 0.51 | 0.7017 |
+| 0069 | 28 | 5 | 1.38 | 0.32 | 0.94 | 0.7015 |
+| 0067 | 31 | 4 | 1.18 | 0.31 | 1.01 | 0.7009 |
+| 0070 | 32 | 8 | 1.36 | 0.48 | 0.89 | 0.7008 |
+| 0074 | 32 | 7 | 1.08 | 0.83 | 0.50 | 0.6987 |
+| 0075 | 29 | 7 | 1.23 | 0.94 | 0.87 | 0.6970 |
+
+- **The six new Cds span 0.697-0.7017, under 1%**, although the designs differ widely (4-8 cuts, overlap 0.31-1.00, inner radius 0.5-1.0). That is tighter than the numerics noise and tighter than the earlier batches. With 22 valid results (excluding 0066): mean 0.7012, standard deviation 1.5%; without 0049, mean 0.6998, standard deviation 1.2%. 0049 (0.7312) is +4.5% above that mean and is still the only outlier.
+- **Hypothesis (medium confidence):** in this rigid-geometry model the honeycomb acts nearly like a closed cup of fixed diameter and depth, so Cd is about 0.70 whatever the cut/overlap pattern; the larger scatter in earlier batches would then be mostly mesh and numerics noise. The physical drop tests show large differences (24-10 vs 24-14: about 26% in Cd) that a rigid model cannot produce, which suggests the real difference comes from how the canopy opens and hangs (depth and shape in flight), not from the rigid pattern.
+- **What the optimizer's model predicts.** Gaussian process on 22 points (Matern, fitted noise level high). Highest predicted Cd: **5 cuts, overlap 0.38, inner radius about 0.71-0.73, rings 29-31**, predicted 0.722 +- 0.006. Rings and spacing exponent have no influence (fitted length scales at their limit). This is simply the neighbourhood of 0049 (0049 itself: 0.7312 observed, 0.7115 predicted when left out). The peak rests on two points sharing overlap 0.38 and inner radius 0.74 (0044: 0.711, 0049: 0.731).
+- **The model has no real predictive skill.** Leave-one-out R-squared is -0.19: predicting each held-out design with the model is slightly worse than predicting the average. Its "best design" is a restatement of 0049, not an independent forecast.
+- **Conclusion:** CFD says 0049's shape (29 rings, 5 cuts, spacing 1.30, overlap 0.38, inner radius 0.74) is the best found, with 0057 (0.7154) the runner-up of the second batch and 0065 (0.6867) near the bottom, so 0049 vs 0065 is the CFD's widest-spread pair for the drop test (about 7%).

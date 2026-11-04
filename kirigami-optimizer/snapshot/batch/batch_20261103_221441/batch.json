@@ -62,7 +62,11 @@
         ]
       ],
       "volume_in3": 0.5962017748851893,
-      "projected_diameter_in": 9.624343840645148
+      "projected_diameter_in": 9.624343840645148,
+      "design_id": "design_0067",
+      "status": "ok",
+      "cd": 0.7008812542736901,
+      "flow_volume_geometry_id": "e3a14634-6496-4da2-85a7-9196f545a29e"
     },
     {
       "name": "batch_20261103_221441_02",
@@ -125,7 +129,11 @@
         ]
       ],
       "volume_in3": 0.6164218716505397,
-      "projected_diameter_in": 9.613312588313564
+      "projected_diameter_in": 9.613312588313564,
+      "design_id": "design_0068",
+      "status": "failed",
+      "cd": null,
+      "flow_volume_geometry_id": "079d1d43-2fdf-48e4-b363-243a5c4d81a3"
     },
     {
       "name": "batch_20261103_221441_03",
@@ -188,7 +196,11 @@
         ]
       ],
       "volume_in3": 0.6178898111245236,
-      "projected_diameter_in": 9.664423870229545
+      "projected_diameter_in": 9.664423870229545,
+      "design_id": "design_0069",
+      "status": "ok",
+      "cd": 0.7015002893077519,
+      "flow_volume_geometry_id": "6817ece4-fb5f-4762-a3ff-ef80fba6cfdf"
     },
     {
       "name": "batch_20261103_221441_04",
@@ -251,7 +263,11 @@
         ]
       ],
       "volume_in3": 0.5576883435587486,
-      "projected_diameter_in": 9.643054026465537
+      "projected_diameter_in": 9.643054026465537,
+      "design_id": "design_0070",
+      "status": "ok",
+      "cd": 0.7007977496926481,
+      "flow_volume_geometry_id": "026e2c51-ddbf-4ae0-a2c9-3190cae1f39f"
     },
     {
       "name": "batch_20261103_221441_05",
@@ -314,7 +330,11 @@
         ]
       ],
       "volume_in3": 0.5411078730906488,
-      "projected_diameter_in": 9.622930896633607
+      "projected_diameter_in": 9.622930896633607,
+      "design_id": "design_0071",
+      "status": "ok",
+      "cd": 0.701719495966,
+      "flow_volume_geometry_id": "dbaa3835-2d05-4e46-aa33-c9643d2b9e10"
     },
     {
       "name": "batch_20261103_221441_06",
@@ -377,7 +397,11 @@
         ]
       ],
       "volume_in3": 0.59373635360339,
-      "projected_diameter_in": 9.579817816252492
+      "projected_diameter_in": 9.579817816252492,
+      "design_id": "design_0072",
+      "status": "failed",
+      "cd": null,
+      "flow_volume_geometry_id": "bf9dff5c-df49-4a58-a1c0-fb14c1b8ed17"
     },
     {
       "name": "batch_20261103_221441_07",
@@ -440,7 +464,11 @@
         ]
       ],
       "volume_in3": 0.45367464057542367,
-      "projected_diameter_in": 9.666836102039255
+      "projected_diameter_in": 9.666836102039255,
+      "design_id": "design_0073",
+      "status": "failed",
+      "cd": null,
+      "flow_volume_geometry_id": "77c9edf3-08c4-4ca3-a1e6-e989a005398b"
     },
     {
       "name": "batch_20261103_221441_08",
@@ -503,7 +531,11 @@
         ]
       ],
       "volume_in3": 0.4516576593976454,
-      "projected_diameter_in": 9.62582312165252
+      "projected_diameter_in": 9.62582312165252,
+      "design_id": "design_0074",
+      "status": "ok",
+      "cd": 0.698659193586454,
+      "flow_volume_geometry_id": "623017ca-3506-4fbf-9d59-6a0e7916e2a1"
     },
     {
       "name": "batch_20261103_221441_09",
@@ -566,7 +598,11 @@
         ]
       ],
       "volume_in3": 0.5807173367473603,
-      "projected_diameter_in": 9.644175376713429
+      "projected_diameter_in": 9.644175376713429,
+      "design_id": "design_0075",
+      "status": "ok",
+      "cd": 0.697036739424448,
+      "flow_volume_geometry_id": "2a9432e4-fc3e-4b18-957c-8c633ac5baff"
     },
     {
       "name": "batch_20261103_221441_10",
@@ -629,7 +665,11 @@
         ]
       ],
       "volume_in3": 0.5577148879141175,
-      "projected_diameter_in": 9.670028388151813
+      "projected_diameter_in": 9.670028388151813,
+      "design_id": "design_0076",
+      "status": "failed",
+      "cd": null,
+      "flow_volume_geometry_id": "69ab23a9-cd55-4430-9ce2-ed8c110127d0"
     }
   ]
 }

@@ -1,23 +1,34 @@
-design_id,status,Cd,rings,cuts,spacing_exp,overlap_frac,inner_radius,cpu_h,drift_pct,error
-design_0044,ok,0.711107330242854,29,6,1.2992,0.3821,0.7361,6.43,0.079,
-design_0045,ok,0.7020641566386119,32,8,1.4219,0.8428,0.5978,7.79,0.064,
-design_0046,ok,0.6878012184754201,29,4,1.4069,0.7163,0.6736,6.22,0.09,
-design_0047,ok,0.6895365744217499,32,6,1.4942,0.9239,1.0871,7.21,0.032,
-design_0048,failed,,27,6,0.7272,0.9008,1.1335,0,,SimScaleError: meshing FAILED
-design_0049,ok,0.7311946151479221,29,5,1.2992,0.3821,0.7361,6.57,0.304,
-design_0050,ok,0.7039625722100059,30,7,1.4254,0.5618,0.717,6.91,0.077,
-design_0051,failed,,30,7,1.2664,0.803,1.1642,0,,SimScaleError: meshing FAILED
-design_0052,ok,0.7052512632941581,28,5,1.2132,0.6191,0.9484,7.5,0.061,
-design_0053,ok,0.6960851708311219,28,5,0.9958,0.7994,0.5148,6.24,0.081,
-design_0054,failed,,30,5,1.0934,0.9854,0.5534,5.48,,SimScaleError: simulation run cancelled: diverging: Cd rose 
-design_0055,ok,0.6836951628749379,32,7,1.1632,0.3678,1.25,6.8,0.015,
-design_0056,failed,,31,6,1.2326,0.3105,0.5977,0,,SimScaleError: meshing FAILED
-design_0057,ok,0.715394081963812,28,4,1.189,0.2,0.6893,6.33,0.112,
-design_0058,failed,,30,5,1.3092,0.2939,0.5,3.79,,SimScaleError: simulation run FAILED
-design_0059,failed,,32,4,1.0885,0.4328,1.1843,0,,SimScaleError: meshing FAILED
-design_0060,ok,0.700325322491266,27,4,0.8726,0.5093,0.5,6.62,0.089,
-design_0061,ok,0.7080511320316961,27,5,1.145,0.481,0.6895,6.68,0.095,
-design_0062,ok,0.6999471127605079,28,4,0.9342,1.0,0.7194,4.22,0.062,
-design_0063,ok,0.6957885279479881,27,4,1.0759,0.2684,1.1764,6.2,0.084,
-design_0064,ok,0.7095691933910541,29,8,1.2675,1.0,0.5264,7.06,0.069,
-design_0065,ok,0.686716613776378,28,4,1.116,0.9371,1.1061,4.23,0.071,
+design_id,status,Cd,rings,cuts,spacing_exp,overlap_frac,inner_radius,cpu_h,drift_pct,settings,error
+design_0044,ok,0.711107330242854,29,6,1.2992,0.3821,0.7361,6.43,0.079,fineness 6; 500 it; default numerics,
+design_0045,ok,0.7020641566386119,32,8,1.4219,0.8428,0.5978,7.79,0.064,fineness 6; 500 it; default numerics,
+design_0046,ok,0.6878012184754201,29,4,1.4069,0.7163,0.6736,6.22,0.09,fineness 6; 500 it; default numerics,
+design_0047,ok,0.6895365744217499,32,6,1.4942,0.9239,1.0871,7.21,0.032,fineness 6; 500 it; default numerics,
+design_0048,failed,,27,6,0.7272,0.9008,1.1335,0,,fineness 6; 500 it; default numerics,SimScaleError: meshing FAILED
+design_0049,ok,0.7311946151479221,29,5,1.2992,0.3821,0.7361,6.57,0.304,fineness 6; 500 it; default numerics,
+design_0050,ok,0.7039625722100059,30,7,1.4254,0.5618,0.717,6.91,0.077,fineness 6; 500 it; default numerics,
+design_0051,failed,,30,7,1.2664,0.803,1.1642,0,,fineness 6; 500 it; default numerics,SimScaleError: meshing FAILED
+design_0052,ok,0.7052512632941581,28,5,1.2132,0.6191,0.9484,7.5,0.061,fineness 6; 500 it; default numerics,
+design_0053,ok,0.6960851708311219,28,5,0.9958,0.7994,0.5148,6.24,0.081,fineness 6; 500 it; default numerics,
+design_0054,failed,,30,5,1.0934,0.9854,0.5534,5.48,,fineness 6; 500 it; default numerics,SimScaleError: simulation run cancelled: diverging: Cd rose 
+design_0055,ok,0.6836951628749379,32,7,1.1632,0.3678,1.25,6.8,0.015,fineness 6; 500 it; default numerics,
+design_0056,failed,,31,6,1.2326,0.3105,0.5977,0,,fineness 6; 500 it; default numerics,SimScaleError: meshing FAILED
+design_0057,ok,0.715394081963812,28,4,1.189,0.2,0.6893,6.33,0.112,fineness 6; 500 it; default numerics,
+design_0058,failed,,30,5,1.3092,0.2939,0.5,3.79,,fineness 6; 500 it; default numerics,SimScaleError: simulation run FAILED
+design_0059,failed,,32,4,1.0885,0.4328,1.1843,0,,fineness 6; 500 it; default numerics,SimScaleError: meshing FAILED
+design_0060,ok,0.700325322491266,27,4,0.8726,0.5093,0.5,6.62,0.089,fineness 6; 500 it; default numerics,
+design_0061,ok,0.7080511320316961,27,5,1.145,0.481,0.6895,6.68,0.095,fineness 6; 500 it; default numerics,
+design_0062,ok,0.6999471127605079,28,4,0.9342,1.0,0.7194,4.22,0.062,fineness 6; 500 it; default numerics,
+design_0063,ok,0.6957885279479881,27,4,1.0759,0.2684,1.1764,6.2,0.084,fineness 6; 500 it; default numerics,
+design_0064,ok,0.7095691933910541,29,8,1.2675,1.0,0.5264,7.06,0.069,fineness 6; 500 it; default numerics,
+design_0065,ok,0.686716613776378,28,4,1.116,0.9371,1.1061,4.23,0.071,fineness 6; 500 it; default numerics,
+design_0066,ok,0.739150491760464,29,5,1.2992,0.3821,0.7361,6.45,-0.162,fineness 6; 500 it; potential-flow init; relax p 0.2 U 0.5,
+design_0067,ok,0.7008812542736901,31,4,1.1771,0.3099,1.0117,6.43,0.054,fineness 6; 500 it; default numerics,
+design_0068,failed,,29,5,1.0272,0.3588,1.1156,0,,fineness 6; 500 it; default numerics,SimScaleError: meshing FAILED
+design_0069,ok,0.7015002893077519,28,5,1.38,0.3206,0.9396,6.85,0.099,fineness 6; 500 it; default numerics,
+design_0070,ok,0.7007977496926481,32,8,1.3595,0.4822,0.8912,7.37,0.05,fineness 6; 500 it; default numerics,
+design_0071,ok,0.701719495966,27,7,0.8839,1.0,0.5063,7.14,0.062,fineness 6; 500 it; default numerics,
+design_0072,failed,,32,7,0.7919,1.0,1.087,0,,fineness 6; 500 it; default numerics,SimScaleError: meshing FAILED
+design_0073,failed,,27,7,1.4259,0.83,1.1423,0,,fineness 6; 500 it; default numerics,SimScaleError: meshing FAILED
+design_0074,ok,0.698659193586454,32,7,1.0808,0.8313,0.5,6.97,0.036,fineness 6; 500 it; default numerics,
+design_0075,ok,0.697036739424448,29,7,1.2285,0.9399,0.8689,7.27,0.064,fineness 6; 500 it; default numerics,
+design_0076,failed,,27,8,1.5,0.4322,1.25,0,,fineness 6; 500 it; default numerics,SimScaleError: meshing FAILED
