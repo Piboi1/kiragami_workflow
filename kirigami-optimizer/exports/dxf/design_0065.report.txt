@@ -1,0 +1,293 @@
+Ring 1:
+  Requested overlap: 6.09 degrees
+  Required cut angle: 51.09 degrees
+  Maximum allowed cut angle: 70.00 degrees
+  Maximum possible overlap: 25.00 degrees
+  Actual cut angle used: 51.09 degrees
+  Actual overlap achieved: 6.09 degrees
+  Minimum gap required: 20.00 degrees
+  Actual gap achieved: 38.91 degrees
+  Actual gap width: 0.7512 inches
+Ring 2:
+  Requested overlap: 13.70 degrees
+  Required cut angle: 58.70 degrees
+  Maximum allowed cut angle: 73.50 degrees
+  Maximum possible overlap: 28.50 degrees
+  Actual cut angle used: 58.70 degrees
+  Actual overlap achieved: 13.70 degrees
+  Minimum gap required: 16.50 degrees
+  Actual gap achieved: 31.30 degrees
+  Actual gap width: 0.6545 inches
+Ring 3:
+  Requested overlap: 21.32 degrees
+  Required cut angle: 66.32 degrees
+  Maximum allowed cut angle: 77.00 degrees
+  Maximum possible overlap: 32.00 degrees
+  Actual cut angle used: 66.32 degrees
+  Actual overlap achieved: 21.32 degrees
+  Minimum gap required: 13.00 degrees
+  Actual gap achieved: 23.68 degrees
+  Actual gap width: 0.5397 inches
+Ring 4:
+  Requested overlap: 28.93 degrees
+  Required cut angle: 73.93 degrees
+  Maximum allowed cut angle: 80.50 degrees
+  Maximum possible overlap: 35.50 degrees
+  Actual cut angle used: 73.93 degrees
+  Actual overlap achieved: 28.93 degrees
+  Minimum gap required: 9.50 degrees
+  Actual gap achieved: 16.07 degrees
+  Actual gap width: 0.3982 inches
+Ring 5:
+  Requested overlap: 36.55 degrees
+  Required cut angle: 81.55 degrees
+  Maximum allowed cut angle: 84.00 degrees
+  Maximum possible overlap: 39.00 degrees
+  Actual cut angle used: 81.55 degrees
+  Actual overlap achieved: 36.55 degrees
+  Minimum gap required: 6.00 degrees
+  Actual gap achieved: 8.45 degrees
+  Actual gap width: 0.2271 inches
+Ring 6:
+  Requested overlap: 36.55 degrees
+  Required cut angle: 81.55 degrees
+  Maximum allowed cut angle: 84.00 degrees
+  Maximum possible overlap: 39.00 degrees
+  Actual cut angle used: 81.55 degrees
+  Actual overlap achieved: 36.55 degrees
+  Minimum gap required: 6.00 degrees
+  Actual gap achieved: 8.45 degrees
+  Actual gap width: 0.2451 inches
+Ring 7:
+  Requested overlap: 36.55 degrees
+  Required cut angle: 81.55 degrees
+  Maximum allowed cut angle: 84.00 degrees
+  Maximum possible overlap: 39.00 degrees
+  Actual cut angle used: 81.55 degrees
+  Actual overlap achieved: 36.55 degrees
+  Minimum gap required: 6.00 degrees
+  Actual gap achieved: 8.45 degrees
+  Actual gap width: 0.2636 inches
+Ring 8:
+  Requested overlap: 36.55 degrees
+  Required cut angle: 81.55 degrees
+  Maximum allowed cut angle: 84.00 degrees
+  Maximum possible overlap: 39.00 degrees
+  Actual cut angle used: 81.55 degrees
+  Actual overlap achieved: 36.55 degrees
+  Minimum gap required: 6.00 degrees
+  Actual gap achieved: 8.45 degrees
+  Actual gap width: 0.2824 inches
+Ring 9:
+  Requested overlap: 36.55 degrees
+  Required cut angle: 81.55 degrees
+  Maximum allowed cut angle: 84.00 degrees
+  Maximum possible overlap: 39.00 degrees
+  Actual cut angle used: 81.55 degrees
+  Actual overlap achieved: 36.55 degrees
+  Minimum gap required: 6.00 degrees
+  Actual gap achieved: 8.45 degrees
+  Actual gap width: 0.3016 inches
+Ring 10:
+  Requested overlap: 36.55 degrees
+  Required cut angle: 81.55 degrees
+  Maximum allowed cut angle: 84.00 degrees
+  Maximum possible overlap: 39.00 degrees
+  Actual cut angle used: 81.55 degrees
+  Actual overlap achieved: 36.55 degrees
+  Minimum gap required: 6.00 degrees
+  Actual gap achieved: 8.45 degrees
+  Actual gap width: 0.3210 inches
+Ring 11:
+  Requested overlap: 36.55 degrees
+  Required cut angle: 81.55 degrees
+  Maximum allowed cut angle: 84.00 degrees
+  Maximum possible overlap: 39.00 degrees
+  Actual cut angle used: 81.55 degrees
+  Actual overlap achieved: 36.55 degrees
+  Minimum gap required: 6.00 degrees
+  Actual gap achieved: 8.45 degrees
+  Actual gap width: 0.3407 inches
+Ring 12:
+  Requested overlap: 36.55 degrees
+  Required cut angle: 81.55 degrees
+  Maximum allowed cut angle: 84.00 degrees
+  Maximum possible overlap: 39.00 degrees
+  Actual cut angle used: 81.55 degrees
+  Actual overlap achieved: 36.55 degrees
+  Minimum gap required: 6.00 degrees
+  Actual gap achieved: 8.45 degrees
+  Actual gap width: 0.3606 inches
+Ring 13:
+  Requested overlap: 36.55 degrees
+  Required cut angle: 81.55 degrees
+  Maximum allowed cut angle: 84.00 degrees
+  Maximum possible overlap: 39.00 degrees
+  Actual cut angle used: 81.55 degrees
+  Actual overlap achieved: 36.55 degrees
+  Minimum gap required: 6.00 degrees
+  Actual gap achieved: 8.45 degrees
+  Actual gap width: 0.3807 inches
+Ring 14:
+  Requested overlap: 36.55 degrees
+  Required cut angle: 81.55 degrees
+  Maximum allowed cut angle: 84.00 degrees
+  Maximum possible overlap: 39.00 degrees
+  Actual cut angle used: 81.55 degrees
+  Actual overlap achieved: 36.55 degrees
+  Minimum gap required: 6.00 degrees
+  Actual gap achieved: 8.45 degrees
+  Actual gap width: 0.4011 inches
+Ring 15:
+  Requested overlap: 36.55 degrees
+  Required cut angle: 81.55 degrees
+  Maximum allowed cut angle: 84.00 degrees
+  Maximum possible overlap: 39.00 degrees
+  Actual cut angle used: 81.55 degrees
+  Actual overlap achieved: 36.55 degrees
+  Minimum gap required: 6.00 degrees
+  Actual gap achieved: 8.45 degrees
+  Actual gap width: 0.4216 inches
+Ring 16:
+  Requested overlap: 36.55 degrees
+  Required cut angle: 81.55 degrees
+  Maximum allowed cut angle: 84.00 degrees
+  Maximum possible overlap: 39.00 degrees
+  Actual cut angle used: 81.55 degrees
+  Actual overlap achieved: 36.55 degrees
+  Minimum gap required: 6.00 degrees
+  Actual gap achieved: 8.45 degrees
+  Actual gap width: 0.4423 inches
+Ring 17:
+  Requested overlap: 36.55 degrees
+  Required cut angle: 81.55 degrees
+  Maximum allowed cut angle: 84.00 degrees
+  Maximum possible overlap: 39.00 degrees
+  Actual cut angle used: 81.55 degrees
+  Actual overlap achieved: 36.55 degrees
+  Minimum gap required: 6.00 degrees
+  Actual gap achieved: 8.45 degrees
+  Actual gap width: 0.4631 inches
+Ring 18:
+  Requested overlap: 36.55 degrees
+  Required cut angle: 81.55 degrees
+  Maximum allowed cut angle: 84.00 degrees
+  Maximum possible overlap: 39.00 degrees
+  Actual cut angle used: 81.55 degrees
+  Actual overlap achieved: 36.55 degrees
+  Minimum gap required: 6.00 degrees
+  Actual gap achieved: 8.45 degrees
+  Actual gap width: 0.4841 inches
+Ring 19:
+  Requested overlap: 36.55 degrees
+  Required cut angle: 81.55 degrees
+  Maximum allowed cut angle: 84.00 degrees
+  Maximum possible overlap: 39.00 degrees
+  Actual cut angle used: 81.55 degrees
+  Actual overlap achieved: 36.55 degrees
+  Minimum gap required: 6.00 degrees
+  Actual gap achieved: 8.45 degrees
+  Actual gap width: 0.5052 inches
+Ring 20:
+  Requested overlap: 36.55 degrees
+  Required cut angle: 81.55 degrees
+  Maximum allowed cut angle: 84.00 degrees
+  Maximum possible overlap: 39.00 degrees
+  Actual cut angle used: 81.55 degrees
+  Actual overlap achieved: 36.55 degrees
+  Minimum gap required: 6.00 degrees
+  Actual gap achieved: 8.45 degrees
+  Actual gap width: 0.5265 inches
+Ring 21:
+  Requested overlap: 36.55 degrees
+  Required cut angle: 81.55 degrees
+  Maximum allowed cut angle: 84.00 degrees
+  Maximum possible overlap: 39.00 degrees
+  Actual cut angle used: 81.55 degrees
+  Actual overlap achieved: 36.55 degrees
+  Minimum gap required: 6.00 degrees
+  Actual gap achieved: 8.45 degrees
+  Actual gap width: 0.5479 inches
+Ring 22:
+  Requested overlap: 36.55 degrees
+  Required cut angle: 81.55 degrees
+  Maximum allowed cut angle: 84.00 degrees
+  Maximum possible overlap: 39.00 degrees
+  Actual cut angle used: 81.55 degrees
+  Actual overlap achieved: 36.55 degrees
+  Minimum gap required: 6.00 degrees
+  Actual gap achieved: 8.45 degrees
+  Actual gap width: 0.5694 inches
+Ring 23:
+  Requested overlap: 36.55 degrees
+  Required cut angle: 81.55 degrees
+  Maximum allowed cut angle: 84.00 degrees
+  Maximum possible overlap: 39.00 degrees
+  Actual cut angle used: 81.55 degrees
+  Actual overlap achieved: 36.55 degrees
+  Minimum gap required: 6.00 degrees
+  Actual gap achieved: 8.45 degrees
+  Actual gap width: 0.5911 inches
+Ring 24:
+  Requested overlap: 36.55 degrees
+  Required cut angle: 81.55 degrees
+  Maximum allowed cut angle: 84.00 degrees
+  Maximum possible overlap: 39.00 degrees
+  Actual cut angle used: 81.55 degrees
+  Actual overlap achieved: 36.55 degrees
+  Minimum gap required: 6.00 degrees
+  Actual gap achieved: 8.45 degrees
+  Actual gap width: 0.6128 inches
+Ring 25:
+  Requested overlap: 36.55 degrees
+  Required cut angle: 81.55 degrees
+  Maximum allowed cut angle: 84.00 degrees
+  Maximum possible overlap: 39.00 degrees
+  Actual cut angle used: 81.55 degrees
+  Actual overlap achieved: 36.55 degrees
+  Minimum gap required: 6.00 degrees
+  Actual gap achieved: 8.45 degrees
+  Actual gap width: 0.6347 inches
+Ring 26:
+  Requested overlap: 36.55 degrees
+  Required cut angle: 81.55 degrees
+  Maximum allowed cut angle: 84.00 degrees
+  Maximum possible overlap: 39.00 degrees
+  Actual cut angle used: 81.55 degrees
+  Actual overlap achieved: 36.55 degrees
+  Minimum gap required: 6.00 degrees
+  Actual gap achieved: 8.45 degrees
+  Actual gap width: 0.6567 inches
+Ring 27:
+  Requested overlap: 36.55 degrees
+  Required cut angle: 81.55 degrees
+  Maximum allowed cut angle: 84.00 degrees
+  Maximum possible overlap: 39.00 degrees
+  Actual cut angle used: 81.55 degrees
+  Actual overlap achieved: 36.55 degrees
+  Minimum gap required: 6.00 degrees
+  Actual gap achieved: 8.45 degrees
+  Actual gap width: 0.6787 inches
+Ring 28:
+  Requested overlap: 36.55 degrees
+  Required cut angle: 81.55 degrees
+  Maximum allowed cut angle: 84.00 degrees
+  Maximum possible overlap: 39.00 degrees
+  Actual cut angle used: 81.55 degrees
+  Actual overlap achieved: 36.55 degrees
+  Minimum gap required: 6.00 degrees
+  Actual gap achieved: 8.45 degrees
+  Actual gap width: 0.7009 inches
+Kirigami DXF created successfully!
+File: exports/dxf/design_0065.dxf
+
+Parameters:
+Diameter: 10.0 in
+Rim width: 0.25 in
+Rings: 28
+Cuts per ring: 4
+Ring spacing: parabolic
+Min cut length: 0.05 in
+Max cut length: 2.95 in
+Parabolic exponent: 1.75
+Inner gap transition: 20 to 6 degrees across 5 rings
