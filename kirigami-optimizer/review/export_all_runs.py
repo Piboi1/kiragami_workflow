@@ -23,9 +23,9 @@ for pattern in ("runs/batch/*/batch.json", "snapshot/batch/*/batch.json"):
                 if d:
                     batch_of.setdefault(d, e["name"])
 
-physical = {  # drop tests reported by the team (ranking only; times are in the team's sheet)
-    "design_0057": "1st of the three (best)", "design_0049": "2nd, close behind 0057", "design_0065": "3rd, by far the worst tested",
-}
+from sheets.results import drop_tests  # noqa: E402
+
+physical = {d: f"avg {m:.3f} s (std {sd:.3f}, {n} trials)" for d, (m, sd, n) in drop_tests().items()}  # data/drop_tests.csv
 
 
 def fineness_numerics(r):

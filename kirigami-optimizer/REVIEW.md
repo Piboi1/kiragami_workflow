@@ -312,3 +312,22 @@ Physical result (from the team; times are in their sheet): **0057 best, 0049 clo
 - Not yet compared: the physical best from the earlier tests (24-10, 1.322 s), because it was not dropped in the same session. "Better than the earlier tests" needs 24-10 (or whichever earlier chute) as a same-session control.
 
 **Why design_0023 ranked first in the sheet's `results` tab.** `sheets/results.py` ranked only runs whose settings equal a hard-coded `DEFAULT_SETTINGS = "fineness 4.5; 500 it; default numerics"`. After the switch to fineness 6 (sections 7-8) that constant was never updated, so every fineness-6 run, including 0049 and 0057, was filed under "different settings: not comparable", and the ranked list consisted of the old coarse-mesh runs, with 0023 (0.7863) at the top. At fineness 6 the same design is 0.7111 (design_0044), 3rd of the 22 like-for-like results. Fixed: the comparable group now follows `config.SIMSCALE`, coarse-mesh runs sit in a separate section labelled "Cd runs 4-10% too high", and `exports/all_runs.csv` / `all_runs.xlsx` (script `review/export_all_runs.py`) hold every run with build, mesh and numerics columns plus a like-for-like ranking tab. The Google Sheet's `results` tab has not been regenerated yet.
+
+## 16. Addendum: drop-test times of 0057, 0049 and 0065, results tab regenerated (2026-11-16)
+
+Raw trials are in `data/drop_tests.csv`; the Google Sheet `results` tab was regenerated from the ledger and now has the corrected ranking plus two drop-test columns.
+
+| design | trials (s) | mean | std | standard error | speed (m/s)* | Cd equivalent* | CFD Cd | physical / CFD |
+|---|---|---|---|---|---|---|---|---|
+| 0057 (0.69 in, 4 cuts, 28 rings) | 1.42 1.19 1.21 1.53 1.36 | 1.342 | 0.143 | 0.064 | 3.68 | 0.60 | 0.715 | 0.83 |
+| 0049 (0.74 in, 5 cuts, 29 rings) | 1.29 1.40 1.25 1.41 1.32 | 1.334 | 0.069 | 0.031 | 3.70 | 0.59 | 0.731 | 0.81 |
+| 0065 (1.11 in, 4 cuts, 28 rings) | 1.02 0.92 0.90 1.07 0.82 | 0.946 | 0.099 | 0.044 | 5.22 | 0.30 | 0.687 | 0.43 |
+| 24-10 (earlier best, other session) | | 1.322 | 0.049 | 0.022 | 3.73 | 0.58 | | |
+
+\* assumes the timed distance is 4.937 m at terminal speed (section 13); the distance is not yet confirmed.
+
+- **0057 vs 0049:** difference 0.008 s, standard error 0.071 s. A tie. The CFD's 2% gap between them is also inside its noise.
+- **Both vs 0065:** 0.39-0.40 s, 5-7 standard errors. Real, and the CFD did put 0065 last.
+- **Both vs the earlier best 24-10:** +0.020 s (0057) and +0.012 s (0049) against standard errors of 0.04-0.07 s, i.e. about 0.3 standard errors. They match 24-10, they do not beat it. Their means are the highest in the team sheet, but by far less than the noise, and 24-10 was measured in another session.
+- **The CFD gets the order but not the size.** Its spread across the three is 6% (0.687-0.731); the physical Cd equivalent spreads by a factor of 2 (0.30-0.60). 0065 is the outlier: the CFD says 0.687, the drops say about 0.30 (43%). Its 36.6 deg outer overlap with a 1.11 in inner radius is the most extreme shape the search proposed; a rigid model probably misses what the real sheet does there.
+- A single trial's scatter for 0057 (std 0.143 s) is about 10% in time, so 5 trials resolve about +-10% in Cd (one standard error). Separating 0057, 0049 and 24-10 needs about 10-15 trials each in one session.

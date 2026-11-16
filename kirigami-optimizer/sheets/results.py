@@ -6,7 +6,10 @@ The raw log (tab `runs`) is never reordered or deleted; every run keeps its row.
     different solver settings (not comparable) below them.
 """
 
+import csv
 import math
+import statistics
+from pathlib import Path
 
 import config
 
@@ -47,11 +50,26 @@ def _settings(record):
     return record.get("settings") or LEGACY_SETTINGS
 
 
+def drop_tests(path=None):
+    """{design_id: (mean time s, std s, n)} from data/drop_tests.csv (physical drop tests of CFD designs; empty if the file is missing)."""
+
+    path = Path(path or config.ROOT / "data" / "drop_tests.csv")
+    out = {}
+    if path.exists():
+        for row in csv.DictReader(path.open()):
+            times = [float(row[k]) for k in row if k.startswith("trial") and row[k]]
+            if times:
+                out[row["design_id"]] = (statistics.mean(times), statistics.stdev(times) if len(times) > 1 else 0.0, len(times))
+    return out
+
+
 def results_table(records, air_density):
     """(header, ranked rows, other-settings rows) for the `results` tab, from ledger records."""
 
     header = ["rank", "design_id", "Cd", "predicted fall speed (m/s)", "rings", "cuts per ring", "spacing exponent",
-              "overlap fraction", "inner radius (in)", "depth (in)", "Cd x area (in2)", "solver settings", "CPU hours", "note"]
+              "overlap fraction", "inner radius (in)", "depth (in)", "Cd x area (in2)", "solver settings", "CPU hours",
+              "drop test avg time (s)", "drop test +- std (s) / trials", "note"]
+    drops = drop_tests()
     good, other = [], []
     for r in records:
         if outcome_of(r) != "valid":
@@ -68,7 +86,9 @@ def results_table(records, air_density):
             note = (note + "; " if note else "") + "outside the current search space"
         row = [None, r["design_id"], round(r["cd"], 4), speed, p.get("NUM_RINGS"), p.get("CUTS_PER_RING"),
                _round(p.get("RING_SPACING_EXPONENT")), _round(p.get("RING_OVERLAP_FRACTION")), _round(p.get("INNER_RADIUS")),
-               _round(s.get("canopy_depth_in"), 1), _round(r["cd"] * area_in2, 1) if area_in2 else "", _settings(r), hours, note]
+               _round(s.get("canopy_depth_in"), 1), _round(r["cd"] * area_in2, 1) if area_in2 else "", _settings(r), hours,
+               round(drops[r["design_id"]][0], 3) if r["design_id"] in drops else "",
+               f"+-{drops[r['design_id']][1]:.3f} / {drops[r['design_id']][2]}" if r["design_id"] in drops else "", note]
         (good if _settings(r) == DEFAULT_SETTINGS else other).append(row)
     good.sort(key=lambda row: -row[2])
     for i, row in enumerate(good, start=1):
