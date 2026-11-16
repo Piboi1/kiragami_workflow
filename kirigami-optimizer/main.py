@@ -297,6 +297,8 @@ def cmd_prepare_batch(args):
     from optimizer.batch import prepare_batch
 
     ctx = _live_context()
+    if args.no_sliver_screen:
+        config.OPTIMIZER["SCREEN_SLIVERS"] = False
     custom = json.loads(Path(args.from_params_json).read_text()) if args.from_params_json else None
     batch_id, designs, texts = prepare_batch(ctx, args.n, from_designs=args.from_design, custom=custom)
     out = config.RUNS_DIR / "batch" / batch_id
@@ -920,6 +922,8 @@ def main(argv=None):
                    help="prepare these ledger designs again (built with the current canopy method, same inlet speed) instead of new proposals")
     p.add_argument("--from-params-json", metavar="FILE",
                    help="JSON list of {\"label\": ..., \"params\": {overrides of config.FIXED_PARAMS}, \"uz\": optional m/s}: prepare these hand-specified designs (e.g. physical chutes) instead of proposals")
+    p.add_argument("--no-sliver-screen", action="store_true",
+                   help="do not skip designs the local sliver screen predicts the mesher will reject (a mesher failure costs 0 CPU h; only the manual flow-volume clicks are wasted)")
     p.set_defaults(fn=cmd_prepare_batch)
 
     p = sub.add_parser("run-batch")
