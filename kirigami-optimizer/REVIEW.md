@@ -297,3 +297,18 @@ Ten more model-proposed designs at fineness 6, default numerics. Six gave a Cd, 
 - **What the optimizer's model predicts.** Gaussian process on 22 points (Matern, fitted noise level high). Highest predicted Cd: **5 cuts, overlap 0.38, inner radius about 0.71-0.73, rings 29-31**, predicted 0.722 +- 0.006. Rings and spacing exponent have no influence (fitted length scales at their limit). This is simply the neighbourhood of 0049 (0049 itself: 0.7312 observed, 0.7115 predicted when left out). The peak rests on two points sharing overlap 0.38 and inner radius 0.74 (0044: 0.711, 0049: 0.731).
 - **The model has no real predictive skill.** Leave-one-out R-squared is -0.19: predicting each held-out design with the model is slightly worse than predicting the average. Its "best design" is a restatement of 0049, not an independent forecast.
 - **Conclusion:** CFD says 0049's shape (29 rings, 5 cuts, spacing 1.30, overlap 0.38, inner radius 0.74) is the best found, with 0057 (0.7154) the runner-up of the second batch and 0065 (0.6867) near the bottom, so 0049 vs 0065 is the CFD's widest-spread pair for the drop test (about 7%).
+
+## 15. Addendum: drop tests of 0049, 0057 and 0065 (reported 2026-11-16) and the ranking bug
+
+Physical result (from the team; times are in their sheet): **0057 best, 0049 close behind, 0065 by far the worst of everything tested so far.**
+
+| design | CFD Cd (fineness 6) | CFD order | physical order |
+|---|---|---|---|
+| 0049 | 0.7312 | 1 | 2 (close behind 0057) |
+| 0057 | 0.7154 | 2 | 1 |
+| 0065 | 0.6867 | 3 | 3, far behind |
+
+- The CFD got the clear call right: the lowest-Cd design was by far the worst chute. The top two are 2% apart in the CFD (inside its ~1.5-3% noise) and "close" in the drops, so their swap is not a contradiction. This is the first physical evidence that the CFD ranks something correctly, but with three designs it is weak evidence (6 possible orderings).
+- Not yet compared: the physical best from the earlier tests (24-10, 1.322 s), because it was not dropped in the same session. "Better than the earlier tests" needs 24-10 (or whichever earlier chute) as a same-session control.
+
+**Why design_0023 ranked first in the sheet's `results` tab.** `sheets/results.py` ranked only runs whose settings equal a hard-coded `DEFAULT_SETTINGS = "fineness 4.5; 500 it; default numerics"`. After the switch to fineness 6 (sections 7-8) that constant was never updated, so every fineness-6 run, including 0049 and 0057, was filed under "different settings: not comparable", and the ranked list consisted of the old coarse-mesh runs, with 0023 (0.7863) at the top. At fineness 6 the same design is 0.7111 (design_0044), 3rd of the 22 like-for-like results. Fixed: the comparable group now follows `config.SIMSCALE`, coarse-mesh runs sit in a separate section labelled "Cd runs 4-10% too high", and `exports/all_runs.csv` / `all_runs.xlsx` (script `review/export_all_runs.py`) hold every run with build, mesh and numerics columns plus a like-for-like ranking tab. The Google Sheet's `results` tab has not been regenerated yet.

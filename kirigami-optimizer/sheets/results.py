@@ -8,7 +8,12 @@ The raw log (tab `runs`) is never reordered or deleted; every run keeps its row.
 
 import math
 
-DEFAULT_SETTINGS = "fineness 4.5; 500 it; default numerics"
+import config
+
+# Runs logged before the settings column existed were all made at the original fineness 4.5.
+LEGACY_SETTINGS = "fineness 4.5; 500 it; default numerics"
+# The settings every new run uses (config.py): only runs with exactly these are ranked against each other.
+DEFAULT_SETTINGS = f"fineness {config.SIMSCALE['MESH_FINENESS']:g}; {config.SIMSCALE['END_TIME_S']} it; default numerics"
 CD_RANGE = (0.05, 4.0)
 
 
@@ -39,7 +44,7 @@ def outcome_of(record):
 
 
 def _settings(record):
-    return record.get("settings") or DEFAULT_SETTINGS
+    return record.get("settings") or LEGACY_SETTINGS
 
 
 def results_table(records, air_density):
@@ -71,8 +76,14 @@ def results_table(records, air_density):
     other.sort(key=lambda row: -row[2])
     for row in other:
         row[0] = ""
-        row[-1] = (row[-1] + "; " if row[-1] else "") + "different settings: not comparable with the ranking"
+        coarse = _settings_of_row(row) == LEGACY_SETTINGS and DEFAULT_SETTINGS != LEGACY_SETTINGS
+        row[-1] = (row[-1] + "; " if row[-1] else "") + ("coarse mesh (fineness 4.5): Cd runs 4-10% too high, not comparable with the ranking"
+                                                          if coarse else "different settings: not comparable with the ranking")
     return header, good, other
+
+
+def _settings_of_row(row):
+    return row[11]
 
 
 def _round(x, n=3):
