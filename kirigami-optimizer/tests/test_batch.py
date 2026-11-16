@@ -139,7 +139,7 @@ def test_results_table_ranks_valid_designs_and_separates_other_settings():
                 "params": {"NUM_RINGS": 30, "CUTS_PER_RING": 6}, "solid": {"reference_area_in2": 73.0, "canopy_depth_in": 10.0},
                 "velocity": {"mass_kg": 0.0238}, "simscale": {"mesh_core_hours": 0.1, "run_core_hours": 3.0}}
 
-    records = [rec("a", 0.74), rec("b", 0.79), rec("c", 0.80, settings="fineness 6; 500 it; default numerics"),
+    records = [rec("a", 0.74), rec("b", 0.79), rec("c", 0.80, settings="fineness 4.5; 500 it; potential-flow init"),
                rec("d", None, status="failed", error="SimScaleError: meshing FAILED")]
     header, good, other = results_table(records, 1.196)
     assert [r[1] for r in good] == ["b", "a"] and [r[0] for r in good] == [1, 2]      # ranked by Cd, failures left out
