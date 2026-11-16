@@ -348,3 +348,18 @@ Mean overlap is the average of `actual_overlap_degrees` over all rings in the ge
 - Caveats: five points; overlap is confounded with inner radius (0065 has both the largest overlap and the largest inner radius) and with cuts/rings; the 24-ring chutes come from another session.
 - Prediction: designs with mean overlap up to about 11 deg should tie the current best (about 1.30-1.35 s); designs above about 12-13 deg should lose time (about 1.15-1.25 s at 13-14 deg, 1.0-1.1 s at 17-24 deg). Nothing in the data points to a region clearly above about 1.35-1.40 s, a gain smaller than 5-trial noise.
 - Already-simulated shapes worth a physical test (mean overlap, inner radius): 0044 (8.5 deg, 0.74, 6 cuts), 0069 (8.9 deg, 0.94, 5 cuts), 0063 (9.7 deg, 1.18, 4 cuts; separates inner radius from overlap, because 0065 had both).
+
+## 18. Correction to section 17: the overlap trend does not hold across the whole drop-test sheet
+
+Section 17 reported a correlation of -0.95 between overlap and drop time over five designs. Adding the 23 older rows of the `geo testing` tab that have an overlap range (outer overlap taken from the range; values transcribed from a screenshot, so approximate):
+
+| set | n | correlation (outer overlap vs time) |
+|---|---|---|
+| the five designs (24-10, 24-14, 0057, 0049, 0065) | 5 | -0.94 |
+| older sheet rows only | 23 | -0.02 |
+| everything | 28 | -0.46 |
+| everything except 0065 | 27 | -0.30 |
+
+- Older chutes with outer overlap of 14 deg or less average 1.13 s (range 1.04-1.25), well below the 1.33 s of the three newest low-overlap chutes (0057, 0049, 24-10). Overlap alone does not explain why those three are about 0.2 s faster-falling-slower than older chutes with similar overlap.
+- Candidates for the difference (not tested): 4-5 cuts with 28-29 rings, a different test session or timing method, or the build (printed vs cut sheet). The older rows may also have been timed differently (not known).
+- So the overlap effect is real at the extreme (0065 at 36 deg is by far the worst) and between 24-10 and 24-14, but there is no evidence for a smooth overlap trend, and the "plateau up to 11 deg" is a hypothesis based on three designs. The predictions in section 17 should be read with that in mind.
