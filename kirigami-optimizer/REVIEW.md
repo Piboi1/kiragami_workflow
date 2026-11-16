@@ -331,3 +331,20 @@ Raw trials are in `data/drop_tests.csv`; the Google Sheet `results` tab was rege
 - **Both vs the earlier best 24-10:** +0.020 s (0057) and +0.012 s (0049) against standard errors of 0.04-0.07 s, i.e. about 0.3 standard errors. They match 24-10, they do not beat it. Their means are the highest in the team sheet, but by far less than the noise, and 24-10 was measured in another session.
 - **The CFD gets the order but not the size.** Its spread across the three is 6% (0.687-0.731); the physical Cd equivalent spreads by a factor of 2 (0.30-0.60). 0065 is the outlier: the CFD says 0.687, the drops say about 0.30 (43%). Its 36.6 deg outer overlap with a 1.11 in inner radius is the most extreme shape the search proposed; a rigid model probably misses what the real sheet does there.
 - A single trial's scatter for 0057 (std 0.143 s) is about 10% in time, so 5 trials resolve about +-10% in Cd (one standard error). Separating 0057, 0049 and 24-10 needs about 10-15 trials each in one session.
+
+## 17. Addendum: overlap vs drop time, and predictions for further contenders (no sims run)
+
+Mean overlap is the average of `actual_overlap_degrees` over all rings in the generator report. Physical results (terminal-speed drop times) of the five designs with known generator settings:
+
+| design | mean overlap | outer overlap | cuts | rings | inner radius | drop time |
+|---|---|---|---|---|---|---|
+| 0057 | 7.2 deg | 7.8 | 4 | 28 | 0.69 | 1.342 s |
+| 24-10 | 10.2 | 13.1 | 8 | 24 | 0.75 | 1.322 s |
+| 0049 | 10.6 | 11.5 | 5 | 29 | 0.74 | 1.334 s |
+| 24-14 | 14.0 | 14.0 | 8 | 24 | 0.75 | 1.150 s |
+| 0065 | 33.8 | 36.5 | 4 | 28 | 1.11 | 0.946 s |
+
+- Drop time falls with mean overlap (correlation -0.95, n = 5, three different design families): flat at about 1.32-1.34 s for 7-11 deg, then 1.15 s at 14 deg and 0.95 s at 34 deg. The CFD shows no such trend (its Cd is flat over overlap fraction 0.2-1.0), so this is a physical effect the rigid model does not capture.
+- Caveats: five points; overlap is confounded with inner radius (0065 has both the largest overlap and the largest inner radius) and with cuts/rings; the 24-ring chutes come from another session.
+- Prediction: designs with mean overlap up to about 11 deg should tie the current best (about 1.30-1.35 s); designs above about 12-13 deg should lose time (about 1.15-1.25 s at 13-14 deg, 1.0-1.1 s at 17-24 deg). Nothing in the data points to a region clearly above about 1.35-1.40 s, a gain smaller than 5-trial noise.
+- Already-simulated shapes worth a physical test (mean overlap, inner radius): 0044 (8.5 deg, 0.74, 6 cuts), 0069 (8.9 deg, 0.94, 5 cuts), 0063 (9.7 deg, 1.18, 4 cuts; separates inner radius from overlap, because 0065 had both).
