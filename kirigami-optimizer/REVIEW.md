@@ -429,3 +429,13 @@ Least squares for y = a x^2 + b x + c with the constraint a <= 0 (the curve must
 - Adding the 7.8 deg level (1.180 s): again a = 0, time = 1.285 - 0.0147 x, SSE 0.0028.
 - Forcing a peak at x_v (best concave parabola with its vertex at x_v): with the 3 points the misfit grows as the peak moves right: SSE 0.0036 (peak far left), 0.0042 (peak at 0 deg), 0.0046 (4 deg), 0.0054 (7.8 deg), 0.0072 (12 deg); peak heights 1.137, 1.112, 1.090, 1.069 s. With the 4 points it grows faster (0.0062 at 0 deg to 0.0177 at 12 deg). At 7.8 deg the forced parabola gives a peak of 1.09-1.13 s while the measured 7.8 deg level is 1.18 s.
 - Reading: the data contain only the falling side of the outer-overlap curve, so no peak position is supported; the least-misfit concave curve is a straight line. A peak below 7.8 deg cannot be located without measurements there.
+
+## 25. Addendum: where the outer-overlap trend meets "just paper" (figure: `exports/outer_overlap_paper_floor.png`)
+
+Reference for "paper-like": in10 (innermost overlap 1.0 deg), which the team observed barely stretched, 0.876 s in the overlap-sweep session. Note it is an observed stand-in, not a measured flat uncut disk.
+
+- The straight lines fitted to the outer-overlap points reach the paper-like level at 28.3 deg (12/18/26 points) and 27.8 deg (with the 7.8 deg level). The highest measured outer overlap (26 deg, 0.925 s) is already within 0.05 s (6%) of that level.
+- A decay-to-a-floor model (plateau fixed at 1.18 s) could not identify a floor: the fit ran to its lower bound (floor 0.5 s, decay length 37 deg), so the data do not show whether the decline flattens or keeps going. ov18 and ov26 rest on two trials each.
+- Cross-session hint (crude): the first-session chute 0065 (outer overlap 36.5 deg, other differences too) fell at 0.71 of that session's plateau, against 0.74 for in10 in this session; rescaled to this session that is about 0.84 s, at or below the paper-like level and above the straight-line extrapolation (0.76 s at 36.5 deg). So beyond about 28 deg the chute is paper-like or worse, and the decline may slow down.
+- The two ends of the working window fail differently: too little innermost overlap is a cliff (1.0 deg: does not open); too much outer overlap is a slope of about 1.2% of the plateau per degree from roughly 8 deg upward (ov12 already 5% below the plateau), reaching paper-like performance near 28 deg.
+- Trust range of the straight line: the measured 8 to 26 deg only. Do not extrapolate it past about 26-28 deg (beyond it, performance is paper-like, not linearly worse) or below 8 deg (no data).
