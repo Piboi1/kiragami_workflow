@@ -1,0 +1,8 @@
+chute,overlap range (deg),color,trial1_s,trial2_s,trial3_s,trial4_s,trial5_s,testers,note
+design_0057_in10,1.0-7.8,light green,0.86,0.91,0.88,0.88,0.85,"Bart, Anirud, Archie",different drop area than earlier data; compare within this session only
+design_0057_in25,2.5-7.8,dark green,1.2,1.18,1.13,1.17,1.14,"Bart, Anirud, Archie",different drop area than earlier data; compare within this session only
+design_0057_in40,4.0-7.8,orange,1.16,1.15,1.19,1.2,1.21,"Bart, Anirud, Archie",different drop area than earlier data; compare within this session only
+design_0057_in78,7.8-7.8,blue,1.15,1.22,1.25,1.19,1.16,"Bart, Anirud, Archie",different drop area than earlier data; compare within this session only
+design_0057_ov12,2.0-12.0,brown,1.14,1.12,1.1,1.15,1.1,"Bart, Anirud, Archie",different drop area than earlier data; compare within this session only
+design_0057_ov18,3.0-18.0,pink,0.98,0.97,,,,"Bart, Anirud, Archie",different drop area than earlier data; compare within this session only; trials 3-5 marked x in the sheet
+design_0057_ov26,4.33-26.0,black,0.91,0.94,,,,"Bart, Anirud, Archie",different drop area than earlier data; compare within this session only; trials 3-5 marked x in the sheet

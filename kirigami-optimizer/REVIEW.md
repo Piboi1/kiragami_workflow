@@ -363,3 +363,23 @@ Section 17 reported a correlation of -0.95 between overlap and drop time over fi
 - Older chutes with outer overlap of 14 deg or less average 1.13 s (range 1.04-1.25), well below the 1.33 s of the three newest low-overlap chutes (0057, 0049, 24-10). Overlap alone does not explain why those three are about 0.2 s faster-falling-slower than older chutes with similar overlap.
 - Candidates for the difference (not tested): 4-5 cuts with 28-29 rings, a different test session or timing method, or the build (printed vs cut sheet). The older rows may also have been timed differently (not known).
 - So the overlap effect is real at the extreme (0065 at 36 deg is by far the worst) and between 24-10 and 24-14, but there is no evidence for a smooth overlap trend, and the "plateau up to 11 deg" is a hypothesis based on three designs. The predictions in section 17 should be read with that in mind.
+
+## 19. Addendum: overlap-sweep drop tests (new drop area, compare within this session only)
+
+Raw trials: `data/drop_tests_final_session.csv`. Testers Bart, Anirud, Archie. Different drop area than all earlier data, terminal speed reached; times are NOT comparable with sections 13-17. No 0057 control was dropped in this session. Trials marked "x" in the sheet were not counted (ov18 and ov26 have two valid trials).
+
+| chute | overlap range | n | mean (s) | sd | SE |
+|---|---|---|---|---|---|
+| in10 | 1.0-7.8 | 5 | 0.876 | 0.023 | 0.010 |
+| in25 | 2.5-7.8 | 5 | 1.164 | 0.029 | 0.013 |
+| in40 | 4.0-7.8 | 5 | 1.182 | 0.026 | 0.012 |
+| in78 | 7.8-7.8 | 5 | 1.194 | 0.042 | 0.019 |
+| ov12 | 2.0-12 | 5 | 1.122 | 0.023 | 0.010 |
+| ov18 | 3.0-18 | 2 | 0.975 | 0.007 | 0.005 |
+| ov26 | 4.33-26 | 2 | 0.925 | 0.021 | 0.015 |
+
+- Measurement noise is much lower than in the first session: pooled per-trial sd 0.028 s (was 0.087), so 5 trials give a standard error of about 0.013 s.
+- **Outer overlap matters and lower is better.** Outer 7.8 (in25/in40/in78, about 1.18 s) > 12 (1.122) > 18 (0.975) > 26 (0.925): a monotone decline, steepest between 12 and 18 (-0.147 s, 6 standard errors). ov18/ov26 rest on only two trials each.
+- **Inner overlap does not matter between 2.5 and 7.8** (1.164, 1.182, 1.194; the largest gap is 1.7 standard errors).
+- **in10 (innermost 1.0 deg) is far worse than everything else**: 0.288 s below in25 (16 standard errors). This contradicts the earlier-session result that 0057 (innermost 1.3 deg) was among the best, and a real effect of 0.3 deg is implausible: on ring 1 (radius 0.689 in) 1.0 deg is 0.31 mm of arc, 1.3 deg is 0.40 mm, so in10 and 0057 differ by about 0.09 mm, below normal cutting tolerance, and the geometry of in10 is within 0.3 deg of 0057 on every ring. A build defect in that specimen (tear, mis-cut, crease) is the more likely explanation; the single physical chute per design means specimen quality is confounded with design.
+- Not tested: outer overlap below 7.8 deg (ov04 was dropped by the 1 deg rule), the 0057 control in this session, and replicate chutes.
