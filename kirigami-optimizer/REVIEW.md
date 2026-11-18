@@ -507,3 +507,7 @@ Generator numbers for 0057 / in78 (4 cuts, 28 rings, radii 0.69-4.75 in): the ra
 ## 32. Addendum: the 45 degree test chute (`exports/dxf_45deg/design_45deg_r13_c10.dxf`)
 
 13 rings, 10 cuts per ring, ring spacing exponent 1.0 (equal pitch 0.333 in), inner radius 0.75 in, overlap 10 deg on rings 1-10 and 12 deg on rings 11-13 (the generator raises the outer rings to the maximum its 6 deg minimum gap allows), no clamping. Chosen so that depth per ring (about 0.346 in, from the 18-ring measurement) is close to the ring pitch: predicted ribbon slope 46 deg (44-51 deg), predicted stretch height 10.5 cm (9.7-12.7 cm). Width = length cannot hold on all rings (cut length 0.37-2.5 in against a 0.333 in pitch). Ring-1 overlap arc / pitch is 0.39, above the opening threshold seen so far. The depth per ring comes from 8-cut chutes; the real slope is known only after measuring the stretch height. Support for the theory: a drop time clearly above the 28-ring plateau chutes in the same indoor session.
+
+## 33. Addendum: uniform-overlap test chutes (`exports/uniform_overlap_tests.zip`)
+
+Uniform overlap (inner = outer) on the 0057 layout (28 rings, 4 cuts): 9, 10, 11, 12 and 14 deg, plus a theory chute whose overlap falls from 6.7 to 2.2 deg so the overlap region is about square on every ring (arc/pitch 0.85-1.21). All DXFs validated (112 arcs, 10 x 10 in, no clamping). Predicted indoor times (13 ft) from the section 30 lines: 9 deg 1.20 s, 10 deg 1.17 s, 11 deg 1.13 s, 12 deg 1.09 s, 14 deg 1.02 s (about +-0.05 s); no prediction for the square chute.

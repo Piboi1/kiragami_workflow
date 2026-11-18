@@ -1,0 +1,7 @@
+name,ring-1 overlap deg,outermost overlap deg,mean overlap deg,rings,rings clamped,overlap arc/pitch ring 1,overlap arc/pitch outermost,arcs,extent in,note
+design_0057_uni09,9.0,9.0,9.0,28,0,1.34,4.03,112,10.0,optional extra
+design_0057_uni10,10.0,10.0,10.0,28,0,1.49,4.48,112,10.0,asked
+design_0057_uni11,11.0,11.0,11.0,28,0,1.64,4.93,112,10.0,optional extra
+design_0057_uni12,12.0,12.0,12.0,28,0,1.79,5.37,112,10.0,asked
+design_0057_uni14,14.0,14.0,14.0,28,0,2.09,6.27,112,10.0,asked
+design_0057_square,6.7,2.2,4.37,28,0,1.0,0.99,112,10.0,optional extra (theory)
