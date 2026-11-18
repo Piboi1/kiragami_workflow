@@ -402,3 +402,16 @@ The team observed that ov18 and ov26 opened a lot (too much). Section 20 read th
 - Working window found so far: innermost overlap about 2.5 deg or more (flat from 2.5 to 7.8 deg: 1.164-1.194 s) and outer overlap at or below roughly 8-12 deg (ov12 1.122 s, already slightly below the 7.8 deg chutes).
 - The "score" in section 20 is a performance index relative to in10 and in78, not an opening measure; do not read it as degree of opening.
 - Not yet tested: the low side of outer overlap (below 7.8 deg with the innermost ring at 2.5 deg or more). That is where the optimum of the outer-overlap curve lies, and the part of the parabola the team wanted that is still missing. The rigid CFD cannot show either failure mode, because it never changes the opened shape.
+
+## 22. Addendum: quadratic fits to the overlap sweeps (figure: `exports/overlap_quadratic_fits.png`)
+
+Least-squares quadratics on the session means (error bars = 1 standard error; ov18/ov26 use the pooled sd 0.028 s over sqrt(2)):
+
+| fit | points | result |
+|---|---|---|
+| A. inner overlap (outer fixed 7.8 deg): (1, .876) (2.5, 1.164) (4, 1.182) (7.8, 1.194) | 4 points, 3 parameters, 1 dof | y = -0.01736 x^2 + 0.19517 x + 0.7224; vertex at x = 5.6 deg, y = 1.271 s; R2 0.909 |
+| B. outer overlap: (12, 1.122) (18, .975) (26, .925) | 3 points, exact fit, 0 dof | y = 0.00130 x^2 - 0.06361 x + 1.6976; opens UPWARD: a minimum at 24.4 deg (0.922 s), no maximum |
+| C. outer overlap plus the 7.8 deg level (mean of in25/in40/in78, 1.180 s) | 4 points, 1 dof | opens upward: minimum at 30.1 deg (0.911 s), no maximum |
+
+- A: the parabola's peak (1.271 s) is higher than every measurement (best 1.194 s), the curve misses the points at 2.5 and 4.0 deg, and the data are a cliff at about 1 deg followed by a plateau, not a parabola. The vertex at 5.6 deg is effectively the middle of the plateau, not a measured optimum. Resampling the points within their error bars moves the vertex only between 5.4 and 5.9 deg, but that spread reflects measurement noise inside a model of the wrong shape and should not be read as the uncertainty of the optimum.
+- B and C: all tested outer-overlap levels are on the falling side of the curve (time decreases monotonically from 7.8 to 26 deg), so a quadratic through them has no peak. The outer-overlap optimum, if it exists, lies below 7.8 deg, which has not been tested.
