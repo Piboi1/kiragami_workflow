@@ -469,3 +469,12 @@ Timed distance today (overlap-sweep session): 13 ft = 3.962 m. Earlier session: 
 - 0065 (earlier session, outer 36.5 deg) falls at 5.22 m/s, 15% faster than the paper-like chute, and still 4.73 m/s (5% faster) after allowing the 10% session gap: beyond about 29 deg the chute performs at or below the paper-like level.
 - 24-14 at 14 deg (4.29 m/s) sits about 16% above what today's sweep gives at 14 deg (about 3.7 m/s by interpolation): 10% session gap plus a residual of about 5%.
 - Today's plateau Cd-equivalent (0.70-0.73) matches the CFD range (0.70-0.73 at fineness 6), while the earlier session's plateau gives 0.59. This is an observation under the stated mass and area assumptions, not proof the CFD level is right; it needs the real payload and canopy mass of today's chutes and confirmation that 13 ft is the timed segment in the same sense as 4.937 m.
+
+## 28. Addendum: the overlap-sweep session was indoors (still air); earlier sessions were outdoors
+
+Confirmed by the team: 13 ft is the timed segment (same meaning as 4.937 m), payload masses are the same, today's drops were indoors, the earlier sessions outdoors. Consequences:
+
+- The 10% faster fall of the earlier plateau chutes (3.70 vs 3.36 m/s) is plausibly an air effect (it corresponds to about 0.35 m/s of average vertical air motion), together with the larger scatter outdoors (per-trial sd 0.087 s vs 0.028 s indoors). It cannot be separated from other differences (chute copies, material, testers) because no chute was dropped in both settings.
+- The indoor session is therefore the cleanest physical data. Its plateau Cd-equivalent is 0.70-0.73 (75 in^2 reference) or 0.71-0.75 (73.25 in^2, the CFD's projected area), against 0.70-0.73 from the CFD at fineness 6: agreement within about 3-5%. This replaces the statement in sections 1 and 13 that the CFD overshoots the drag by 20-60%; that gap came from the outdoor data. Caveats: the area of the real deployed chute is unmeasured, and chute masses beyond the common payload are assumed; the over-opened chutes (ov18, ov26) probably have a smaller projected area, so their lower Cd-equivalents are not purely lower drag.
+- Outdoor results are kept as supporting, qualitative evidence with a systematic uncertainty of about 10% and about three times the scatter.
+- A clean way to measure the air offset without going outside: re-drop two of the earlier chutes indoors (0057 and 24-10 if they still exist) at 13 ft and compare with their outdoor speeds.
