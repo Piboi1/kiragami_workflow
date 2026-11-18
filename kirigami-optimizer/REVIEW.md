@@ -420,3 +420,12 @@ Least-squares quadratics on the session means (error bars = 1 standard error; ov
 
 - Inner overlap without in10 (the chute that did not open): points (2.5, 1.164) (4, 1.182) (7.8, 1.194); an exact quadratic (3 points, 0 dof), y = -0.00167 x^2 + 0.02284 x + 1.1173, vertex at 6.8 deg, 1.196 s (0.1% above the best measurement). Within the error bars the vertex is unstable (opens downward in 72% of resamples; median 6.2 deg, 5-95% range 4.9 to 14.9 deg). Practical reading: the curve is almost flat from 2.5 to 7.8 deg; no optimum is resolved.
 - Outer overlap, "flipping the parabola": the fit through (12, 1.122) (18, .975) (26, .925) is a bowl with its minimum at 24.4 deg (0.922 s). Mirroring it (y -> 2*0.922 - y, or any negation) turns the minimum into a maximum at the same 24.4 deg, so it cannot point to a better overlap, and the mirrored curve misses the measurements (0.72 s at 12 deg against 1.122 s measured). It carries no information about where the best outer overlap is. The data say time falls with outer overlap across 7.8-26 deg; the outer optimum, if any, lies below 7.8 deg.
+
+## 24. Addendum: downward-facing (constrained) parabola regression on the outer-overlap points (figure: `exports/outer_overlap_concave_fit.png`)
+
+Least squares for y = a x^2 + b x + c with the constraint a <= 0 (the curve must bend downward):
+
+- (12, 1.122) (18, .975) (26, .925): the unconstrained fit has a > 0 (a bowl, exact through 3 points), so the constrained optimum lies on the boundary a = 0: a straight line, time = 1.262 - 0.0136 x (slope -0.0136 s per degree), misfit SSE 0.0026. No vertex exists.
+- Adding the 7.8 deg level (1.180 s): again a = 0, time = 1.285 - 0.0147 x, SSE 0.0028.
+- Forcing a peak at x_v (best concave parabola with its vertex at x_v): with the 3 points the misfit grows as the peak moves right: SSE 0.0036 (peak far left), 0.0042 (peak at 0 deg), 0.0046 (4 deg), 0.0054 (7.8 deg), 0.0072 (12 deg); peak heights 1.137, 1.112, 1.090, 1.069 s. With the 4 points it grows faster (0.0062 at 0 deg to 0.0177 at 12 deg). At 7.8 deg the forced parabola gives a peak of 1.09-1.13 s while the measured 7.8 deg level is 1.18 s.
+- Reading: the data contain only the falling side of the outer-overlap curve, so no peak position is supported; the least-misfit concave curve is a straight line. A peak below 7.8 deg cannot be located without measurements there.
