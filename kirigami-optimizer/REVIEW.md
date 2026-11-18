@@ -391,3 +391,14 @@ The team watched the drops: the 1.0 deg chute (in10) behaved like plain paper an
 - Reading: stretching of the pattern is gated by the innermost ring. If the first ring's overlap is too small, the centre cannot open and the rest of the sheet stays closed. Between 2.5 and 7.8 deg the innermost overlap no longer matters (1.164-1.194 s). A threshold lies between 1.0 deg (does not open) and 2.5 deg (opens); the first-session 0057 (1.3 deg, best of that session, other drop area) suggests it is between 1.0 and 1.3 deg, but that is not verified within a session.
 - in10 (0.876 s) is therefore an empirical "paper-like" reference for this session. Opening score = (t - 0.876) / (1.18 - 0.876): in25 0.95, in40 1.0, in78 1.05, ov12 0.81, ov18 0.33 (2 trials), ov26 0.16 (2 trials). At outer overlap 18-26 deg the chute is close to paper-like behaviour.
 - The team's 1 deg floor sits exactly on the failure edge; 1.0 deg fails. Safe tested floor: 2.5 deg. A 0057 control re-drop in this drop area would show whether 1.3 deg opens (threshold between 1.0 and 1.3) or not (threshold between 1.3 and 2.5).
+
+## 21. Correction to section 20: ov18 and ov26 over-opened (they are not "closer to paper")
+
+The team observed that ov18 and ov26 opened a lot (too much). Section 20 read their low times as near-paper behaviour and called the score an "opening score"; that reading is wrong for the high-overlap chutes.
+
+- Two failure modes, one on each side of a working window:
+  - too little overlap at the innermost ring (1.0 deg, in10): the pattern barely stretches and falls like paper (0.876 s);
+  - too much outer overlap (18 and 26 deg, ov18/ov26): the pattern opens too much and the chute performs poorly (0.975 s and 0.925 s, two trials each). Likely mechanisms (untested): larger gaps let air through, or the chute elongates and narrows.
+- Working window found so far: innermost overlap about 2.5 deg or more (flat from 2.5 to 7.8 deg: 1.164-1.194 s) and outer overlap at or below roughly 8-12 deg (ov12 1.122 s, already slightly below the 7.8 deg chutes).
+- The "score" in section 20 is a performance index relative to in10 and in78, not an opening measure; do not read it as degree of opening.
+- Not yet tested: the low side of outer overlap (below 7.8 deg with the innermost ring at 2.5 deg or more). That is where the optimum of the outer-overlap curve lies, and the part of the parabola the team wanted that is still missing. The rigid CFD cannot show either failure mode, because it never changes the opened shape.
