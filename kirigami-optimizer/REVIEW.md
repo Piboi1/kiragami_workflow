@@ -450,3 +450,22 @@ Question from the team's whiteboard: the inner-overlap fit peaks at about 6.8 de
 - Combined picture: flat from 7.8 to about 11.5 deg, a knee between 11.5 and 14 deg (0049 at 11.5 deg 1.181 s vs ov12 at 12 deg 1.122 s are 5% apart, so the knee position is uncertain by roughly that much), then a slide reaching the paper-like level (0.876 s) at roughly 28 deg; 0065 at 36.5 deg rescales to 0.838 s.
 - "Inner overlap above 7.8 deg" cannot be separated from outer overlap in practice (raising the inner value above 7.8 deg either inverts the ramp or raises the whole pattern); the uniform-overlap chutes 24-10 (10 deg) and 24-14 (14 deg) are the only data above 7.8 deg inner, and they follow the same curve as the outer-overlap sweep.
 - Caveats: the scale factor rests on one assumption (no chute was dropped in both sessions), 24-10 and 24-14 were rebuilt with assumed non-overlap settings, the 5% scatter above is the practical uncertainty. Closing the gap needs the timed distance of each session, or one chute (for example 0057) dropped in both drop areas.
+
+## 27. Addendum: exact conversion with the real timed distances (supersedes the plateau-anchored scaling in section 26) (figure: `exports/overlap_speed_exact.png`)
+
+Timed distance today (overlap-sweep session): 13 ft = 3.962 m. Earlier session: 4.937 m. Terminal speed = distance / time; Cd-equivalent = 2 m g / (rho v^2 A) with the same assumptions as before (23.8 g, 75 in^2 reference area, rho 1.196), which are assumptions for today's chutes.
+
+| session | chute | time | speed | Cd-equivalent |
+|---|---|---|---|---|
+| today | in10 (paper-like) | 0.876 s | 4.52 m/s | 0.39 |
+| today | in25 / in40 / in78 (plateau) | 1.164 / 1.182 / 1.194 s | 3.40 / 3.35 / 3.32 m/s | 0.70 / 0.72 / 0.73 |
+| today | ov12 / ov18 / ov26 | 1.122 / 0.975 / 0.925 s | 3.53 / 4.06 / 4.28 m/s | 0.65 / 0.49 / 0.44 |
+| earlier | 0057 / 0049 / 24-10 (plateau) | 1.342 / 1.334 / 1.322 s | 3.68 / 3.70 / 3.73 m/s | 0.60 / 0.59 / 0.58 |
+| earlier | 24-14 | 1.150 s | 4.29 m/s | 0.44 |
+| earlier | 0065 | 0.946 s | 5.22 m/s | 0.30 |
+
+- The earlier plateau is 10.3% faster (3.705 m/s) than today's plateau (3.358 m/s). Section 26 had anchored the sessions on equal plateau speed (implied distance 4.37 m); the real distance is 3.96 m, so that assumption forced the plateaus to agree and hid a 10% session-to-session difference (different chute copies, material, testers, payload or air are all possible; not identified). Use about 10% as the cross-session uncertainty.
+- Speed trend today, 12/18/26 deg: v = 2.983 + 0.0523 x; it reaches the paper-like speed (in10, 4.52 m/s) at 29.4 deg (28.3 deg in time units; same conclusion).
+- 0065 (earlier session, outer 36.5 deg) falls at 5.22 m/s, 15% faster than the paper-like chute, and still 4.73 m/s (5% faster) after allowing the 10% session gap: beyond about 29 deg the chute performs at or below the paper-like level.
+- 24-14 at 14 deg (4.29 m/s) sits about 16% above what today's sweep gives at 14 deg (about 3.7 m/s by interpolation): 10% session gap plus a residual of about 5%.
+- Today's plateau Cd-equivalent (0.70-0.73) matches the CFD range (0.70-0.73 at fineness 6), while the earlier session's plateau gives 0.59. This is an observation under the stated mass and area assumptions, not proof the CFD level is right; it needs the real payload and canopy mass of today's chutes and confirmation that 13 ft is the timed segment in the same sense as 4.937 m.
