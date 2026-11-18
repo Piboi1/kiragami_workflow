@@ -511,3 +511,7 @@ Generator numbers for 0057 / in78 (4 cuts, 28 rings, radii 0.69-4.75 in): the ra
 ## 33. Addendum: uniform-overlap test chutes (`exports/uniform_overlap_tests.zip`)
 
 Uniform overlap (inner = outer) on the 0057 layout (28 rings, 4 cuts): 9, 10, 11, 12 and 14 deg, plus a theory chute whose overlap falls from 6.7 to 2.2 deg so the overlap region is about square on every ring (arc/pitch 0.85-1.21). All DXFs validated (112 arcs, 10 x 10 in, no clamping). Predicted indoor times (13 ft) from the section 30 lines: 9 deg 1.20 s, 10 deg 1.17 s, 11 deg 1.13 s, 12 deg 1.09 s, 14 deg 1.02 s (about +-0.05 s); no prediction for the square chute.
+
+## 34. Addendum: final test set decided by the team (`exports/final_test_set.zip`)
+
+Uniform overlap 9, 10, 11, 12 and 13 deg (28 rings, 4 cuts; 13 deg added now, all DXFs validated, no clamping), the 13-ring 45 deg chute, and in78 (uniform 7.8 deg) as control. Predicted indoor times from the section 30 lines: 1.20, 1.17, 1.13, 1.09, 1.06 s (about +-0.05 s). With 8 trials per chute (indoor per-trial sd 0.028 s) the trend over the five uniform chutes is measured to about +-0.004 s per degree against an expected -0.038 s per degree; neighbouring chutes 1 deg apart are not separable one by one (difference uncertainty 0.014 s against 0.038 s expected).
